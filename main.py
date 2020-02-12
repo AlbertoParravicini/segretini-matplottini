@@ -63,9 +63,16 @@ if __name__ == "__main__":
     # Set style and fonts ########
     ##############################
     
-    # Do this at the very beginning, they are stored in the current session;
+    # Do this at the very beginning, they are stored in the current session.
+    # If using a kernel/notebook, restoring default values require restaring the kernel;
     sns.set_style("white")
     plt.rcParams["font.family"] = ["Latin Modern Roman Demi"]
+    
+    # Hard-coded padding values, use with care for precise formatting;
+    plt.rcParams['axes.titlepad'] = 25 
+    plt.rcParams['axes.labelpad'] = 10 
+    plt.rcParams['axes.titlesize'] = 22 
+    plt.rcParams['axes.labelsize'] = 14 
     
     # After installing new fonts, use matplotlib.font_manager._rebuild() to make them available;
 
@@ -79,7 +86,7 @@ if __name__ == "__main__":
     # Option 2: create a new figure, then create a GridSpec to create multiple subplots;
     num_col = 2
     num_row = 3
-    fig = plt.figure(figsize=(4.7 * num_col, 3.4 * num_row))
+    fig = plt.figure(figsize=(4 * num_col, 3 * num_row))
     gs = gridspec.GridSpec(num_row, num_col)
     ax = fig.add_subplot(gs[1 % num_row, 1 // num_row])
     
@@ -89,6 +96,7 @@ if __name__ == "__main__":
     # Adjust plot margins ########
     ##############################
     
+    # These settings affect the current figure;
     plt.subplots_adjust(top=0.90,  # Max is 1
                         bottom=0.04,  # Min is 0 
                         left=0.08,  # Min is 0
@@ -98,6 +106,9 @@ if __name__ == "__main__":
     
     # Despine plot;
     sns.despine(ax=ax, top=True, right=True)
+    
+    # Enable horizontal grid lines;
+    ax.grid(axis='y')
     
     #%%
     
@@ -149,7 +160,9 @@ if __name__ == "__main__":
     labels = ["r1", "r2", "r3"]
     # Create "colors" for the legend;
     custom_lines = [Patch(facecolor=COLORS[x], edgecolor="#2f2f2f", label=x) for x in labels]    
-    # Create the legend;
+    # Create the legend. Note that the legend is positioned using the figure percentage (in this case, top-right corner),
+    #   which is better for plots with many subplots;
+    # Use ax.legend(...) to create a legend relative to the current axis;
     leg = fig.legend(custom_lines, labels, bbox_to_anchor=(1, 1), fontsize=14, title_fontsize=12)
     leg.set_title("My Custom Legend")
     leg._legend_box.align = "left"
@@ -161,13 +174,46 @@ if __name__ == "__main__":
     leg.set_title("My Custom Legend, 2")
     leg._legend_box.align = "left"
     
-    # Set legend title;
+    # Set legend title. Use an if-statement as we are accessing the axis legend,
+    #   which might not exist in these examlples;
     if ax.get_legend():
         ax.get_legend().set_title("My Legend")
         # Manually modify legend titles;
         for t in ax.get_legend().texts:
             t.set_text(t.get_text().upper())
+            
+    #%%
+
+    ##############################
+    # Set axis limits ############
+    ##############################       
+            
+    # Get/set axis limits. 
+    # Better do it after plotting, as values might be overwritten by the plotting function;
+    ax.set_ylim((0, ax.get_ylim()[1]))
     
+    
+    #%% 
+    
+    ##############################
+    # Annotations ################
+    ############################## 
+    
+    # More info: https://matplotlib.org/api/_as_gen/matplotlib.pyplot.annotate.html
+    
+    # By default, "xy" is given in "data" coordinates, useful to annotate specific values in the plot.
+    # "textcoords" can be "offset points" or "offset pixels", and is used to move a little bit the text from 
+    #   the corresponding point;
+    ax.annotate("Annotation text",
+                xy=(100, 200), fontsize=10,
+                textcoords="offset points", xytext=(5, 10))
+    # The annotation uses percentage-based axis coordinates. 
+    # Useful to add titles/labels to subplots. 
+    # Using "figure fraction" uses percentage-based figure coordinates, 
+    #   useful to add precise titles to the plot;
+    ax.annotate("Annotation text 2",
+                xy=(0, 1), xycoords="axes fraction", fontsize=14, textcoords="offset points", xytext=(-30, 20),
+                horizontalalignment="left", verticalalignment="center")
     
     
     

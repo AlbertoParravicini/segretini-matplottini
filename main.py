@@ -130,6 +130,18 @@ if __name__ == "__main__":
     ##############################
     # Axis ticks and labels ######
     ##############################
+    
+    # Add some random data to a plot;
+    fig, ax = plt.subplots()
+    x = np.linspace(0, 2 * np.pi, 100)
+    y = np.sin(x)
+    ax.scatter(x, y)
+    
+    # Manually modify ticks. 
+    # This sometimes doesn't work (usually, if the x-axis is continuous instead of discrete);
+    xlabels = [f"{str(x).upper()}" for x in ax.get_xticklabels()]
+    # Rotate ticks by 45 degrees, and right-align them for correct visualization;
+    ax.set_xticklabels(labels=xlabels, rotation=45, ha="right")
 
     # Set percentage-based tick labels;    
     ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{int(100 * x)}%"))
@@ -138,12 +150,7 @@ if __name__ == "__main__":
     # Other formatters: 
     #   * https://matplotlib.org/3.1.1/gallery/ticks_and_spines/tick-formatters.html
     #   * https://matplotlib.org/3.1.1/api/ticker_api.html
-    
-    # Manually modify ticks. 
-    # This sometimes doesn't work (usually, if the x-axis is continuous instead of discrete);
-    xlabels = [f"{str(x).upper()}" for x in ax.get_xticklabels()]
-    # Rotate ticks by 45 degrees, and right-align them for correct visualization;
-    ax.set_xticklabels(labels=xlabels, rotation=45, ha="right")
+
     # Modify ticks parameters;
     ax.tick_params(axis='x', which='major', labelsize=12)
     
@@ -170,7 +177,7 @@ if __name__ == "__main__":
     # Another legend, using dots instead of rectangles to denote colors;
     custom_lines = [Line2D([0], [0], marker='o', color="w", label="Label 1", markerfacecolor=COLORS["c1"], markersize=15),
                     Line2D([0], [0], marker='o', color="w", label="Label 2", markerfacecolor=COLORS["c2"], markersize=15)]    
-    leg = fig.legend(custom_lines, ["Label 1", "Label 2"], bbox_to_anchor=(0.8, 1), fontsize=14, title_fontsize=12)
+    leg = fig.legend(custom_lines, ["Label 1", "Label 2"], bbox_to_anchor=(1, 0.7), fontsize=14, title_fontsize=12)
     leg.set_title("My Custom Legend, 2")
     leg._legend_box.align = "left"
     
@@ -215,9 +222,20 @@ if __name__ == "__main__":
                 xy=(0, 1), xycoords="axes fraction", fontsize=14, textcoords="offset points", xytext=(-30, 20),
                 horizontalalignment="left", verticalalignment="center")
     
+    #%% 
     
+    ##############################
+    # Save plot ##################
+    ############################## 
     
-    
+    save_folder = "plots"
+    if not os.path.exists(save_folder):
+        os.mkdir(save_folder)
+        
+    # Use "pdf" or "png". The "dpi" setting is only relevant for "png";
+    extension = "pdf"
+    plt.savefig(f"plots/test.{extension}", dpi=200)
+
     
     
     

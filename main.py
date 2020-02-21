@@ -7,20 +7,15 @@ Created on Wed Feb 12 14:42:20 2020
 """
 
 import os
-import pandas as pd
-from collections import defaultdict
 
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt 
 import matplotlib.gridspec as gridspec
-import matplotlib.lines as lines
-from matplotlib.patches import Patch, Rectangle
 from matplotlib.lines import Line2D
 from matplotlib.colors import LinearSegmentedColormap
-from matplotlib.colors import ListedColormap
 import matplotlib.ticker as ticker
-
+from plot_utils import *
 
 # Define some colors for later use.
 # Tool to create paletters: https://color.adobe.com/create

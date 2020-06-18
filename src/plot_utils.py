@@ -11,6 +11,60 @@ import pandas as pd
 import matplotlib.pyplot as plt 
 import numpy as np
 
+##############################
+# Colors #####################
+##############################
+
+# Define some colors for later use.
+# Tool to create paletters: https://color.adobe.com/create
+# Guide to make nice palettes: https://earthobservatory.nasa.gov/blogs/elegantfigures/2013/08/05/subtleties-of-color-part-1-of-6/
+COLORS = dict(
+    
+    
+
+    
+    c1 = "#b1494a",
+    c2 = "#256482",
+    c3 = "#2f9c5a",
+    c4 = "#28464f",
+    
+    r1 = "#FA4D4A",
+    r2 = "#FA3A51",
+    r3 = "#F41922",
+    r4 = "#CE1922",
+    r5 = "#F07B71",
+    r6 = "#F0A694",
+    
+    b1 = "#97E6DB",
+    b2 = "#C6E6DB",
+    b3 = "#CEF0E4",
+    b4 = "#9CCFC4",
+    b5 = "#AEDBF2",
+    b6 = "#B0E6DB",
+    b7 = "#B6FCDA",
+    b8 = "#7bd490",
+    
+    # Another blue-green palette;
+    bb0 = "#FFA685",
+    bb1 = "#75B0A2",
+    bb2 = "#CEF0E4",  # Same as b3; 
+    bb3 = "#B6FCDA",  # Same as b7;
+    bb4 = "#7ED7B8",
+    bb5 = "#7BD490",
+    
+    y1 = "#FFA728",
+    y2 = "#FF9642",
+    y3 = "#FFAB69",
+    
+    bt1 = "#55819E",
+    bt2 = "#538F6F",
+    blue_klein = "#002fa7",
+    )
+
+##############################
+# Functions ##################
+##############################
+
 def get_exp_label(val) -> str: 
     """
     :param val: numeric label to format
@@ -22,7 +76,7 @@ def get_exp_label(val) -> str:
     # Get the power of 10
     exp_val = 0
     remaining_val = val
-    while (remaining_val % 10 == 0):
+    while (remaining_val % 10 == 0 and remaining_val > 0):
         exp_val += 1
         remaining_val = remaining_val // 10
     if remaining_val > 1:
@@ -67,7 +121,7 @@ def compute_speedup(X: pd.DataFrame, col_slow: str, col_fast: str, col_speedup: 
     X[col_speedup] = X[col_slow] / X[col_fast]
     
     
-def get_upper_ci_size(x, ci=0.95):
+def get_ci_size(x, ci=0.95):
     """
     :param x: a sequence of numerical data, iterable
     :param ci: confidence interval to consider
@@ -80,9 +134,14 @@ def get_upper_ci_size(x, ci=0.95):
     mean = np.mean(x)
     ci_lower, ci_upper = st.t.interval(ci, len(x) - 1, loc=mean, scale=st.sem(x))
     return ci_upper - mean, mean - ci_lower, mean
+
+
+def get_upper_ci_size(x, ci=0.95):
+    return get_ci_size(x, ci)[0]
     
     
-def add_labels(ax: plt.Axes, labels: list=None, vertical_offsets: list=None, patch_num: list=None, fontsize: int=14, rotation: int=0):
+def add_labels(ax: plt.Axes, labels: list=None, vertical_offsets: list=None, patch_num: list=None, fontsize: int=14, rotation: int=0,
+               skip_zero: bool=False, format_str: str="{:.2f}x", label_color: str="#2f2f2f"):
     """
     :param ax: current axis, it is assumed that each ax.Patch is a bar over which we want to add a label
     :param labels: optional labels to add. If not present, add the bar height
@@ -91,13 +150,17 @@ def add_labels(ax: plt.Axes, labels: list=None, vertical_offsets: list=None, pat
     :param patch_num: indices of patches to which we add labels, if some of them should be skipped
     :param fontsize: size of each label
     :param rotation: rotation of the labels (e.g. 90°)
+    :param skip_zero: if True, don't put a label over the first bar
+    :param format_str: format of each label, by default use speedup (e.g. 2.10x)
+    :param label_color: hexadecimal color used for labels
         
     Used to add labels above barplots;
     """
     if not vertical_offsets:
-        vertical_offsets = [0] * len(ax.patches)
+        # 5% above each bar, by default;
+        vertical_offsets = [ax.get_ylim()[1] * 0.05] * len(ax.patches)
     if not labels:
-        labels = ["{:.2f}".format(p.get_height()) for p in ax.patches]
+        labels = [p.get_height() for p in ax.patches]
     patches = []
     if not patch_num:
         patches = ax.patches
@@ -105,12 +168,10 @@ def add_labels(ax: plt.Axes, labels: list=None, vertical_offsets: list=None, pat
         patches = [p for i, p in enumerate(ax.patches) if i in patch_num]
     
     # Iterate through the list of axes' patches
-    lab_num = 0
-    for p in patches:
-        if labels[lab_num]:
-            ax.text(p.get_x() + p.get_width()/2., vertical_offsets[lab_num] + p.get_height(), "{:.2f}x".format(labels[lab_num]), 
-                    fontsize=fontsize, color="#2f2f2f", ha='center', va='bottom', rotation=rotation)
-        lab_num += 1
+    for i, p in enumerate(patches):
+        if labels[i] and (i > 0 or not skip_zero):
+            ax.text(p.get_x() + p.get_width()/2., vertical_offsets[i] + p.get_height(), format_str.format(labels[i]), 
+                    fontsize=fontsize, color=label_color, ha='center', va='bottom', rotation=rotation)
         
 
 def update_width(ax: plt.Axes, width: float=1):

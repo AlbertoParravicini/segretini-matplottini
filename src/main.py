@@ -17,39 +17,6 @@ from matplotlib.colors import LinearSegmentedColormap
 import matplotlib.ticker as ticker
 from plot_utils import *
 
-# Define some colors for later use.
-# Tool to create paletters: https://color.adobe.com/create
-# Guide to make nice palettes: https://earthobservatory.nasa.gov/blogs/elegantfigures/2013/08/05/subtleties-of-color-part-1-of-6/
-COLORS = dict(
-    c1 = "#b1494a",
-    c2 = "#256482",
-    c3 = "#2f9c5a",
-    c4 = "#28464f",
-    
-    r4 = "#CE1922",
-    r3 = "#F41922",
-    r2 = "#FA3A51",
-    r1 = "#FA4D4A",
-    r5 = "#F07B71",
-    r6 = "#F0A694",
-    
-    b1 = "#97E6DB",
-    b2 = "#C6E6DB",
-    b3 = "#CEF0E4",
-    b4 = "#9CCFC4",
-    b5 = "#AEDBF2",
-    b6 = "#B0E6DB",
-    b7 = "#B6FCDA",
-    b8 = "#7bd490",
-    
-    y1 = "#FFA728",
-    y2 = "#FF9642",
-    y3 = "#FFAB69",
-    
-    bt1 = "#55819E",
-    bt2 = "#538F6F",
-    )
-
 
 #%%
 if __name__ == "__main__":
@@ -105,6 +72,9 @@ if __name__ == "__main__":
     # Enable horizontal grid lines;
     ax.grid(axis='y')
     
+    # Set the number of ticks on the y axis;
+    ax.yaxis.set_major_locator(plt.MaxNLocator(5))
+    
     #%%
     
     ##############################
@@ -145,6 +115,9 @@ if __name__ == "__main__":
     # Other formatters: 
     #   * https://matplotlib.org/3.1.1/gallery/ticks_and_spines/tick-formatters.html
     #   * https://matplotlib.org/3.1.1/api/ticker_api.html
+    
+    # Use exponential notation for labels (requires to know the labels!);
+    # ax.set_xticklabels(labels=[get_exp_label(l) for l in labels], rotation=45, ha="right", fontsize=15)
 
     # Modify ticks parameters;
     ax.tick_params(axis='x', which='major', labelsize=12)
@@ -172,8 +145,8 @@ if __name__ == "__main__":
     # Another legend, using dots instead of rectangles to denote colors;
     custom_lines = [Line2D([0], [0], marker='o', color="w", label="Label 1", markerfacecolor=COLORS["c1"], markersize=15),
                     Line2D([0], [0], marker='o', color="w", label="Label 2", markerfacecolor=COLORS["c2"], markersize=15)]    
-    leg = fig.legend(custom_lines, ["Label 1", "Label 2"], bbox_to_anchor=(1, 0.7), fontsize=14, title_fontsize=12)
-    leg.set_title("My Custom Legend, 2")
+    leg = fig.legend(custom_lines, ["Label 1", "Label 2"], bbox_to_anchor=(1, 0.7), fontsize=14, title_fontsize=12, ncol=2)
+    leg.set_title("My Custom Legend, 2", prop={"size": 18})
     leg._legend_box.align = "left"
     
     # Set legend title. Use an if-statement as we are accessing the axis legend,

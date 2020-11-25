@@ -44,7 +44,6 @@ def load_data(path):
 
 def ridgeplot(res):
     # Plotting setup;
-    sns.set(font_scale=1.4)
     sns.set_style("whitegrid")
     plt.rcParams["font.family"] = ["Latin Modern Roman"]
     plt.rcParams['axes.titlepad'] = 20 

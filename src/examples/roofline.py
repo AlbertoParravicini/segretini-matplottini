@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-
 Created on Wed Nov 25 12:43:36 2020
 
 Plot a Roofline model of the performance of one or more algorithms w.r.t. a target architecture;

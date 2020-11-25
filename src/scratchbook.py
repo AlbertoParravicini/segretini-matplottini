@@ -3,6 +3,11 @@
 """
 Created on Wed Feb 12 14:42:20 2020
 
+This file contains a collection of common settings to setup plots 
+or adjust small formatting details.
+If you don't remember how to add a legend or update tick labels or change font,
+this is a good place to start your search; 
+
 @author: aparravi
 """
 
@@ -14,7 +19,9 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib.lines import Line2D
 from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.patches import Patch
 import matplotlib.ticker as ticker
+
 from plot_utils import *
 
 
@@ -27,31 +34,36 @@ if __name__ == "__main__":
     
     # Do this at the very beginning, they are stored in the current session.
     # If using a kernel/notebook, restoring default values require restaring the kernel;
-    sns.set_style("white")
+   
+    # Specify seaborn style, and add tick marks to y and x axis (left and bottom);
+    sns.set_style("white", {"ytick.left": True, "xtick.bottom": True})
+    # Set the default font to Latin Modern Demi (very readable for papers!);
     plt.rcParams["font.family"] = ["Latin Modern Roman Demi"]
-    
-    # Hard-coded padding values, use with care for precise formatting;
-    plt.rcParams['axes.titlepad'] = 25 
-    plt.rcParams['axes.labelpad'] = 10 
-    plt.rcParams['axes.titlesize'] = 22 
-    plt.rcParams['axes.labelsize'] = 14 
-    
     # After installing new fonts, use matplotlib.font_manager._rebuild() to make them available;
+
+    # Hard-coded padding values, use with care for precise formatting;
+    plt.rcParams['axes.titlepad'] = 25  # Title padding;
+    plt.rcParams['axes.labelpad'] = 10  # Padding of axis labels;
+    plt.rcParams['axes.titlesize'] = 22  # Title size, it's better to override it when adding the title;
+    plt.rcParams['axes.labelsize'] = 14  # Label size of axis, you should also override it;
+    plt.rcParams['hatch.linewidth'] = 0.3  # Size of hatches in bars;    
 
     ##############################
     # Creating new plots #########
     ##############################
     
     # Option 1: create a new figure and axis by hand;
+    # Note: this will not have the style set using sns.set_style()!
     fig, ax = plt.subplots()
+    # plt.close(fig)  # Close the figure so it's not displayed;
     
-    # Option 2: create a new figure, then create a GridSpec to create multiple subplots;
+    # Option 2: create a new figure, then create a GridSpec to create multiple subplots.
+    # This has the style specified with sns.set_style()
     num_col = 2
     num_row = 3
     fig = plt.figure(figsize=(4 * num_col, 3 * num_row))
     gs = gridspec.GridSpec(num_row, num_col)
-    ax = fig.add_subplot(gs[1 % num_row, 1 // num_row])
-    
+    ax = fig.add_subplot(gs[1 % num_row, 1 // num_row])  # [row number, column number]
     # Other options: create it directly using e.g. ax = sns.lineplot(...) or fig = sns.catplot(...)
     
     ##############################
@@ -66,14 +78,25 @@ if __name__ == "__main__":
                         hspace=0.7,  # Vertical space (height)
                         wspace=0.6)  # Horizontal space (width)
     
-    # Despine plot;
+    # Despine plot (i.e. delete bars top and right);
     sns.despine(ax=ax, top=True, right=True)
     
+    # I don't like despined plots;
+    sns.despine(ax=ax, top=False, right=False)
     # Enable horizontal grid lines;
     ax.grid(axis='y')
     
     # Set the number of ticks on the y axis;
     ax.yaxis.set_major_locator(plt.MaxNLocator(5))
+    # This also works;
+    ax.yaxis.set_major_locator(plt.LinearLocator(5))
+    
+    # Set axes to log-scale;
+    plt.yscale("log")
+    plt.xscale("log")
+    # Set back to linear scale;
+    plt.yscale("linear")
+    plt.xscale("linear")
     
     #%%
     
@@ -90,6 +113,10 @@ if __name__ == "__main__":
     colors = [cm(x) for x in np.linspace(0, 1, 10)]
     sns.palplot(colors)
     
+    # Obtain the same palette in grayscale;
+    grayscale_colors = [hex_color_to_grayscale(c) for c in colors]
+    sns.palplot(grayscale_colors)
+    
     #%%
     
     ##############################
@@ -97,14 +124,17 @@ if __name__ == "__main__":
     ##############################
     
     # Add some random data to a plot;
-    fig, ax = plt.subplots()
+    fig = plt.figure(figsize=(2, 2))
+    gs = gridspec.GridSpec(1, 1)
+    ax = fig.add_subplot(gs[0, 0])
     x = np.linspace(0, 2 * np.pi, 100)
     y = np.sin(x)
     ax.scatter(x, y)
+    ax.grid(axis='y')
     
     # Manually modify ticks. 
     # This sometimes doesn't work (usually, if the x-axis is continuous instead of discrete);
-    xlabels = [f"{str(x).upper()}" for x in ax.get_xticklabels()]
+    xlabels = [f"{str(x._text).upper()}" for x in ax.get_xticklabels()]
     # Rotate ticks by 45 degrees, and right-align them for correct visualization;
     ax.set_xticklabels(labels=xlabels, rotation=45, ha="right")
 
@@ -120,7 +150,7 @@ if __name__ == "__main__":
     # ax.set_xticklabels(labels=[get_exp_label(l) for l in labels], rotation=45, ha="right", fontsize=15)
 
     # Modify ticks parameters;
-    ax.tick_params(axis='x', which='major', labelsize=12)
+    ax.tick_params(axis='x', which='major', labelsize=12, pad=2)
     
     # Set axis label;
     ax.set_xlabel("X Axis", fontsize=12)
@@ -187,7 +217,8 @@ if __name__ == "__main__":
     # Using "figure fraction" uses percentage-based figure coordinates, 
     #   useful to add precise titles to the plot;
     ax.annotate("Annotation text 2",
-                xy=(0, 1), xycoords="axes fraction", fontsize=14, textcoords="offset points", xytext=(-30, 20),
+                xy=(0, 1), xycoords="axes fraction", fontsize=14,
+                textcoords="offset points", xytext=(-30, 20),
                 horizontalalignment="left", verticalalignment="center")
     
     #%% 
@@ -202,7 +233,7 @@ if __name__ == "__main__":
         
     # Use "pdf" or "png". The "dpi" setting is only relevant for "png";
     extension = "pdf"
-    plt.savefig(f"plots/test.{extension}", dpi=200)
+    plt.savefig(f"../plots/test.{extension}", dpi=200)
 
     
     

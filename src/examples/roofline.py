@@ -29,7 +29,7 @@ from plot_utils import *
 SCATTER_SIZE = 14
 
 MARKERS = ["o", "X", "D", "P"]
-PALETTE = [COLORS["peach1"], COLORS["g3"], COLORS["bb4"], COLORS["bb5"]] 
+PALETTE = [COLORS["peach1"], COLORS["g2"], COLORS["bb4"], COLORS["bb5"]] 
 
 
 def setup_plot():

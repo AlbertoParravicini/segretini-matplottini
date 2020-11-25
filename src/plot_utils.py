@@ -61,9 +61,8 @@ COLORS = dict(
     peach1 = "#FF9868",
     peach2 = "#fab086",
     
-    g1 = "#fab086",
-    g2 = "#A2F2B1",
-    g3 = "#A5E6C6",
+    g1 = "#A2F2B1",
+    g2 = "#A5E6C6",
     
     bt1 = "#55819E",
     bt2 = "#538F6F",

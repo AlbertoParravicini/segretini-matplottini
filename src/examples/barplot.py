@@ -12,7 +12,10 @@ import matplotlib.gridspec as gridspec
 import pandas as pd
 import numpy as np
 import matplotlib.ticker as ticker
-from plot_utils import COLORS, get_upper_ci_size, add_labels
+
+import sys
+sys.path.append("..")
+from plot_utils import *
 
 
 def barplot(res: pd.DataFrame) -> plt.Figure:
@@ -25,7 +28,6 @@ def barplot(res: pd.DataFrame) -> plt.Figure:
     Parameters
     ----------
     res : a pandas DataFrame
-        DESCRIPTION.
 
     Returns
     -------
@@ -122,4 +124,4 @@ if __name__ == "__main__":
     # Run this script from the "src" folder;
     res = pd.read_csv("../data/barplot_data.csv")    
     fig = barplot(res)          
-    plt.savefig(f"../plots/barplot.pdf")
+    plt.savefig(f"../../plots/barplot.pdf")

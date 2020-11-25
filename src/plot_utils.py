@@ -147,7 +147,8 @@ def add_labels(ax: plt.Axes, labels: list=None, vertical_offsets: list=None,
                skip_zero: bool=False, format_str: str="{:.2f}x",
                label_color: str="#2f2f2f", max_only=False,
                skip_bars: int=0, max_bars: int=None,
-               skip_value: float=None, skip_threshold: float=1e-6):
+               skip_value: float=None, skip_threshold: float=1e-6,
+               skip_nan_bars: bool=True):
     """
     :param ax: current axis, it is assumed that each ax.Patch is a bar over which we want to add a label
     :param labels: optional labels to add. If not present, add the bar height
@@ -164,6 +165,7 @@ def add_labels(ax: plt.Axes, labels: list=None, vertical_offsets: list=None,
     :param max_bars: don't add labels after the specified bar
     :param skip_value: don't add labels equal to the specified value
     :param skip_threshold: threshold used to determine if a label is 1 or 0
+    :param skip_nan_bars: if True, skip bars with NaN height when placing labels;
     Used to add labels above barplots;
     """
     if not vertical_offsets:
@@ -178,6 +180,9 @@ def add_labels(ax: plt.Axes, labels: list=None, vertical_offsets: list=None,
         patches = ax.patches
     else:
         patches = [p for i, p in enumerate(ax.patches) if i in patch_num]
+    if skip_nan_bars:
+        labels = [l for l in labels if not pd.isna(l)]
+        patches = [p for p in patches if not pd.isna(p.get_height())]
     
     # Iterate through the list of axes' patches
     for i, p in enumerate(patches[skip_bars:max_bars]):

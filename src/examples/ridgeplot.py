@@ -15,8 +15,11 @@ import matplotlib.pyplot as plt
 import scipy.stats as st
 from matplotlib.patches import Patch
 import matplotlib.ticker as ticker
-from plot_utils import *
 import os
+
+import sys
+sys.path.append("..")
+from plot_utils import *
 
 PALETTE = [COLORS["peach2"], COLORS["g1"]]
 

@@ -69,6 +69,8 @@ COLORS = dict(
     blue_klein = "#002fa7",
     )
 
+# Pastel-tint palette from dark blue to red;
+PALETTE_1 = ["#4C9389", "#60b1b0", "#8fd4d4", "#9BD198", "#EFE8AC", "#f9af85", "#f59191"]
 
 ##################################
 # Utility functions for plotting #
@@ -81,7 +83,7 @@ def hex_color_to_grayscale(c):
     return to_hex(hsv_to_rgb(new_c))
 
 
-def get_exp_label(val, prefix="", decimal_remaining_val: bool=False) -> str: 
+def get_exp_label(val, prefix="", decimal_remaining_val: bool=False, tens_only=True, from_string=False, decimal_places=2) -> str: 
     """
     :param val: numeric label to format
     :return: label formatted in scientific notation
@@ -89,22 +91,29 @@ def get_exp_label(val, prefix="", decimal_remaining_val: bool=False) -> str:
     Format a label in scientific notation, using Latex math font.
     For example, 10000 -> 10^4;
     """
-    # Get the power of 10
-    exp_val = 0
-    remaining_val = int(val)
-    while (remaining_val % 10 == 0 and remaining_val > 0):
-        exp_val += 1
-        remaining_val = remaining_val // 10
-    if remaining_val > 1 and exp_val >= 1:
-        if decimal_remaining_val and remaining_val > 0:
-            return r"$\mathdefault{" + prefix + str(remaining_val / 10) + r"\!·\!{10}^{" + str(exp_val + 1) + r"}}$"
+    if not from_string:
+        # Get the power of 10
+        exp_val = 0
+        remaining_val = int(val)
+        while ((remaining_val % 10 == 0 if tens_only else remaining_val > 1) and remaining_val > 0):
+            exp_val += 1
+            remaining_val = remaining_val // 10
+        if remaining_val > 1 and exp_val >= 1:
+            if decimal_remaining_val and remaining_val > 0:
+                return r"$\mathdefault{" + prefix + str(remaining_val / 10) + r"\!·\!{10}^{" + str(exp_val + 1) + r"}}$"
+            else:
+                return r"$\mathdefault{" + prefix + str(remaining_val) + r"\!·\!{10}^{" + str(exp_val) + r"}}$"
+        elif remaining_val > 1 and exp_val == 0:
+            print(val)
+            return r"$\mathdefault{" + prefix + str(val) + r"}$"
         else:
-            return r"$\mathdefault{" + prefix + str(remaining_val) + r"\!·\!{10}^{" + str(exp_val) + r"}}$"
-    elif remaining_val > 1 and exp_val == 0:
-        print(val)
-        return r"$\mathdefault{" + prefix + str(val) + r"}$"
+            return r"$\mathdefault{" + prefix + r"{10}^{" + str(exp_val) + r"}}$"
     else:
-        return r"$\mathdefault{" + prefix + r"{10}^{" + str(exp_val) + r"}}$"
+        string = "{:.{prec}E}".format(val, prec=decimal_places)
+        decimal_part = float(string.split("E")[0])
+        sign = string.split("E")[1][0]
+        exponent = int(string.split("E")[1][1:])
+        return r"$\mathdefault{" + prefix + str(decimal_part) + r"\!·\!{10}^{" + (sign if sign == "-" else "") + str(exponent) + r"}}$"
     
 
 def fix_label_length(labels: list, max_length: int=20) -> list:

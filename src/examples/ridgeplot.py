@@ -59,17 +59,17 @@ def ridgeplot(res):
     
     x_lim = (0.7, 1.3)
     
-    # Initializethe plot;
-    g = sns.FacetGrid(res_tot, row="kernel_group", hue="kernel", aspect=8, height=1, palette=["#2f2f2f"], sharey=False, col="group")
+    # Initializethe plot. We need to set "hue=kernel" to use the "kernel" field below, to map names to the label in each plot;
+    g = sns.FacetGrid(res, row="kernel_group", hue="kernel", aspect=8, height=1, palette=["#2f2f2f"], sharey=False, col="group")
 
     # Plot a vertical line corresponding to speedup = 1;
     g.map(plt.axvline, x=1, lw=0.75, clip_on=True, zorder=0, linestyle="--", ymax=0.8)         
     # Plot the densities. Plot them twice as the second time we plot just the black contour.
     # "cut" removes values above the threshold; clip=x_lim avoids plotting values outside the margins;
-    g.map(sns.kdeplot, "time_u_k_ms", clip_on=False, clip=x_lim, shade=True, alpha=0.8, lw=1, bw=0.25, color=PALETTE[0], zorder=2, cut=10)  
-    g.map(sns.kdeplot, "time_m_k_ms", clip_on=False, clip=x_lim, shade=True, alpha=0.8, lw=1, bw=0.25, color=PALETTE[1], zorder=3, cut=10)
-    g.map(sns.kdeplot, "time_u_k_ms", clip_on=False, clip=x_lim, color="#5f5f5f", lw=1.5, bw=0.25, zorder=2, cut=10)
-    g.map(sns.kdeplot, "time_m_k_ms", clip_on=False, clip=x_lim, color="#5f5f5f", lw=1.5, bw=0.25, zorder=3, cut=10)
+    g.map(sns.kdeplot, "time_u_k_ms", clip_on=False, clip=x_lim, shade=True, alpha=0.8, lw=1, bw_adjust=0.25, color=PALETTE[0], zorder=2, cut=10)  
+    g.map(sns.kdeplot, "time_m_k_ms", clip_on=False, clip=x_lim, shade=True, alpha=0.8, lw=1, bw_adjust=0.25, color=PALETTE[1], zorder=3, cut=10)
+    g.map(sns.kdeplot, "time_u_k_ms", clip_on=False, clip=x_lim, color="#5f5f5f", lw=1.5, bw_adjust=0.25, zorder=2, cut=10)
+    g.map(sns.kdeplot, "time_m_k_ms", clip_on=False, clip=x_lim, color="#5f5f5f", lw=1.5, bw_adjustbw=0.25, zorder=3, cut=10)
     # Plot the horizontal line below the densities;
     g.map(plt.axhline, y=0, lw=1, clip_on=False, zorder=4)
     

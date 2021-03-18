@@ -3,6 +3,7 @@ A collection of useful matplolib/seaborn tips &amp; tricks collected over years 
 
 ## Repository Structure
 * `src/scratchbook.py` contains common commands used to setup plots: creating plots, customizing tick labels, adding custom legends, etc. If you don't remember how to customize some part of your plot, this is a good starting point.
+* `src/plot_utils.py` contains many useful functions commonly used during plotting, along with nice colors and palettes. Among these functions, some are useful when plotting (for example, to add speedup labels above bars or writing nice labels with exponential notation), while other are useful for data preprocessing (removing outliers, computing speedups).
 * `src/examples` contains different custom plots. Some are ready-made (like `roofline.py`) and can be used like standard `seaborn` plots. Other examples (like `barplot_2`) are much more complex: look at them if you are trying to replicate some complex feature, like having separate bar groups or adding fancy custom annotations.
 * `data` contains files used for plots. For the most part, you can ignore it.
 * `plots` is where all the plots are stored. If you find something you like, the code to replicate it is in `src/examples`.

@@ -32,6 +32,9 @@ if __name__ == "__main__":
     # Set style and fonts ########
     ##############################
     
+    # Reset all values to default, always a good practice when changing global values using "sns.set_style" and "plt.rcParams";
+    plt.rcdefaults()
+    
     # Do this at the very beginning, they are stored in the current session.
     # If using a kernel/notebook, restoring default values require restaring the kernel;
    

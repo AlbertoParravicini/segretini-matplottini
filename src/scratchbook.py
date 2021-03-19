@@ -116,6 +116,9 @@ if __name__ == "__main__":
     colors = [cm(x) for x in np.linspace(0, 1, 10)]
     sns.palplot(colors)
     
+    # Manipulate HLS values of color;
+    new_color = sns.set_hls_values("#DEDEDE", h=0.2, l=0.3, s=0.4)
+    
     # Obtain the same palette in grayscale;
     grayscale_colors = [hex_color_to_grayscale(c) for c in colors]
     sns.palplot(grayscale_colors)

@@ -30,6 +30,8 @@ SCATTER_SIZE = 14
 MARKERS = ["o", "X", "D", "P"]
 PALETTE = [COLORS["peach1"], COLORS["g2"], COLORS["bb4"], COLORS["bb5"]] 
 
+##############################
+##############################
 
 def setup_plot():
     """
@@ -231,6 +233,8 @@ def roofline(performance: list, operational_intensity: list,
     
     return ax
     
+##############################
+##############################
 
 if __name__ == "__main__":
     

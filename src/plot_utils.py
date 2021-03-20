@@ -72,6 +72,12 @@ COLORS = dict(
 # Pastel-tint palette from dark blue to red;
 PALETTE_1 = ["#4C9389", "#60b1b0", "#8fd4d4", "#9BD198", "#EFE8AC", "#f9af85", "#f59191"]
 
+# Palette of green tones, light to dark;
+PALETTE_G = ["#AEE69C", "#96DE9B", "#73BD8E", "#66B784", "#469E94", "#3A857C", "#34756E"] 
+
+# Palette of orange/yellow/brown tones;
+PALETTE_O = ["#FDCE7C", "#EBB25E", "#E6A37C", "#FAB187", "#E3896F", "#E37E62", "#FD867C"]
+
 ##################################
 # Utility functions for plotting #
 ##################################

@@ -138,10 +138,11 @@ def fix_label_length(labels: list, max_length: int=20) -> list:
     return fixed_labels
     
     
-def get_ci_size(x, ci=0.95, estimator=np.mean):
+def get_ci_size(x, ci=0.95, estimator=np.mean, get_non_scaled_value: bool=False):
     """
     :param x: a sequence of numerical data, iterable
     :param ci: confidence interval to consider
+    :param get_non_scaled_value: if True, report the values of upper and lower intervals, instead of their sizes from the center
     :return: size of upper confidence interval, size of lower confidence interval, mean
     
     Compute the size of the upper confidence interval,
@@ -150,7 +151,10 @@ def get_ci_size(x, ci=0.95, estimator=np.mean):
     """ 
     center = estimator(x)
     ci_lower, ci_upper = st.t.interval(ci, len(x) - 1, loc=center, scale=st.sem(x))
-    return ci_upper - center, center - ci_lower, center
+    if not get_non_scaled_value:
+        ci_upper =- center
+        ci_lower = center - ci_lower
+    return ci_upper, ci_lower, center
 
 
 def get_upper_ci_size(x, ci=0.95, estimator=np.mean):
@@ -284,7 +288,7 @@ def remove_outliers_df_grouped(data: pd.DataFrame, column: str, group: list, res
     filtered = []
     for i, g in data.groupby(group, sort=False):
         filtered += [remove_outliers_df(g, column, reset_index, drop_index, sigmas)]
-    new_data = pd.concat(filtered)
+    new_data = pd.concat(filtered, ignore_index=True)
     if debug and (len(new_data) < old_len):
         print(f"removed {old_len - len(new_data)} outliers")
     return new_data

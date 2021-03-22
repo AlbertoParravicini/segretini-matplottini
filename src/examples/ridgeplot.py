@@ -12,41 +12,70 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt 
-import scipy.stats as st
-from matplotlib.patches import Patch
+import matplotlib
+from matplotlib.patches import Patch, Rectangle
 import matplotlib.ticker as ticker
-import os
 
 import sys
 sys.path.append("..")
 from plot_utils import *
 
+##############################
+##############################
+
+INPUT_DATA_PATH = "../../data/ridgeplot_data.csv"
 PALETTE = [COLORS["peach2"], COLORS["g1"]]
 
+##############################
+##############################
 
-def load_data(path):
-    res = pd.read_csv(path, sep=", ") 
+def clean_data(data: pd.DataFrame) -> pd.DataFrame:   
+    data = remove_outliers_df_grouped(data, "exec_time_1_us", ["name"], debug=True)
+    data = remove_outliers_df_grouped(data, "exec_time_2_us", ["name"], debug=True)
     
-    res = remove_outliers_df_grouped(res, "exec_time_u_k_us", ["opt_level", "simplify", "num_elements"], debug=False)
-    res = remove_outliers_df_grouped(res, "exec_time_m_k_us", ["opt_level", "simplify", "num_elements"], debug=False)
-    res = remove_outliers_df_grouped(res, "exec_time_u_us", ["opt_level", "simplify", "num_elements"], debug=False)
-    res = remove_outliers_df_grouped(res, "exec_time_m_us", ["opt_level", "simplify", "num_elements"], debug=False)
-    
-    res["speedup"] = 1
-    res["speedup_k"] = 1
-    compute_speedup(res, "exec_time_u_k_us", "exec_time_m_k_us", "speedup_k")
-    compute_speedup(res, "exec_time_u_us", "exec_time_m_us", "speedup")
-    
-    res["time_u_k_ms"] = res["exec_time_u_k_us"] / 1000 
-    res["time_m_k_ms"] = res["exec_time_m_k_us"] / 1000
-    res["time_u_ms"] = res["exec_time_u_us"] / 1000
-    res["time_m_ms"] = res["exec_time_m_us"] / 1000
-    
-    return res
+    # Add relative execution time;
+    data["rel_time_1"] = 1
+    data["rel_time_2"] = 1
+    for name, g in data.groupby("name", as_index=False):
+        data.loc[g.index, "rel_time_1"] = g["exec_time_1_us"] / np.mean(g["exec_time_1_us"])
+        data.loc[g.index, "rel_time_2"] = g["exec_time_2_us"] / np.mean(g["exec_time_1_us"])
+        
+    # As we are plotting on 2 columns, we need to explicitely assign the column to each plot;
+    benchmarks = data["name"].unique()
+    num_columns = 2
+    b_to_col = {b: i // np.ceil(len(benchmarks) / num_columns) for i, b in enumerate(benchmarks)}
+    b_to_row = {b: i % np.ceil(len(benchmarks) / num_columns) for i, b in enumerate(benchmarks)}
+    data["col_num"] = data["name"].replace(b_to_col)
+    data["row_num"] = data["name"].replace(b_to_row)
+
+    return data
 
 
-def ridgeplot(res):
+def ridgeplot(data: pd.DataFrame, plot_confidence_intervals: bool=True,
+              identifier_column: str="name", column_1: str="rel_time_1", column_2: str="rel_time_2",
+              row_identifier: str="row_num", col_identifier: str="col_num") -> sns.FacetGrid:
+    """
+    Draw a ridgeplot that compares two distributions across different populations.
+    For example, the performance of different benchmarks before and after some optimization,
+    or the height of males and females across different countries;
+
+    Parameters
+    ----------
+    data : the data to plot
+    plot_confidence_intervals : if True, plot 95% confidence intervals centered on the mean of each population, along with the distribution
+    identifier_column : name of the column that identifies each sub-population (e.g. "country")
+    column_1 : name of the column that identifies the first distribution to plot in each sub-population (e.g. "height_males")
+    column_2 : name of the column that identifies the second distribution to plot in each sub-population (e.g. "height_females")
+    row_identifier : numeric identifier that assigns each sub-population to a row in the plot
+    col_identifier : numeric identifier that assigns each sub-population to a column in the plot
+    
+    Returns
+    -------
+    The FacetGrid containing the plot
+    """
+    
     # Plotting setup;
+    plt.rcdefaults()  # Reset to default settings;
     sns.set_style("whitegrid")
     plt.rcParams["font.family"] = ["Latin Modern Roman"]
     plt.rcParams['axes.titlepad'] = 20 
@@ -59,19 +88,28 @@ def ridgeplot(res):
     
     x_lim = (0.7, 1.3)
     
-    # Initializethe plot. We need to set "hue=kernel" to use the "kernel" field below, to map names to the label in each plot;
-    g = sns.FacetGrid(res, row="kernel_group", hue="kernel", aspect=8, height=1, palette=["#2f2f2f"], sharey=False, col="group")
+    # Maximum height of each subplot;
+    plot_height = 0.8 
+    
+    # Initialize the plot.
+    # "sharey"is disabled as we don't care that the distributions have the same y-scale.
+    # "sharex" is disabled as seaborn would use a single axis object preventing customizations on individual plots.
+    # "hue=identifier_column" is necessary to create a mapping over the individual plots, required to set benchmark labels on each axis;
+    g = sns.FacetGrid(data, hue=identifier_column, aspect=8, height=1, palette=["#2f2f2f"], 
+                      sharex=False, sharey=False, row=row_identifier, col=col_identifier)
 
     # Plot a vertical line corresponding to speedup = 1;
-    g.map(plt.axvline, x=1, lw=0.75, clip_on=True, zorder=0, linestyle="--", ymax=0.8)         
+    g.map(plt.axvline, x=1, lw=0.75, clip_on=True, zorder=0, linestyle="--", ymax=plot_height)        
+    
     # Plot the densities. Plot them twice as the second time we plot just the black contour.
     # "cut" removes values above the threshold; clip=x_lim avoids plotting values outside the margins;
-    g.map(sns.kdeplot, "time_u_k_ms", clip_on=False, clip=x_lim, shade=True, alpha=0.8, lw=1, bw_adjust=0.25, color=PALETTE[0], zorder=2, cut=10)  
-    g.map(sns.kdeplot, "time_m_k_ms", clip_on=False, clip=x_lim, shade=True, alpha=0.8, lw=1, bw_adjust=0.25, color=PALETTE[1], zorder=3, cut=10)
-    g.map(sns.kdeplot, "time_u_k_ms", clip_on=False, clip=x_lim, color="#5f5f5f", lw=1.5, bw_adjust=0.25, zorder=2, cut=10)
-    g.map(sns.kdeplot, "time_m_k_ms", clip_on=False, clip=x_lim, color="#5f5f5f", lw=1.5, bw_adjustbw=0.25, zorder=3, cut=10)
+    g.map(sns.kdeplot, column_1, clip_on=False, clip=x_lim, shade=True, alpha=0.8, lw=1, bw_adjust=1, color=PALETTE[0], zorder=2, cut=10)  
+    g.map(sns.kdeplot, column_2, clip_on=False, clip=x_lim, shade=True, alpha=0.8, lw=1, bw_adjust=1, color=PALETTE[1], zorder=3, cut=10)
+    g.map(sns.kdeplot, column_1, clip_on=False, clip=x_lim, color="#5f5f5f", lw=1, bw_adjust=1, zorder=2, cut=10)
+    g.map(sns.kdeplot, column_2, clip_on=False, clip=x_lim, color="#5f5f5f", lw=1, bw_adjust=1, zorder=3, cut=10)
+    
     # Plot the horizontal line below the densities;
-    g.map(plt.axhline, y=0, lw=1, clip_on=False, zorder=4)
+    g.map(plt.axhline, y=0, lw=1.2, clip_on=False, zorder=4)
     
     # Fix the horizontal axes so that they are in the specified range (x_lim);
     def set_x_width(label="", color="#2f2f2f"):
@@ -83,7 +121,30 @@ def ridgeplot(res):
     def label(x, label, color="#2f2f2f"):
         ax = plt.gca()
         ax.text(0, 0.15, label, color=color, ha="left", va="center", transform=ax.transAxes, fontsize=18)      
-    g.map(label, "kernel")
+    g.map(label, identifier_column)
+    
+    if plot_confidence_intervals:
+        # Plot a vertical line corresponding to the mean speedup of each benchmark.
+        # Pass an unnecessary "color" argument as "name" is mapped to "hue" in the FacetGrid;
+        def plot_mean(x, label, color="#2f2f2f"):
+            for i, c in enumerate([column_1, column_2]):
+                mean_speedup = data[data[identifier_column] == label][c].mean()
+                plt.axvline(x=mean_speedup, lw=1, clip_on=True, zorder=4, linestyle="dotted", 
+                            ymax=0.25, color=sns.set_hls_values(PALETTE[i], l=0.3))
+        g.map(plot_mean, identifier_column)
+        
+        # Plot confidence intervals;
+        def plot_ci(x, label, color="#2f2f2f"):
+            ax = plt.gca()
+            y_max = 0.25 * ax.get_ylim()[1]
+            for i, c in enumerate([column_1, column_2]):
+                color = sns.set_hls_values(PALETTE[i], l=0.3)
+                fillcolor = matplotlib.colors.to_rgba(color, alpha=0.2)  # Add alpha to facecolor, while leaving the border opaque;
+                upper, lower, _ = get_ci_size(data[data[identifier_column] == label][c], get_non_scaled_value=True)
+                new_patch = Rectangle((lower, 0), upper - lower, y_max, linewidth=1, edgecolor=color,
+                                      facecolor=fillcolor, zorder=4)
+                ax.add_patch(new_patch)   
+        g.map(plot_ci, identifier_column)
     
     # Fix the borders. This must be done here as the previous operations update the default values;
     g.fig.subplots_adjust(top=0.96,
@@ -96,30 +157,40 @@ def ridgeplot(res):
     # Titles and labels;
     g.set_titles("")
     g.set(xlabel=None)
-    g.fig.get_axes()[-1].set_xlabel("Relative Execution Time", fontsize=18)
-    g.fig.get_axes()[-2].set_xlabel("Relative Execution Time", fontsize=18)
     
     # Write the x-axis tick labels using percentages;
     @ticker.FuncFormatter
     def major_formatter(x, pos):
         return f"{int(100 * x)}%"
-    g.fig.get_axes()[-1].xaxis.set_major_formatter(major_formatter)
-    g.fig.get_axes()[-2].xaxis.set_major_formatter(major_formatter)
+    # Disable y ticks and remove axis;
     g.set(yticks=[])
-    g.fig.get_axes()[-1].tick_params(axis='x', which='major', labelsize=16)
-    g.fig.get_axes()[-2].tick_params(axis='x', which='major', labelsize=16)
     g.despine(bottom=True, left=True)
-    for tic in g.fig.get_axes()[-1].xaxis.get_major_ticks():
-        tic.tick1line.set_visible(True) 
-        tic.tick2line.set_visible(False) 
-    for tic in g.fig.get_axes()[-2].xaxis.get_major_ticks():
-        tic.tick1line.set_visible(True) 
-        tic.tick2line.set_visible(False) 
+    
+    # Identify the last axes on each column and update them.
+    # We handle the case where the total number of plots is < than rows * columns.
+    # It is not necessary in this case, but it's useful to have;
+    n_rows = int(data[row_identifier].max()) + 1
+    n_cols = int(data[col_identifier].max()) + 1
+    n_axes = int(n_rows * n_cols)
+    n_full_axes = len(data[identifier_column].unique())
+    last_row_axes_num = list(range(n_cols))
+    last_row_axes_num[0] = n_cols * ((n_axes - n_full_axes) % n_cols)  # Manually set the last axis, there might be empty axes;
+    for i in last_row_axes_num:
+        g.fig.get_axes()[-1 - i].xaxis.set_major_formatter(major_formatter)
+        g.fig.get_axes()[-1 - i].tick_params(axis='x', which='major', labelsize=14)
+        g.fig.get_axes()[-1 - i].set_xlabel("Relative Execution Time", fontsize=18)
+        for tic in g.fig.get_axes()[-1 - i].xaxis.get_major_ticks():
+            tic.tick1line.set_visible(True) 
+            tic.tick2line.set_visible(False) 
+            
+    # Hide ticks of missing axis if necessary;
+    for i, a in enumerate(g.fig.get_axes()):
+        if i not in last_row_axes_num:
+            g.fig.get_axes()[-1 - i].xaxis.set_ticklabels([])
+    
     # Add custom legend;
-    labels = ["Type 1", "Type 2"]
-    custom_lines = [Patch(facecolor=PALETTE[0], edgecolor="#2f2f2f", label=labels[0]),
-                    Patch(facecolor=PALETTE[1], edgecolor="#2f2f2f", label=labels[1])] 
-      
+    labels = ["Before transformations", "After transformations"]
+    custom_lines = [Patch(facecolor=PALETTE[i], edgecolor="#2f2f2f", label=l) for i, l in enumerate(labels)]
     leg = g.fig.legend(custom_lines, labels, loc="lower center", bbox_to_anchor=(0.5, 0.0), fontsize=17, ncol=2, handletextpad=0.5, columnspacing=0.4)
     leg.set_title(None)
     leg._legend_box.align = "left"
@@ -127,49 +198,22 @@ def ridgeplot(res):
     
     return g
 
+##############################
+##############################
 
 if __name__ == "__main__":
     
-    ##################################
-    # Load data ######################
-    ##################################
+    # Load data. The input dataframe is a collection of execution times of different benchmarks.
+    # Each benchmark has around 100 samples, and it has been measure before transformations ("exec_time_1_us") and after ("exec_time_2_us");
+    data = pd.read_csv(INPUT_DATA_PATH)
     
-    RES_FOLDER = "../../data/ridgeplot_data"
+    # Compute relative execution time before and after transformations and remove outliers.
+    # Also assign row/column identifiers to each benchmark for the ridgeplot;
+    data = clean_data(data)
+            
+    # Plotting;    
+    g = ridgeplot(data)
     
-    KERNELS =  ["axpy", "dot_product", "convolution", "mmul", "autocov", "hotspot", "hotspot3d",
-            "backprop", "backprop2", "bfs", "pr", "nested", "gaussian",
-            "histogram", "lud", "needle"]
-    
-    # Load all the datasets and keep only the data relevant to visualization;
-    res_list = []
-    for i, k in enumerate(KERNELS):
-        for f in os.listdir(RES_FOLDER):
-            if os.path.splitext(f)[0] == k:
-                temp_res= load_data(os.path.join(RES_FOLDER, f))
-                temp_res = temp_res[(temp_res["simplify"] == "simplify_accesses") & (temp_res["opt_level"] == "O2") & (temp_res["num_elements"] == max(temp_res["num_elements"]))].reset_index()  
-                temp_res["kernel"] = f"B{i}"
-                 # Normalize using the unmodified kernel time median;
-                temp_res["time_m_k_ms"] /= np.median(temp_res["time_u_k_ms"])
-                temp_res["time_u_k_ms"] /= np.median(temp_res["time_u_k_ms"])
-                res_list += [temp_res]
-                
-    # As we are plotting on 2 columns, we need to explicitely assign the column to each plot;
-    num_col = 2
-    for i in range(num_col):
-        # Process only a chunk of the datasets for each column;
-        start = i * len(res_list) // num_col  
-        end = (i + 1) * len(res_list) // num_col
-        for j in range(start, end):
-            res_list[j]["group"] = i  # Assign column;
-            res_list[j]["kernel_group"] = j % (len(res_list) // num_col)  # Assign row;
-        
-    res_tot = pd.concat(res_list)
-    
-    ##################################
-    # Plotting #######################
-    ##################################  
-    
-    g = ridgeplot(res_tot)
     # Save the plot;
     save_plot("../../plots", "ridgeplot.{}") 
    

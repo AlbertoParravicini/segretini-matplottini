@@ -33,7 +33,7 @@ In scatterplots and lineplots you can use different markers (circles, diamonds, 
 
 ## Update 2021-03-22
 
-Updated **Ridgeplot** to have confidence intervals and be more user-friendly (`src/examples/ridgeplot.py`). Added some general tips on choosing colors.
+Updated **Ridgeplot** to have confidence intervals and be more user-friendly (`src/examples/ridgeplot.py`). Added some general tips about choosing colors.
 
 ![Ridgeplot Example](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/ridgeplot.png)
 

@@ -53,7 +53,8 @@ def clean_data(data: pd.DataFrame) -> pd.DataFrame:
 
 def ridgeplot(data: pd.DataFrame, plot_confidence_intervals: bool=True,
               identifier_column: str="name", column_1: str="rel_time_1", column_2: str="rel_time_2",
-              row_identifier: str="row_num", col_identifier: str="col_num") -> sns.FacetGrid:
+              row_identifier: str="row_num", col_identifier: str="col_num",
+              compact_layout: bool=True) -> sns.FacetGrid:
     """
     Draw a ridgeplot that compares two distributions across different populations.
     For example, the performance of different benchmarks before and after some optimization,
@@ -68,7 +69,8 @@ def ridgeplot(data: pd.DataFrame, plot_confidence_intervals: bool=True,
     column_2 : name of the column that identifies the second distribution to plot in each sub-population (e.g. "height_females")
     row_identifier : numeric identifier that assigns each sub-population to a row in the plot
     col_identifier : numeric identifier that assigns each sub-population to a column in the plot
-    
+    compact_layout : if True, draw distributions on the same column slightly overlapped, to take less space
+        
     Returns
     -------
     The FacetGrid containing the plot
@@ -89,13 +91,13 @@ def ridgeplot(data: pd.DataFrame, plot_confidence_intervals: bool=True,
     x_lim = (0.7, 1.3)
     
     # Maximum height of each subplot;
-    plot_height = 0.8 
+    plot_height = 0.8 if compact_layout else 1.4
     
     # Initialize the plot.
     # "sharey"is disabled as we don't care that the distributions have the same y-scale.
     # "sharex" is disabled as seaborn would use a single axis object preventing customizations on individual plots.
     # "hue=identifier_column" is necessary to create a mapping over the individual plots, required to set benchmark labels on each axis;
-    g = sns.FacetGrid(data, hue=identifier_column, aspect=8, height=1, palette=["#2f2f2f"], 
+    g = sns.FacetGrid(data, hue=identifier_column, aspect=8, height=plot_height, palette=["#2f2f2f"], 
                       sharex=False, sharey=False, row=row_identifier, col=col_identifier)
 
     # Plot a vertical line corresponding to speedup = 1;
@@ -147,11 +149,11 @@ def ridgeplot(data: pd.DataFrame, plot_confidence_intervals: bool=True,
         g.map(plot_ci, identifier_column)
     
     # Fix the borders. This must be done here as the previous operations update the default values;
-    g.fig.subplots_adjust(top=0.96,
-                      bottom=0.17,
+    g.fig.subplots_adjust(top=0.98,
+                      bottom=0.21 if compact_layout else 0.1,
                       right=0.98,
                       left=0.02,
-                      hspace=-0.20,
+                      hspace=-0.20 if compact_layout else 0.4,
                       wspace=0.1)
     
     # Titles and labels;
@@ -175,17 +177,21 @@ def ridgeplot(data: pd.DataFrame, plot_confidence_intervals: bool=True,
     n_full_axes = len(data[identifier_column].unique())
     last_row_axes_num = list(range(n_cols))
     last_row_axes_num[0] = n_cols * ((n_axes - n_full_axes) % n_cols)  # Manually set the last axis, there might be empty axes;
-    for i in last_row_axes_num:
+    if compact_layout:
+        last_row_axes_num_adjusted = last_row_axes_num.copy()
+    else:
+        last_row_axes_num_adjusted = list(range(last_row_axes_num[0], n_full_axes))  # Draw ticks on all axes;
+    for i in last_row_axes_num_adjusted:
         g.fig.get_axes()[-1 - i].xaxis.set_major_formatter(major_formatter)
         g.fig.get_axes()[-1 - i].tick_params(axis='x', which='major', labelsize=14)
-        g.fig.get_axes()[-1 - i].set_xlabel("Relative Execution Time", fontsize=18)
         for tic in g.fig.get_axes()[-1 - i].xaxis.get_major_ticks():
             tic.tick1line.set_visible(True) 
             tic.tick2line.set_visible(False) 
-            
+    for i in last_row_axes_num:  # Axis label is added always to the final axes;
+        g.fig.get_axes()[-1 - i].set_xlabel("Relative Execution Time", fontsize=18)        
     # Hide ticks of missing axis if necessary;
     for i, a in enumerate(g.fig.get_axes()):
-        if i not in last_row_axes_num:
+        if i not in last_row_axes_num_adjusted:
             g.fig.get_axes()[-1 - i].xaxis.set_ticklabels([])
     
     # Add custom legend;
@@ -210,10 +216,14 @@ if __name__ == "__main__":
     # Compute relative execution time before and after transformations and remove outliers.
     # Also assign row/column identifiers to each benchmark for the ridgeplot;
     data = clean_data(data)
-            
-    # Plotting;    
-    g = ridgeplot(data)
     
+    # Plotting;    
+    g = ridgeplot(data, compact_layout=True)
     # Save the plot;
     save_plot("../../plots", "ridgeplot.{}") 
+            
+    # Plotting;    
+    g = ridgeplot(data, compact_layout=False)
+    # Save the plot;
+    save_plot("../../plots", "ridgeplot_large.{}") 
    

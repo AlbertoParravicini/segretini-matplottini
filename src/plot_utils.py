@@ -13,7 +13,7 @@ import os
 from matplotlib.colors import rgb_to_hsv, to_rgb, to_hex, hsv_to_rgb
 from scipy.stats.mstats import gmean
 from functools import reduce
-
+from pathlib import Path
 
 ##############################
 # Colors #####################
@@ -234,11 +234,10 @@ def save_plot(directory: str, filename: str, date: str = "", create_date_dir: bo
     :param date: date that should appear in the plot filename
     :param create_date_dir: if True, create a sub-folder with the date
     :param extension: list of extension used to store the plot
-    """
-    
+    """       
     output_folder = os.path.join(directory, date) if create_date_dir and date else directory
     if not os.path.exists(output_folder):
-        os.mkdir(output_folder)
+         Path(output_folder).mkdir(parents=True, exist_ok=True)
         
     for e in extension:
         plt.savefig(os.path.join(output_folder, filename.format(date, e) if date else filename.format(e)), dpi=300)

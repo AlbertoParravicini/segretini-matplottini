@@ -226,6 +226,23 @@ def update_width(ax: plt.Axes, width: float=1):
         patch.set_x(patch.get_x() + 0.5 * diff)
         
         
+def transpose_legend_labels(labels, patches, max_elements_per_row=6, default_elements_per_col=2):
+    """
+    Matplotlib by defaults places elements in the legend from top to bottom.
+    In most cases, placing them left-to-right is more readable (you know, English is read left-to-right, not top-to-bottom)
+    This function transposes the elements in the legend, allowing to set the maximum number of values you want in each row.
+    
+    :param labels: list of labels in the legend
+    :param patches: list of patches in the legend
+    :param max_elements_per_row: maximum number of legend elements per row
+    :param default_elements_per_col: by default, try having default_elements_per_col elements in each col (could be more if max_elements_per_row is reached) 
+    """
+    elements_per_row = min(int(np.ceil(len(labels) / default_elements_per_col)), max_elements_per_row)  # Don't add too many assets per row;
+    labels = np.concatenate([labels[i::elements_per_row] for i in range(elements_per_row)], axis=0)
+    patches = np.concatenate([patches[i::elements_per_row] for i in range(elements_per_row)], axis=0)
+    return labels, patches
+        
+        
 def save_plot(directory: str, filename: str, date: str = "", create_date_dir: bool = True, extension: list = ["pdf", "png"]):
     """
     :param directory: where the plot is stored

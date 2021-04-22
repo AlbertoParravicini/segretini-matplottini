@@ -390,7 +390,7 @@ def compute_speedup_df(data: pd.DataFrame, key: list, baseline_filter_col: list,
     if type(baseline_filter_col) is not list:
         baseline_filter_col = [baseline_filter_col]
     if type(baseline_filter_val) is not list:
-        baseline_filter_col = [baseline_filter_val]
+        baseline_filter_val = [baseline_filter_val]
         
     grouped_data = data.groupby(key, as_index=False)
     for group_key, group in grouped_data:

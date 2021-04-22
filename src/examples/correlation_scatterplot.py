@@ -134,7 +134,7 @@ def correlation_scatterplot(data: pd.DataFrame,
         slope, intercept, r_value, p_value, std_err = stats.linregress(data["estimate0"], data["estimate1"])
         angle = slope * 2 * 180 / np.pi  # Convert slope angle from radians to degrees;
         # Add label with Latex Math font, at the right angle;
-        ax.annotate(r"$\mathdefault{R^2=" + f"{r_value:.2f}}}$", xy=(0.47, 0.42 * slope + intercept),
+        ax.annotate(r"$\mathdefault{R^2=" + f"{r_value**2:.2f}}}$", xy=(0.47, 0.42 * slope + intercept),
                     rotation=angle, fontsize=8, ha="center", color="#2f2f2f")
                  
     # Turn on the grid;

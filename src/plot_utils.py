@@ -12,6 +12,7 @@ import numpy as np
 import os
 from matplotlib.colors import rgb_to_hsv, to_rgb, to_hex, hsv_to_rgb
 from scipy.stats.mstats import gmean
+import scipy.stats
 from functools import reduce
 from pathlib import Path
 
@@ -243,21 +244,26 @@ def transpose_legend_labels(labels, patches, max_elements_per_row=6, default_ele
     return labels, patches
         
         
-def save_plot(directory: str, filename: str, date: str = "", create_date_dir: bool = True, extension: list = ["pdf", "png"]):
+def save_plot(directory: str, filename: str, figure: plt.Figure=None, date: str = "", create_date_dir: bool = True, extension: list = ["pdf", "png"]):
     """
     :param directory: where the plot is stored
     :param filename: should be of format 'myplot_{}.{}', where the first placeholder is used for the date and the second for the extension,
         or 'myplot.{}', or 'myplot.extension'
+    :param figure: a specific figure to save. If None, save the last plot that has been drawn
     :param date: date that should appear in the plot filename
     :param create_date_dir: if True, create a sub-folder with the date
     :param extension: list of extension used to store the plot
-    """       
+    """
+    
     output_folder = os.path.join(directory, date) if create_date_dir and date else directory
     if not os.path.exists(output_folder):
-         Path(output_folder).mkdir(parents=True, exist_ok=True)
+        os.mkdir(output_folder)
         
     for e in extension:
-        plt.savefig(os.path.join(output_folder, filename.format(date, e) if date else filename.format(e)), dpi=300)
+        if figure:
+            figure.savefig(os.path.join(output_folder, filename.format(date, e) if date else filename.format(e)), dpi=300)
+        else:  # Save the current plot;
+            plt.savefig(os.path.join(output_folder, filename.format(date, e) if date else filename.format(e)), dpi=300)
 
 
 ####################################
@@ -307,6 +313,66 @@ def remove_outliers_df_grouped(data: pd.DataFrame, column: str, group: list, res
     new_data = pd.concat(filtered, ignore_index=True)
     if debug and (len(new_data) < old_len):
         print(f"removed {old_len - len(new_data)} outliers")
+    return new_data
+
+
+def remove_outliers_iqr(data, quantile: float=0.75, iqr_extension: float=1.5):
+    """
+    :param data: a sequence of numerical data, iterable
+    :param quantile: upper quantile value used as filtering threshold. Also use (1 - quantile) as lower threshold. Should be in [0.5, 1]
+    :param iqr_extension: multiple of interquantile range (iqr) used to filter data, starting from the quantiles
+    :return: data without outliers
+    
+    Filter a sequence of data by removing outliers looking at the quantiles of the distribution.
+    Find quantiles (by default, Q1 and Q3), and interquantile range (by default, Q3 - Q1), 
+    and keep values in [Q1 - iqr_extension * IQR, Q3 + iqr_extension * IQR].
+    This is the same range used to identify whiskers in a boxplot (e.g. in pandas and seaborn);
+    """
+    assert(quantile >= 0.5 and quantile <= 1)
+    q1 = np.quantile(data, 1 - quantile)
+    q3 = np.quantile(data, quantile)
+    iqr = scipy.stats.iqr(data, rng=(100 - 100 * quantile, 100 * quantile))
+    return data[(data >= q1 - iqr * q1) & (data <= q3 + iqr * q3)]
+
+
+def remove_outliers_iqr_df(data: pd.DataFrame, column: str, reset_index: bool = True, drop_index: bool = True,
+                           quantile: float=0.75, iqr_extension: float=1.5, debug: bool=True) -> pd.DataFrame:
+    """
+    :param data: a pd.DataFrame
+    :param column: name of the column where data are filtered
+    :param reset_index: if True, reset the index after filtering
+    :param drop_index: if True, drop the index column after reset
+    :param quantile: upper quantile value used as filtering threshold. Also use (1 - quantile) as lower threshold. Should be in [0.5, 1]
+    :param iqr_extension: multiple of interquantile range (iqr) used to filter data, starting from the quantiles
+    :return: data without outliers
+    
+    Filter a pd.DataFrame by removing outliers (on te specified column) looking at the quantiles of the distribution.
+    Find quantiles (by default, Q1 and Q3), and interquantile range (by default, Q3 - Q1), 
+    and keep values in [Q1 - iqr_extension * IQR, Q3 + iqr_extension * IQR].
+    This is the same range used to identify whiskers in a boxplot (e.g. in pandas and seaborn);
+    """
+    old_len = len(data)
+    col = data[column]
+    new_data = data.loc[remove_outliers_iqr(col, quantile, iqr_extension).index]
+    if reset_index:
+        new_data = new_data.reset_index(drop=drop_index)
+    if debug and (len(new_data) < old_len):
+        print(f"removed {old_len - len(new_data)} outliers on column {column}")
+    return new_data
+
+
+def remove_outliers_df_iqr_grouped(data: pd.DataFrame, column: str, group: list, reset_index: bool = True, drop_index: bool = True, 
+                                   quantile: float=0.75, iqr_extension: float=1.5, debug: bool = True) -> pd.DataFrame:
+    """
+    Same as "remove_outliers_iqr_df", but also filter values after divided by the group of columns specified in "group";
+    """
+    old_len = len(data)
+    filtered = []
+    for i, g in data.groupby(group, sort=False):
+        filtered += [remove_outliers_iqr_df(g, column, reset_index, drop_index, quantile, iqr_extension, debug)]
+    new_data = pd.concat(filtered, ignore_index=True)
+    if debug and (len(new_data) < old_len):
+        print(f"removed a total of {old_len - len(new_data)} outliers")
     return new_data
 
 
@@ -391,6 +457,8 @@ def compute_speedup_df(data: pd.DataFrame, key: list, baseline_filter_col: list,
         baseline_filter_col = [baseline_filter_col]
     if type(baseline_filter_val) is not list:
         baseline_filter_val = [baseline_filter_val]
+        
+    assert(len(baseline_filter_col) == len(baseline_filter_val))
         
     grouped_data = data.groupby(key, as_index=False)
     for group_key, group in grouped_data:

@@ -142,7 +142,7 @@ def ridgeplot(data: pd.DataFrame, plot_confidence_intervals: bool=True,
             for i, c in enumerate([column_1, column_2]):
                 color = sns.set_hls_values(PALETTE[i], l=0.3)
                 fillcolor = matplotlib.colors.to_rgba(color, alpha=0.2)  # Add alpha to facecolor, while leaving the border opaque;
-                upper, lower, _ = get_ci_size(data[data[identifier_column] == label][c], get_non_scaled_value=True)
+                upper, lower, _ = get_ci_size(data[data[identifier_column] == label][c], get_raw_location=True)
                 new_patch = Rectangle((lower, 0), upper - lower, y_max, linewidth=1, edgecolor=color,
                                       facecolor=fillcolor, zorder=4)
                 ax.add_patch(new_patch)   
@@ -167,33 +167,35 @@ def ridgeplot(data: pd.DataFrame, plot_confidence_intervals: bool=True,
     # Disable y ticks and remove axis;
     g.set(yticks=[])
     g.despine(bottom=True, left=True)
-    
-    # Identify the last axes on each column and update them.
-    # We handle the case where the total number of plots is < than rows * columns.
-    # It is not necessary in this case, but it's useful to have;
+            
+    # Identify the last axes on each column and update them;
     n_rows = int(data[row_identifier].max()) + 1
     n_cols = int(data[col_identifier].max()) + 1
     n_axes = int(n_rows * n_cols)
     n_full_axes = len(data[identifier_column].unique())
-    last_row_axes_num = list(range(n_cols))
-    last_row_axes_num[0] = n_cols * ((n_axes - n_full_axes) % n_cols)  # Manually set the last axis, there might be empty axes;
-    if compact_layout:
-        last_row_axes_num_adjusted = last_row_axes_num.copy()
-    else:
-        last_row_axes_num_adjusted = list(range(last_row_axes_num[0], n_full_axes))  # Draw ticks on all axes;
-    for i in last_row_axes_num_adjusted:
-        g.fig.get_axes()[-1 - i].xaxis.set_major_formatter(major_formatter)
-        g.fig.get_axes()[-1 - i].tick_params(axis='x', which='major', labelsize=14)
-        for tic in g.fig.get_axes()[-1 - i].xaxis.get_major_ticks():
-            tic.tick1line.set_visible(True) 
-            tic.tick2line.set_visible(False) 
-    for i in last_row_axes_num:  # Axis label is added always to the final axes;
-        g.fig.get_axes()[-1 - i].set_xlabel("Relative Execution Time", fontsize=18)        
-    # Hide ticks of missing axis if necessary;
-    for i, a in enumerate(g.fig.get_axes()):
-        if i not in last_row_axes_num_adjusted:
-            g.fig.get_axes()[-1 - i].xaxis.set_ticklabels([])
-    
+    # Set ticks and labels on all axes;
+    for i, ax_i in enumerate(g.axes):
+        for k, ax_j in enumerate(ax_i):
+            if compact_layout and i < len(g.axes) - 1:
+                ax_j.xaxis.set_ticklabels([])
+            else:
+                ax_j.xaxis.set_major_formatter(major_formatter)
+                ax_j.tick_params(axis="x", which="major", labelsize=14)
+                for tic in ax_j.xaxis.get_major_ticks():
+                    tic.tick1line.set_visible(True) 
+                    tic.tick2line.set_visible(False) 
+    # Set labels on the last axis of each column (except the last, which could have fewer plots);
+    for ax in g.axes[-1][:-1]:
+        ax.set_xlabel("Relative Execution Time", fontsize=18)
+    # Set label on the last axis of the last column;
+    g.axes[-1 - (n_axes - n_full_axes)][-1].set_xlabel("Relative Execution Time", fontsize=18)
+    # Hide labels and ticks on empty axes;
+    if n_axes > n_full_axes:
+        for ax in g.axes[-(n_axes - n_full_axes):]:
+            ax[-1].xaxis.set_ticklabels([])
+            for tic in ax[-1].xaxis.get_major_ticks():
+                tic.tick1line.set_visible(False) 
+            
     # Add custom legend;
     labels = ["Before transformations", "After transformations"]
     custom_lines = [Patch(facecolor=PALETTE[i], edgecolor="#2f2f2f", label=l) for i, l in enumerate(labels)]

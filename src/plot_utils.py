@@ -90,7 +90,7 @@ def hex_color_to_grayscale(c):
     return to_hex(hsv_to_rgb(new_c))
 
 
-def get_exp_label(val, prefix="", decimal_remaining_val: bool=False, tens_only=True, from_string=False, decimal_places=2) -> str: 
+def get_exp_label(val, prefix="", decimal_remaining_val: bool=False, tens_only=True, from_string=True, decimal_places=2) -> str: 
     """
     :param val: numeric label to format
     :return: label formatted in scientific notation
@@ -139,11 +139,11 @@ def fix_label_length(labels: list, max_length: int=20) -> list:
     return fixed_labels
     
     
-def get_ci_size(x, ci=0.95, estimator=np.mean, get_non_scaled_value: bool=False):
+def get_ci_size(x, ci=0.95, estimator=np.mean, get_raw_location: bool=False):
     """
     :param x: a sequence of numerical data, iterable
     :param ci: confidence interval to consider
-    :param get_non_scaled_value: if True, report the values of upper and lower intervals, instead of their sizes from the center
+    :param get_raw_location: if True, report the values of upper and lower intervals, instead of their sizes from the center
     :return: size of upper confidence interval, size of lower confidence interval, mean
     
     Compute the size of the upper confidence interval,
@@ -152,9 +152,9 @@ def get_ci_size(x, ci=0.95, estimator=np.mean, get_non_scaled_value: bool=False)
     """ 
     center = estimator(x)
     ci_lower, ci_upper = st.t.interval(ci, len(x) - 1, loc=center, scale=st.sem(x))
-    if not get_non_scaled_value:
-        ci_upper =- center
-        ci_lower = center - ci_lower
+    if not get_raw_location:
+        ci_upper -= center
+        ci_lower =- center
     return ci_upper, ci_lower, center
 
 
@@ -238,7 +238,7 @@ def transpose_legend_labels(labels, patches, max_elements_per_row=6, default_ele
     :param max_elements_per_row: maximum number of legend elements per row
     :param default_elements_per_col: by default, try having default_elements_per_col elements in each col (could be more if max_elements_per_row is reached) 
     """
-    elements_per_row = min(int(np.ceil(len(labels) / default_elements_per_col)), max_elements_per_row)  # Don't add too many assets per row;
+    elements_per_row = min(int(np.ceil(len(labels) / default_elements_per_col)), max_elements_per_row)  # Don't add too many elements per row;
     labels = np.concatenate([labels[i::elements_per_row] for i in range(elements_per_row)], axis=0)
     patches = np.concatenate([patches[i::elements_per_row] for i in range(elements_per_row)], axis=0)
     return labels, patches
@@ -420,7 +420,8 @@ def correct_speedup_df(data: pd.DataFrame, key: list, baseline_filter_col, basel
 def compute_speedup_df(data: pd.DataFrame, key: list, baseline_filter_col: list, baseline_filter_val: list,  
                     speedup_col_name: str="speedup", time_column: str="exec_time",
                     baseline_col_name: str="baseline_time",
-                    correction: bool=True, aggregation=np.median):
+                    correction: bool=True, aggregation=np.median,
+                    compute_relative_perf: bool=False):
     """
     Compute speedups on a DataFrame by grouping values
 
@@ -441,8 +442,10 @@ def compute_speedup_df(data: pd.DataFrame, key: list, baseline_filter_col: list,
         Name of the new baseline execution time column. The default is "baseline_time".
     correction : bool, optional
         If True, ensure that the median of the baseline is 1. The default is True.
-    aggregation : TYPE, optional
+    aggregation : function, optional
         Function used to aggregate values. The default is np.median.
+    compute_relative_perf: bool, optional
+        If True, compute relative performance instead of speedup (i.e. 1 / speedup);
 
     Returns
     -------
@@ -465,10 +468,10 @@ def compute_speedup_df(data: pd.DataFrame, key: list, baseline_filter_col: list,
         # Compute the median baseline computation time;
         indices = [group[group[i] == j].index for i, j in zip(baseline_filter_col, baseline_filter_val)]
         reduced_index = reduce(lambda x, y: x.intersection(y), indices)
-        median_baseline = aggregation(data.loc[reduced_index, time_column])
+        mean_baseline = aggregation(data.loc[reduced_index, time_column])
         # Compute the speedup for this group;
-        group.loc[:, speedup_col_name] = median_baseline / group[time_column]
-        group.loc[:, baseline_col_name] = median_baseline
+        group.loc[:, speedup_col_name] = (group[time_column] / mean_baseline) if compute_relative_perf else (mean_baseline / group[time_column])
+        group.loc[:, baseline_col_name] = mean_baseline
         data.loc[group.index, :] = group
     
         # Guarantee that the geometric mean of speedup referred to the baseline is 1, and adjust speedups accordingly;

@@ -143,7 +143,7 @@ if __name__ == "__main__":
     xlabels = [f"{str(x._text).upper()}" for x in ax.get_xticklabels()]
     # Rotate ticks by 45 degrees, and right-align them for correct visualization;
     ax.set_xticklabels(labels=xlabels, rotation=45, ha="right")
-
+    
     # Set percentage-based tick labels;    
     ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{int(100 * x)}%"))
     # Set speedup-like tick labels (e.g. 1x, 2x, ...);
@@ -157,6 +157,11 @@ if __name__ == "__main__":
 
     # Modify ticks parameters;
     ax.tick_params(axis='x', which='major', labelsize=12, pad=2)
+    # If using a formatter instead of manually specifying labels as above,
+    # you can also modify the tick label alignment as follows.
+    # Note that ax.tick_params() does not currently allow tto specify the alignment!
+    for l in ax.get_xticklabels():
+        l.set_ha("right")
     
     # Set axis label;
     ax.set_xlabel("X Axis", fontsize=12)

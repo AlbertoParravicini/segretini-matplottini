@@ -141,8 +141,8 @@ if __name__ == "__main__":
     # Manually modify ticks. 
     # This sometimes doesn't work (usually, if the x-axis is continuous instead of discrete);
     xlabels = [f"{str(x._text).upper()}" for x in ax.get_xticklabels()]
-    # Rotate ticks by 45 degrees, and right-align them for correct visualization;
-    ax.set_xticklabels(labels=xlabels, rotation=45, ha="right")
+    # Rotate ticks by 45 degrees, and right-align them using "anchor" for correct visualization;
+    ax.set_xticklabels(labels=xlabels, rotation=45, ha="right", rotation_mode="anchor")
     
     # Set percentage-based tick labels;    
     ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{int(100 * x)}%"))

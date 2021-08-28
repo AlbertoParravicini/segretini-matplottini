@@ -163,6 +163,7 @@ def get_upper_ci_size(x, ci=0.95, estimator=np.mean):
     
     
 def add_labels(ax: plt.Axes, labels: list=None, vertical_offsets: list=None, 
+               vertical_coords: list=None,
                patch_num: list=None, fontsize: int=14, rotation: int=0,
                skip_zero: bool=False, format_str: str="{:.2f}x",
                label_color: str="#2f2f2f", max_only=False,
@@ -174,6 +175,8 @@ def add_labels(ax: plt.Axes, labels: list=None, vertical_offsets: list=None,
     :param labels: optional labels to add. If not present, add the bar height
     :param vertical_offsets: additional vertical offset for each label.
       Useful when displaying error bars (see @get_upper_ci_size), and for fine tuning
+    :param vertical_coords: instead of specifyibf vertical offsets,
+      provide directly the vertical coordinates of the labels
     :param patch_num: indices of patches to which we add labels, if some of them should be skipped
     :param fontsize: size of each label
     :param rotation: rotation of the labels (e.g. 90°)
@@ -209,7 +212,9 @@ def add_labels(ax: plt.Axes, labels: list=None, vertical_offsets: list=None,
         if labels[i] and (i > 0 or not skip_zero) and (not max_only or i == argmax) and i < len(labels) and i < len(vertical_offsets):
             if skip_value and np.abs(labels[i] - skip_value) < skip_threshold:
                 continue  # Skip labels equal to the specified value;
-            ax.text(p.get_x() + p.get_width()/2., vertical_offsets[i] + p.get_height(), format_str.format(labels[i]), 
+            ax.text(p.get_x() + p.get_width()/2.,
+                    (vertical_offsets[i] + p.get_height()) if not vertical_coords else vertical_coords[i],
+                    format_str.format(labels[i]), 
                     fontsize=fontsize, color=label_color, ha='center', va='bottom', rotation=rotation)
         
         
@@ -226,7 +231,7 @@ def update_width(ax: plt.Axes, width: float=1):
         # Recenter the bar
         patch.set_x(patch.get_x() + 0.5 * diff)
         
-        
+
 def transpose_legend_labels(labels, patches, max_elements_per_row=6, default_elements_per_col=2):
     """
     Matplotlib by defaults places elements in the legend from top to bottom.
@@ -238,11 +243,11 @@ def transpose_legend_labels(labels, patches, max_elements_per_row=6, default_ele
     :param max_elements_per_row: maximum number of legend elements per row
     :param default_elements_per_col: by default, try having default_elements_per_col elements in each col (could be more if max_elements_per_row is reached) 
     """
-    elements_per_row = min(int(np.ceil(len(labels) / default_elements_per_col)), max_elements_per_row)  # Don't add too many elements per row;
+    elements_per_row = min(int(np.ceil(len(labels) / default_elements_per_col)), max_elements_per_row)  # Don't add too many assets per row;
     labels = np.concatenate([labels[i::elements_per_row] for i in range(elements_per_row)], axis=0)
     patches = np.concatenate([patches[i::elements_per_row] for i in range(elements_per_row)], axis=0)
     return labels, patches
-        
+
         
 def save_plot(directory: str, filename: str, figure: plt.Figure=None, date: str = "", create_date_dir: bool = True, extension: list = ["pdf", "png"]):
     """

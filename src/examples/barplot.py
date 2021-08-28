@@ -122,6 +122,6 @@ def barplot(res: pd.DataFrame) -> plt.Figure:
 
 if __name__ == "__main__":
     # Run this script from the "src" folder;
-    res = pd.read_csv("../data/barplot_data.csv")    
+    res = pd.read_csv("../../data/barplot_data.csv")    
     fig = barplot(res)          
     plt.savefig(f"../../plots/barplot.pdf")

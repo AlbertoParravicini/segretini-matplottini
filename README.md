@@ -31,6 +31,21 @@ If your plot is not explicitely comparing classes (for example, you want to show
 * **Add redundant information**: if you are plotting many different classes, and use one color per class, it can be difficult to distinguish among them. Instead, add some kind of redundant information.
 In scatterplots and lineplots you can use different markers (circles, diamonds, etc.), while in barplots you can use different hatches (//// or \\\\) or add labels to each class.
 
+## Update 2021-08-28
+
+Update style of **Ridgeplot** to be readable in black & white. Added *large* layout to **Ridgeplot**
+![Ridgeplot Example](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/ridgeplot_large.png)
+
+Updates to `src/plot_utils.py`: added option to directly provide vertical coordinates to `add_labels`. Added better outlier removal based on interquantile range (the same approach used to find outliers in box-plots)
+
+Added `src/examples/performance_scaling.py`: this plot shows the relative performance increase of processors, memory and interconnection technologies from 1996 to 2021. 
+Shamefully copied from [AI and Memory Wall](https://medium.com/riselab/ai-and-memory-wall-2cb4265cb0b8) by Amir Gholami.
+This plot shows how to use dates for the x-axis, and do fairly complex visualization on log-scale axes (i.e. linear regressions on data with exponential increase).
+
+![Performance Scaling](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/performance_scaling.png)
+
+Temporarily removed `src/examples/barplot_2.py`, it has to be cleaned to be usable again.
+
 ## Update 2021-03-22
 
 Updated **Ridgeplot** to have confidence intervals and be more user-friendly (`src/examples/ridgeplot.py`). Added some general tips about choosing colors.
@@ -52,5 +67,3 @@ Added **Roofline Plot**, find it in `src/examples/roofline.py`.
 
 Updated **Ridge Plot**, find it in `src/examples/ridgeplot.py`.
 Added **Bar Plot - Example 2**, find it in `src/examples/barplot_2.py`.
-
-![Barplot 2 Example](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/barplot_2.png)

@@ -132,11 +132,14 @@ def correlation_scatterplot(data: pd.DataFrame,
     # Add a label with the R^2 correlation factor. First, obtain coefficients from the linear regression;
     if plot_regression:
         slope, intercept, r_value, p_value, std_err = stats.linregress(data["estimate0"], data["estimate1"])
-        angle = slope * 2 * 180 / np.pi  # Convert slope angle from radians to degrees;
+        angle = np.arctan(slope)
+        angle = np.rad2deg(angle)  # Convert slope angle from radians to degrees;
+        # Transform angle to adapt to axes with different scale;
+        trans_angle = ax.transData.transform_angles([angle], np.array([0, 0]).reshape((1, 2)))[0]
         # Add label with Latex Math font, at the right angle;
-        ax.annotate(r"$\mathdefault{R^2=" + f"{r_value**2:.2f}}}$", xy=(0.47, 0.42 * slope + intercept),
-                    rotation=angle, fontsize=8, ha="center", color="#2f2f2f")
-                 
+        ax.annotate(r"$\mathdefault{R^2=" + f"{r_value:.2f}}}$", 
+                    rotation_mode='anchor', xy=(0.42, 0.45 * slope + intercept), rotation=trans_angle, fontsize=8, ha="left", color="#2f2f2f")
+
     # Turn on the grid;
     ax.yaxis.grid(True, linewidth=0.5)
     ax.xaxis.grid(True, linewidth=0.5)

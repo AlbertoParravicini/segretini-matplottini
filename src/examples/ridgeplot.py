@@ -24,7 +24,7 @@ from plot_utils import *
 ##############################
 
 INPUT_DATA_PATH = "../../data/ridgeplot_data.csv"
-PALETTE = [COLORS["peach2"], COLORS["g1"]]
+PALETTE = ["#F7C0A4", PALETTE_G[2]]
 
 ##############################
 ##############################
@@ -122,7 +122,7 @@ def ridgeplot(data: pd.DataFrame, plot_confidence_intervals: bool=True,
     # Plot the name of each plot;
     def label(x, label, color="#2f2f2f"):
         ax = plt.gca()
-        ax.text(0, 0.15, label, color=color, ha="left", va="center", transform=ax.transAxes, fontsize=18)      
+        ax.text(0 if compact_layout else 0.01, 0.15, label, color=color, ha="left", va="center", transform=ax.transAxes, fontsize=18)      
     g.map(label, identifier_column)
     
     if plot_confidence_intervals:
@@ -166,9 +166,11 @@ def ridgeplot(data: pd.DataFrame, plot_confidence_intervals: bool=True,
         return f"{int(100 * x)}%"
     # Disable y ticks and remove axis;
     g.set(yticks=[])
-    g.despine(bottom=True, left=True)
-            
-    # Identify the last axes on each column and update them;
+    g.despine(bottom=True, left=compact_layout)
+    
+    # Identify the last axes on each column and update them.
+    # We handle the case where the total number of plots is < than rows * columns.
+    # It is not necessary in this case, but it's useful to have;
     n_rows = int(data[row_identifier].max()) + 1
     n_cols = int(data[col_identifier].max()) + 1
     n_axes = int(n_rows * n_cols)

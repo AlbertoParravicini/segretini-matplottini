@@ -37,6 +37,9 @@ def setup_plot():
     """
     Standard setup of plot style;
     """
+    # Reset matplotlib settings;
+    plt.rcdefaults()
+    # Set style;
     sns.set_style("white", {"ytick.left": True, "xticks.bottom": True, "grid.linewidth": 0.5})
     plt.rcParams["font.family"] = ["Latin Modern Roman Demi"]
     plt.rcParams['axes.titlepad'] = 40 
@@ -245,7 +248,7 @@ if __name__ == "__main__":
     operational_intensity = 1 / 12
     
     ax = roofline(performance, operational_intensity, peak_performance, peak_bandwidth, add_legend=True, legend_labels="CPU")
-    save_plot("../plots", "roofline.{}")  
+    save_plot("../../plots", "roofline.{}")  
     
     #%% Create a fancier Roofline model, with multiple lines and custom settings;
     packet_size = 15

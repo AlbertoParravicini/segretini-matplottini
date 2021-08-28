@@ -44,6 +44,8 @@ This plot shows how to use dates for the x-axis, and do fairly complex visualiza
 
 ![Performance Scaling](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/performance_scaling.png)
 
+Temporarily removed `src/examples/barplot_2.py`, it has to be cleaned to be usable again.
+
 ## Update 2021-03-22
 
 Updated **Ridgeplot** to have confidence intervals and be more user-friendly (`src/examples/ridgeplot.py`). Added some general tips about choosing colors.
@@ -65,5 +67,3 @@ Added **Roofline Plot**, find it in `src/examples/roofline.py`.
 
 Updated **Ridge Plot**, find it in `src/examples/ridgeplot.py`.
 Added **Bar Plot - Example 2**, find it in `src/examples/barplot_2.py`.
-
-![Barplot 2 Example](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/barplot_2.png)

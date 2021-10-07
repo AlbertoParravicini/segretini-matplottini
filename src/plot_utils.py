@@ -75,7 +75,8 @@ PALETTE_1 = ["#4C9389", "#60b1b0", "#8fd4d4", "#9BD198", "#EFE8AC", "#f9af85", "
 
 # Palette of green tones, light to dark;
 PALETTE_G = ["#AEE69C", "#96DE9B", "#73BD8E", "#66B784", "#469E94", "#3A857C", "#34756E"] 
-
+PALETTE_G2 = ["#D5FFC7", "#9AE39F", "#73BD8E", "#5EA889", "#4F9E8C", "#3C8585"]
+PALETTE_G3 = ["#E7F7DF", "#B5E8B5", "#71BD8A", "#469C7F", "#257A7A"]
 # Palette of orange/yellow/brown tones;
 PALETTE_O = ["#FDCE7C", "#EBB25E", "#E6A37C", "#FAB187", "#E3896F", "#E37E62", "#FD867C"]
 
@@ -90,7 +91,7 @@ def hex_color_to_grayscale(c):
     return to_hex(hsv_to_rgb(new_c))
 
 
-def get_exp_label(val, prefix="", decimal_remaining_val: bool=False, tens_only=True, from_string=True, decimal_places=2) -> str: 
+def get_exp_label(val, prefix="", decimal_remaining_val: bool=False, integer_mantissa=True, from_string=True, decimal_places=2) -> str: 
     """
     :param val: numeric label to format
     :return: label formatted in scientific notation
@@ -102,7 +103,7 @@ def get_exp_label(val, prefix="", decimal_remaining_val: bool=False, tens_only=T
         # Get the power of 10
         exp_val = 0
         remaining_val = int(val)
-        while ((remaining_val % 10 == 0 if tens_only else remaining_val > 1) and remaining_val > 0):
+        while ((remaining_val % 10 == 0 if integer_mantissa else remaining_val > 1) and remaining_val > 0):
             exp_val += 1
             remaining_val = remaining_val // 10
         if remaining_val > 1 and exp_val >= 1:
@@ -120,6 +121,12 @@ def get_exp_label(val, prefix="", decimal_remaining_val: bool=False, tens_only=T
         decimal_part = float(string.split("E")[0])
         sign = string.split("E")[1][0]
         exponent = int(string.split("E")[1][1:])
+        if integer_mantissa:
+            while (decimal_part - int(decimal_part) > 0) if val > 0 else (decimal_part - int(decimal_part) < 0):
+                decimal_part *= 10
+                decimal_part = float("{:.{prec}f}".format(decimal_part, prec=decimal_places))
+                exponent -=1
+            decimal_part = int(decimal_part)
         return r"$\mathdefault{" + prefix + str(decimal_part) + r"\!·\!{10}^{" + (sign if sign == "-" else "") + str(exponent) + r"}}$"
     
 
@@ -163,20 +170,17 @@ def get_upper_ci_size(x, ci=0.95, estimator=np.mean):
     
     
 def add_labels(ax: plt.Axes, labels: list=None, vertical_offsets: list=None, 
-               vertical_coords: list=None,
                patch_num: list=None, fontsize: int=14, rotation: int=0,
                skip_zero: bool=False, format_str: str="{:.2f}x",
                label_color: str="#2f2f2f", max_only=False,
                skip_bars: int=0, max_bars: int=None,
                skip_value: float=None, skip_threshold: float=1e-6,
-               skip_nan_bars: bool=True):
+               skip_nan_bars: bool=True, max_height: float=None):
     """
     :param ax: current axis, it is assumed that each ax.Patch is a bar over which we want to add a label
     :param labels: optional labels to add. If not present, add the bar height
     :param vertical_offsets: additional vertical offset for each label.
       Useful when displaying error bars (see @get_upper_ci_size), and for fine tuning
-    :param vertical_coords: instead of specifyibf vertical offsets,
-      provide directly the vertical coordinates of the labels
     :param patch_num: indices of patches to which we add labels, if some of them should be skipped
     :param fontsize: size of each label
     :param rotation: rotation of the labels (e.g. 90°)
@@ -188,7 +192,9 @@ def add_labels(ax: plt.Axes, labels: list=None, vertical_offsets: list=None,
     :param max_bars: don't add labels after the specified bar
     :param skip_value: don't add labels equal to the specified value
     :param skip_threshold: threshold used to determine if a label is 1 or 0
-    :param skip_nan_bars: if True, skip bars with NaN height when placing labels;
+    :param skip_nan_bars: if True, skip bars with NaN height when placing labels
+    :param max_height: if present, place labels at this maximum specified height (e.g. the y axis limit)
+        
     Used to add labels above barplots;
     """
     if not vertical_offsets:
@@ -212,9 +218,10 @@ def add_labels(ax: plt.Axes, labels: list=None, vertical_offsets: list=None,
         if labels[i] and (i > 0 or not skip_zero) and (not max_only or i == argmax) and i < len(labels) and i < len(vertical_offsets):
             if skip_value and np.abs(labels[i] - skip_value) < skip_threshold:
                 continue  # Skip labels equal to the specified value;
-            ax.text(p.get_x() + p.get_width()/2.,
-                    (vertical_offsets[i] + p.get_height()) if not vertical_coords else vertical_coords[i],
-                    format_str.format(labels[i]), 
+            height = vertical_offsets[i] + p.get_height()
+            if max_height is not None and height > max_height:
+                height = max_height
+            ax.text(p.get_x() + p.get_width() / 2, height, format_str.format(labels[i]), 
                     fontsize=fontsize, color=label_color, ha='center', va='bottom', rotation=rotation)
         
         
@@ -231,7 +238,7 @@ def update_width(ax: plt.Axes, width: float=1):
         # Recenter the bar
         patch.set_x(patch.get_x() + 0.5 * diff)
         
-
+        
 def transpose_legend_labels(labels, patches, max_elements_per_row=6, default_elements_per_col=2):
     """
     Matplotlib by defaults places elements in the legend from top to bottom.
@@ -243,13 +250,13 @@ def transpose_legend_labels(labels, patches, max_elements_per_row=6, default_ele
     :param max_elements_per_row: maximum number of legend elements per row
     :param default_elements_per_col: by default, try having default_elements_per_col elements in each col (could be more if max_elements_per_row is reached) 
     """
-    elements_per_row = min(int(np.ceil(len(labels) / default_elements_per_col)), max_elements_per_row)  # Don't add too many assets per row;
+    elements_per_row = min(int(np.ceil(len(labels) / default_elements_per_col)), max_elements_per_row)  # Don't add too many elements per row;
     labels = np.concatenate([labels[i::elements_per_row] for i in range(elements_per_row)], axis=0)
     patches = np.concatenate([patches[i::elements_per_row] for i in range(elements_per_row)], axis=0)
     return labels, patches
-
         
-def save_plot(directory: str, filename: str, figure: plt.Figure=None, date: str = "", create_date_dir: bool = True, extension: list = ["pdf", "png"]):
+        
+def save_plot(directory: str, filename: str, figure: plt.Figure=None, date: str = "", create_date_dir: bool = True, extension: list = ["pdf", "png"], dpi=300):
     """
     :param directory: where the plot is stored
     :param filename: should be of format 'myplot_{}.{}', where the first placeholder is used for the date and the second for the extension,
@@ -262,13 +269,13 @@ def save_plot(directory: str, filename: str, figure: plt.Figure=None, date: str 
     
     output_folder = os.path.join(directory, date) if create_date_dir and date else directory
     if not os.path.exists(output_folder):
-        os.mkdir(output_folder)
+        Path(output_folder).mkdir(parents=True, exist_ok=True)
         
     for e in extension:
         if figure:
-            figure.savefig(os.path.join(output_folder, filename.format(date, e) if date else filename.format(e)), dpi=300)
+            figure.savefig(os.path.join(output_folder, filename.format(date, e) if date else filename.format(e)), dpi=dpi)
         else:  # Save the current plot;
-            plt.savefig(os.path.join(output_folder, filename.format(date, e) if date else filename.format(e)), dpi=300)
+            plt.savefig(os.path.join(output_folder, filename.format(date, e) if date else filename.format(e)), dpi=dpi)
 
 
 ####################################

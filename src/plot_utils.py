@@ -79,6 +79,8 @@ PALETTE_G2 = ["#D5FFC7", "#9AE39F", "#73BD8E", "#5EA889", "#4F9E8C", "#3C8585"]
 PALETTE_G3 = ["#E7F7DF", "#B5E8B5", "#71BD8A", "#469C7F", "#257A7A"]
 # Palette of orange/yellow/brown tones;
 PALETTE_O = ["#FDCE7C", "#EBB25E", "#E6A37C", "#FAB187", "#E3896F", "#E37E62", "#FD867C"]
+# Palette with orange baseline + green tones;
+PALETTE_OG = ["#E8CFB5", "#81C798", "#55A68B", "#358787"]
 
 ##################################
 # Utility functions for plotting #
@@ -381,6 +383,8 @@ def remove_outliers_df_iqr_grouped(data: pd.DataFrame, column: str, group: list,
     old_len = len(data)
     filtered = []
     for i, g in data.groupby(group, sort=False):
+        if debug:
+            print(f"filter {i}")
         filtered += [remove_outliers_iqr_df(g, column, reset_index, drop_index, quantile, iqr_extension, debug)]
     new_data = pd.concat(filtered, ignore_index=True)
     if debug and (len(new_data) < old_len):

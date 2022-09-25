@@ -21,9 +21,12 @@ import seaborn as sns
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
-from plot_utils import *
+from pathlib import Path
+from segretini_matplottini.utils.plot_utils import save_plot, hex_color_to_grayscale
+from segretini_matplottini.utils.colors import B4, C1, C2, R1, R2, R3, R5, PALETTE_O
 
-#%%
+PLOT_DIR = (Path(__file__).parent.parent / "plots").resolve()
+
 if __name__ == "__main__":
 
     ##############################
@@ -65,7 +68,9 @@ if __name__ == "__main__":
     fig = plt.figure(figsize=(4 * num_col, 3 * num_row))
     gs = gridspec.GridSpec(num_row, num_col)
     ax = fig.add_subplot(gs[1 % num_row, 1 // num_row])  # [row number, column number]
-    # Other options: create it directly using e.g. ax = sns.lineplot(...) or fig = sns.catplot(...)
+    # Other options:
+    # - Create it directly using e.g. ax = sns.lineplot(...) or fig = sns.catplot(...)
+    # - If adding a single subplot, you can do ax = fig.add_subplot() without GridSpec
 
     ##############################
     # Adjust plot margins ########
@@ -74,12 +79,12 @@ if __name__ == "__main__":
     # These settings affect the current figure;
     plt.subplots_adjust(
         top=0.90,  # Max is 1
-        bottom=0.04,  # Min is 0
+        bottom=0.2,  # Min is 0
         left=0.08,  # Min is 0
         right=0.88,  # Max is 1
         hspace=0.7,  # Vertical space (height)
-        wspace=0.6,
-    )  # Horizontal space (width)
+        wspace=0.6,  # Horizontal space (width)
+    )
 
     # Despine plot (i.e. delete bars top and right);
     sns.despine(ax=ax, top=True, right=True)
@@ -101,20 +106,15 @@ if __name__ == "__main__":
     plt.yscale("linear")
     plt.xscale("linear")
 
-    #%%
-    def asd(self, asdf):
-        self = +1
-        return self + asdf
-
     ##############################
     # Palettes ###################
     ##############################
 
     # Plot to visualize colors;
-    sns.palplot(COLORS.values())
+    sns.palplot(PALETTE_O)
 
     # Custom color palette ranging from color 1 to color 2, with a neutral tone in the middle, and 20 shades;
-    cm = LinearSegmentedColormap.from_list("test", [COLORS["b4"], "#DEDEDE", COLORS["r5"]], N=20)
+    cm = LinearSegmentedColormap.from_list("test", [B4, "#DEDEDE", R5], N=20)
     # Obtain 10 colors as:
     colors = [cm(x) for x in np.linspace(0, 1, 10)]
     sns.palplot(colors)
@@ -126,14 +126,13 @@ if __name__ == "__main__":
     grayscale_colors = [hex_color_to_grayscale(c) for c in colors]
     sns.palplot(grayscale_colors)
 
-    #%%
-
     ##############################
     # Axis ticks and labels ######
     ##############################
 
     # Add some random data to a plot;
-    fig = plt.figure(figsize=(2, 2))
+    fig = plt.figure(figsize=(6, 6))
+    plt.subplots_adjust(bottom=0.2)
     gs = gridspec.GridSpec(1, 1)
     ax = fig.add_subplot(gs[0, 0])
     x = np.linspace(0, 2 * np.pi, 100)
@@ -169,16 +168,14 @@ if __name__ == "__main__":
     # Set axis label;
     ax.set_xlabel("X Axis", fontsize=12)
 
-    #%%
-
     ##############################
     # Legend #####################
     ##############################
 
     # Create a new custom legend;
-    labels = ["r1", "r2", "r3"]
+    labels = [R1, R2, R3]
     # Create "colors" for the legend;
-    custom_lines = [Patch(facecolor=COLORS[x], edgecolor="#2f2f2f", label=x) for x in labels]
+    custom_lines = [Patch(facecolor=x, edgecolor="#2f2f2f", label=x) for x in labels]
     # Create the legend. Note that the legend is positioned using the figure percentage (in this case, top-right corner),
     #   which is better for plots with many subplots;
     # Use ax.legend(...) to create a legend relative to the current axis;
@@ -188,8 +185,8 @@ if __name__ == "__main__":
 
     # Another legend, using dots instead of rectangles to denote colors;
     custom_lines = [
-        Line2D([0], [0], marker="o", color="w", label="Label 1", markerfacecolor=COLORS["c1"], markersize=15),
-        Line2D([0], [0], marker="o", color="w", label="Label 2", markerfacecolor=COLORS["c2"], markersize=15),
+        Line2D([0], [0], marker="o", color="w", label="Label 1", markerfacecolor=C1, markersize=15),
+        Line2D([0], [0], marker="o", color="w", label="Label 2", markerfacecolor=C2, markersize=15),
     ]
     leg = fig.legend(
         custom_lines, ["Label 1", "Label 2"], bbox_to_anchor=(1, 0.7), fontsize=14, title_fontsize=12, ncol=2
@@ -205,8 +202,6 @@ if __name__ == "__main__":
         for t in ax.get_legend().texts:
             t.set_text(t.get_text().upper())
 
-    #%%
-
     ##############################
     # Set axis limits ############
     ##############################
@@ -214,8 +209,6 @@ if __name__ == "__main__":
     # Get/set axis limits.
     # Better do it after plotting, as values might be overwritten by the plotting function;
     ax.set_ylim((0, ax.get_ylim()[1]))
-
-    #%%
 
     ##############################
     # Annotations ################
@@ -242,16 +235,8 @@ if __name__ == "__main__":
         verticalalignment="center",
     )
 
-    #%%
-
     ##############################
     # Save plot ##################
     ##############################
 
-    save_folder = "plots"
-    if not os.path.exists(save_folder):
-        os.mkdir(save_folder)
-
-    # Use "pdf" or "png". The "dpi" setting is only relevant for "png";
-    extension = "pdf"
-    plt.savefig(f"../plots/test.{extension}", dpi=200)
+    save_plot(PLOT_DIR, "test.{}")

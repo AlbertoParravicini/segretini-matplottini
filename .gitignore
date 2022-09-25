@@ -1,1 +1,6 @@
 **.pyc
+segretini_matplottini.egg-info/
+build/
+**/__pycache__/
+dist/
+**/.DS_Store

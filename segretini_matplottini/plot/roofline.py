@@ -230,7 +230,8 @@ def roofline(
         tic.tick1line.set_visible(True)
         tic.tick2line.set_visible(False)
     # Set exponential labels on the y axis;
-    ax.set_yticklabels(labels=[get_exp_label(l) for l in ax.get_yticks()], ha="right", fontsize=base_font_size)
+    ax.yaxis.set_major_formatter(lambda x, pos: get_exp_label(x))
+    ax.tick_params(axis="y", labelsize=base_font_size)
     # Fix ticks on the x axis, ensuring that all minor ticks appear;
     ax.tick_params(labelcolor="black", labelsize=base_font_size, pad=1)
     ax.minorticks_on()

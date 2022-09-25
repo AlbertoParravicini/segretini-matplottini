@@ -45,14 +45,12 @@ In scatterplots and lineplots you can use different markers (circles, diamonds, 
 ## Update 2022-09-25
 
 I'm revamping the structure of the repository, to make it easier to integrate in other repositories and create pretty plots.
-* Some of the examples in `notebooks` might not work out-of-the-box, such as `plot_ridgeplot.py`. 
-I'll fix them as soon as possible! 
 * I also added a new legend style, and squashed many bugs in `plot_utils.py`
 
 ## Update 2021-08-28
 
 Update style of **Ridgeplot** to be readable in black & white. Added *large* layout to **Ridgeplot**
-<!-- ![Ridgeplot Example](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/ridgeplot_large.png) -->
+![Ridgeplot Example](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/2022-09-25/ridgeplot_large.png)
 
 Updates to `plot_utils.py`: added option to directly provide vertical coordinates to `add_labels`. Added better outlier removal based on interquantile range (the same approach used to find outliers in box-plots)
 
@@ -66,7 +64,7 @@ This plot shows how to use dates for the x-axis, and do fairly complex visualiza
 
 Updated **Ridgeplot** to have confidence intervals and be more user-friendly (`notebooks/plot_ridgeplot.py`). Added some general tips about choosing colors.
 
-<!-- ![Ridgeplot Example](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/ridgeplot.png) -->
+<!-- ![Ridgeplot Example](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/2022-09-25/ridgeplot.png) -->
 
 ## Update 2021-03-20
 

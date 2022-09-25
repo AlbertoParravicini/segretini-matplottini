@@ -10,7 +10,7 @@ from scipy import stats
 
 from segretini_matplottini.utils.colors import PALETTE_G, PALETTE_O
 from segretini_matplottini.utils.plot_utils import (
-    add_legend_with_dark_shadow_to_axis, extend_palette, reset_plot_style)
+    add_legend_with_dark_shadow, extend_palette, reset_plot_style as _reset_plot_style)
 
 
 def correlation_scatterplot(
@@ -26,6 +26,7 @@ def correlation_scatterplot(
     highlight_negative_area: bool = True,
     xlimits: Optional[tuple[float, float]] = None,
     ylimits: Optional[tuple[float, float]] = None,
+    reset_plot_style: bool = True,
 ) -> tuple[plt.Figure, plt.Axes]:
     """
     Plot a detailed correlation analysis between two variables.
@@ -46,14 +47,15 @@ def correlation_scatterplot(
     :param plot_regression: If True, add a Seaborn linear regression plot.
     :param xlimits: If specified, truncate the x-axis to this interval.
     :param ylimits: If specified, truncate the y-axis to this interval.
+    :param reset_plot_style: If True, reset the style of the plot before plotting.
     :return: Matplotlib figure and axis containing the plot
     """
 
     ##############
     # Plot setup #
     ##############
-
-    reset_plot_style(label_pad=5)
+    if reset_plot_style:
+        _reset_plot_style(label_pad=5)
 
     # Create a figure for the plot, and adjust margins;
     fig = plt.figure(figsize=(3.4, 3.1))
@@ -96,7 +98,6 @@ def correlation_scatterplot(
             data=data,
             levels=5,
             color=PALETTE_O[3],
-            linewidths=1,
             fill=True,
             alpha=0.5,
             zorder=2,
@@ -174,7 +175,7 @@ def correlation_scatterplot(
         labels = list(data[hue].unique())
         palette = extend_palette(palette, len(labels))
         custom_lines = [Patch(facecolor=palette[::-1][i], edgecolor="#2f2f2f", label=l) for i, l in enumerate(labels)]
-        add_legend_with_dark_shadow_to_axis(
+        add_legend_with_dark_shadow(
             ax=ax,
             handles=custom_lines,
             labels=labels,

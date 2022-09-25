@@ -12,6 +12,7 @@ import scipy.stats as st
 import seaborn as sns
 from matplotlib.artist import allow_rasterization
 from matplotlib.axis import Axis
+from matplotlib.figure import Figure
 from matplotlib.colors import hsv_to_rgb, rgb_to_hsv, to_hex, to_rgb
 from matplotlib.patches import Patch, Shadow
 
@@ -56,68 +57,71 @@ class LegendWithDarkShadow(matplotlib.legend.Legend):
         self.stale = False
 
 
-def add_legend_with_dark_shadow_to_axis(ax: Axis, shadow_offset: int = 2, *args: Any, **kwargs: Any) -> None:
-    """
-    Add a legend with dark shadow to the specified axis.
-
-    :param ax: Axis where the legend is added.
-    :param shadow_offset: Offset of the shadow from the legend.
-    :param args: Any argument passed to the legend constructor.
-    :param kwargs: Any keyword argument passed to the legend constructor.
-    """
-    handles, labels, _, kwargs = matplotlib.legend._parse_legend_args([ax], *args, **kwargs)
-    ax.legend_ = LegendWithDarkShadow(
-        ax,
-        handles,
-        labels,
-        fancybox=False,
-        framealpha=1,
-        shadow=True,
-        edgecolor="#2f2f2f",
-        **kwargs,
-    )
-    ax.legend_.shadow_offset = shadow_offset
-
-
 def add_legend_with_dark_shadow(
-    fig: plt.Figure,
-    patches: list[Patch],
+    handles: list[Patch],
     labels: list[str],
+    fig: Optional[Figure] = None,
     ax: Optional[Axis] = None,
     shadow_offset: int = 2,
+    line_width=0.5,
+    *args: Any,
     **kwargs: Any,
 ) -> tuple[LegendWithDarkShadow, Axis]:
     """
-    Add a legend with dark shadow to the specified figure.
+    Add a legend with dark shadow to the specified axis.
 
     :param fig: Figure where the legend is added.
-    :param patches: List of legend color patches used to create the legend.
-    :param labels: List of textual labels used to create the legend.
-    :param ax: If present, add the legend to the specified axis.
+    :param ax: Axis where the legend is added. If both figure and axis are specified,
+        draw the legend in the axis. If neither figure nor axis are specified, draw the legend in the current figure.
     :param shadow_offset: Offset of the shadow from the legend.
+    :param line_width: Width of the legend box.
+    :param args: Any argument passed to the legend constructor.
     :param kwargs: Any keyword argument passed to the legend constructor.
-    :return: The created legend and the figure.
     """
+    # If both figure and axis are missing, draw in the current figure
+    if fig is None and ax is None:
+        fig = plt.gcf()
+    legend_kwargs = (
+        dict(
+            fancybox=False,
+            framealpha=1,
+            shadow=True,
+            edgecolor="#2f2f2f",
+        )
+        | kwargs
+    )
+    # If the axis is specified, always draw in the axis
+    where_to_draw = fig
+    if ax is not None:
+        # Draw in the current axis
+        handles, labels, _, kwargs = matplotlib.legend._parse_legend_args(
+            [ax], handles=handles, labels=labels, *args, **kwargs
+        )
+        where_to_draw = ax
     leg = LegendWithDarkShadow(
-        fig if ax is None else ax,
-        patches,
+        where_to_draw,
+        handles,
         labels,
-        fancybox=False,
-        framealpha=1,
-        shadow=True,
-        shadow_offset=shadow_offset,
-        edgecolor="#2f2f2f",
-        **kwargs,
+        **legend_kwargs,
     )
     leg.shadow_offset = shadow_offset
+    leg.get_frame().set_linewidth(line_width)
+    # Add legend to the axis
     if ax is None:
         ax = plt.gca()
-        ax.legend_ = leg
-    return leg, fig
+    ax.legend_ = leg
+    return leg, ax
 
 
 def reset_plot_style(
-    label_pad: float = 0, xtick_major_pad: float = 1, ytick_major_pad: float = 1, border_width: float = 0.8
+    label_pad: float = 0,
+    xtick_major_pad: float = 1,
+    ytick_major_pad: float = 1,
+    border_width: float = 0.8,
+    grid_linewidth: Optional[float] = None,
+    title_size: Optional[float] = None,
+    title_pad: Optional[float] = None,
+    label_size: Optional[float] = None,
 ):
     """
     Initialize the plot with a consistent style.
@@ -125,16 +129,30 @@ def reset_plot_style(
     :param label_pad: Padding between axis and axis label.
     :param xtick_major_pad: Padding between axis ticks and tick labels.
     :param ytick_major_pad: Padding between axis ticks and tick labels.
+    :param grid_linewidth: Width of lines in the grid, when enabled.
+    :param title_size: Size of the title.
+    :param title_pad: Padding of the title.
+    :param label_size: Size of the labels.
     :param border_width: Line width of the axis borders.
     """
     # Reset matplotlib settings;
     plt.rcdefaults()
     # Setup general plotting settings;
-    sns.set_style("white", {"ytick.left": True, "xtick.bottom": True})
+    style_dict = {"ytick.left": True, "xtick.bottom": True}
+    if grid_linewidth is not None:
+        style_dict["grid_linewidth"] = grid_linewidth
+    sns.set_style("white", style_dict)
+    # Other parameters
     plt.rcParams["axes.labelpad"] = label_pad
     plt.rcParams["xtick.major.pad"] = xtick_major_pad
     plt.rcParams["ytick.major.pad"] = ytick_major_pad
     plt.rcParams["axes.linewidth"] = border_width
+    if title_size is not None:
+        plt.rcParams["axes.titlesize"] = title_size
+    if title_pad is not None:
+        plt.rcParams["axes.titlepad"] = title_pad
+    if label_size is not None:
+        plt.rcParams["axes.labelsize"] = label_size
 
 
 def extend_palette(palette: list[str], new_length: int) -> list[str]:
@@ -166,6 +184,7 @@ def get_exp_label(
     prefix: str = "",
     integer_mantissa: bool = True,
     decimal_places: int = 2,
+    skip_mantissa_if_equal_to_one: bool = True,
 ) -> str:
     """
     Format a label in scientific notation, using Latex math font.
@@ -176,6 +195,8 @@ def get_exp_label(
     :param integer_mantissa: If True, return a label whose mantissa is an integer number. For example,
         with `get_exp_label(0.00123, integer_mantissa=False) -> $\\mathdefault{1.23\\!·\\!{10}^{-3}}$`,
         while `get_exp_label(0.00123, integer_mantissa=True) -> $\\mathdefault{123\\!·\\!{10}^{-1}}$`.
+    :param decimal_places: Number of digits to have in the decimal places, if not using an integer mantissa.
+    :param skip_mantissa_if_equal_to_one: Do not add the mantissa if it is equal to 1.
     :return: Label formatted in scientific notation.
     """
     string = "{:.{prec}E}".format(value, prec=decimal_places)
@@ -188,11 +209,16 @@ def get_exp_label(
             decimal_part = float("{:.{prec}f}".format(decimal_part, prec=decimal_places))
             exponent -= 1
         decimal_part = int(decimal_part)
+    separator = r"\!·\!"
+    if skip_mantissa_if_equal_to_one and decimal_part == 1:
+        decimal_part = ""
+        separator = ""
     return (
         r"$\mathdefault{"
         + prefix
         + str(decimal_part)
-        + r"\!·\!{10}^{"
+        + separator
+        + r"{10}^{"
         + (sign if sign == "-" else "")
         + str(exponent)
         + r"}}$"
@@ -352,7 +378,7 @@ def update_bars_width(ax: Axis, percentage_width: float = 1) -> None:
 
 
 def transpose_legend_labels(
-    labels: list[str], patches: list[Patch], max_elements_per_row: int = 6, default_elements_per_col: int = 2
+    labels: list[str], handles: list[Patch], max_elements_per_row: int = 6, default_elements_per_col: int = 2
 ) -> tuple[list[str], list[Patch]]:
     """
     Matplotlib by defaults places elements in the legend from top to bottom.
@@ -361,7 +387,7 @@ def transpose_legend_labels(
     allowing to set the maximum number of values you want in each row.
 
     :param labels: List of textual labels in the legend.
-    :param patches: List of color patches in the legend.
+    :param handles: List of color patches in the legend.
     :param max_elements_per_row: Maximum number of legend elements per row.
     :param default_elements_per_col: By default, try having default_elements_per_col elements
         in each column (could be more if max_elements_per_row is reached).
@@ -370,8 +396,8 @@ def transpose_legend_labels(
         int(np.ceil(len(labels) / default_elements_per_col)), max_elements_per_row
     )  # Don't add too many elements per row;
     labels = np.concatenate([labels[i::elements_per_row] for i in range(elements_per_row)], axis=0)
-    patches = np.concatenate([patches[i::elements_per_row] for i in range(elements_per_row)], axis=0)
-    return labels, patches
+    handles = np.concatenate([handles[i::elements_per_row] for i in range(elements_per_row)], axis=0)
+    return labels, handles
 
 
 def assemble_output_directory_name(

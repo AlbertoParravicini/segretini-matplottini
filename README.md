@@ -50,6 +50,7 @@ I'm revamping the structure of the repository, to make it easier to integrate in
 ## Update 2021-08-28
 
 Update style of **Ridgeplot** to be readable in black & white. Added *large* layout to **Ridgeplot**
+
 ![Ridgeplot Example](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/2022-09-25/ridgeplot_large.png)
 
 Updates to `plot_utils.py`: added option to directly provide vertical coordinates to `add_labels`. Added better outlier removal based on interquantile range (the same approach used to find outliers in box-plots)

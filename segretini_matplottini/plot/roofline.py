@@ -1,17 +1,17 @@
-from segretini_matplottini.utils.colors import BB4, BB5, G2, PEACH1
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
-
-from matplotlib.lines import Line2D
 from typing import Optional
+
+import matplotlib.gridspec as gridspec
+import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.axis import Axis
 from matplotlib.figure import Figure
+from matplotlib.lines import Line2D
+
+from segretini_matplottini.utils.colors import BB4, BB5, G2, PEACH1
 from segretini_matplottini.utils.plot_utils import (
-    get_exp_label,
-    reset_plot_style as _reset_plot_style,
-    add_legend_with_dark_shadow,
-)
+    add_legend_with_dark_shadow, get_exp_label)
+from segretini_matplottini.utils.plot_utils import \
+    reset_plot_style as _reset_plot_style
 
 MARKERS = ["o", "X", "D", "P"]
 PALETTE = [PEACH1, G2, BB4, BB5]

@@ -12,6 +12,7 @@ this is a good place to start your search;
 """
 
 import os
+from pathlib import Path
 
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
@@ -21,9 +22,11 @@ import seaborn as sns
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
-from pathlib import Path
-from segretini_matplottini.utils.plot_utils import save_plot, hex_color_to_grayscale
-from segretini_matplottini.utils.colors import B4, C1, C2, R1, R2, R3, R5, PALETTE_O
+
+from segretini_matplottini.utils.colors import (B4, C1, C2, PALETTE_O, R1, R2,
+                                                R3, R5)
+from segretini_matplottini.utils.plot_utils import (hex_color_to_grayscale,
+                                                    save_plot)
 
 PLOT_DIR = (Path(__file__).parent.parent / "plots").resolve()
 

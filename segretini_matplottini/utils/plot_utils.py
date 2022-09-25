@@ -12,8 +12,8 @@ import scipy.stats as st
 import seaborn as sns
 from matplotlib.artist import allow_rasterization
 from matplotlib.axis import Axis
-from matplotlib.figure import Figure
 from matplotlib.colors import hsv_to_rgb, rgb_to_hsv, to_hex, to_rgb
+from matplotlib.figure import Figure
 from matplotlib.patches import Patch, Shadow
 
 

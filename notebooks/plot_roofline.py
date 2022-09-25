@@ -1,10 +1,11 @@
-import matplotlib.gridspec as gridspec
-import matplotlib.pyplot as plt
 from pathlib import Path
 from typing import Any
 
+import matplotlib.gridspec as gridspec
+import matplotlib.pyplot as plt
+
+from segretini_matplottini.plot.roofline import MARKERS, PALETTE, roofline
 from segretini_matplottini.utils.plot_utils import save_plot
-from segretini_matplottini.plot.roofline import roofline, MARKERS, PALETTE
 
 ##############################
 # Setup ######################

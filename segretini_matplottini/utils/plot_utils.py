@@ -4,9 +4,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 from matplotlib.colors import rgb_to_hsv, to_rgb, to_hex, hsv_to_rgb
-from scipy.stats.mstats import gmean
-import scipy.stats
-from functools import reduce
 from pathlib import Path
 from typing import Union, Sequence, Callable, Optional, Any
 from matplotlib.axis import Axis
@@ -119,43 +116,44 @@ def get_upper_ci_size(x, ci=0.95, estimator=np.mean):
 
 
 def add_labels(
-    ax: plt.Axes,
-    labels: list = None,
-    vertical_offsets: list = None,
-    patch_num: list = None,
+    ax: Axis,
+    labels: list[str] = None,
+    vertical_offsets: list[float] = None,
+    patch_num: list[int] = None,
     fontsize: int = 14,
     rotation: int = 0,
     skip_zero: bool = False,
     format_str: str = "{:.2f}x",
     label_color: str = "#2f2f2f",
-    max_only=False,
+    max_only: bool = False,
     skip_bars: int = 0,
-    max_bars: int = None,
-    skip_value: float = None,
+    max_bars: Optional[int] = None,
+    skip_value: Optional[float] = None,
     skip_threshold: float = 1e-6,
     skip_nan_bars: bool = True,
-    max_height: float = None,
+    max_height: Optional[float] = None,
 ):
     """
-    :param ax: current axis, it is assumed that each ax.Patch is a bar over which we want to add a label
-    :param labels: optional labels to add. If not present, add the bar height
-    :param vertical_offsets: additional vertical offset for each label.
-      Useful when displaying error bars (see @get_upper_ci_size), and for fine tuning
-    :param patch_num: indices of patches to which we add labels, if some of them should be skipped
-    :param fontsize: size of each label
-    :param rotation: rotation of the labels (e.g. 90°)
-    :param skip_zero: if True, don't put a label over the first bar
-    :param format_str: format of each label, by default use speedup (e.g. 2.10x)
-    :param label_color: hexadecimal color used for labels
-    :param max_only: add only the label with highest value
-    :param skip_bars: start adding labels after the specified number of bars
-    :param max_bars: don't add labels after the specified bar
-    :param skip_value: don't add labels equal to the specified value
-    :param skip_threshold: threshold used to determine if a label is 1 or 0
-    :param skip_nan_bars: if True, skip bars with NaN height when placing labels
-    :param max_height: if present, place labels at this maximum specified height (e.g. the y axis limit)
+    Add labels above barplots.
 
-    Used to add labels above barplots;
+    :param ax: Current axis, it is assumed that each ax.Patch is a bar over which we want to add a label.
+    :param labels: Optional labels to add. If not present, add the bar height.
+    :param vertical_offsets: Additional vertical offset for each label.
+        Useful when displaying error bars (see @get_upper_ci_size), and for fine tuning.
+    :param patch_num: Indices of patches to which we add labels, if some of them should be skipped.
+    :param fontsize: Size of each label.
+    :param rotation: Rotation of the labels (e.g. `90` for 90°).
+    :param skip_zero: If True, don't put a label over the first bar.
+    :param format_str: Format of each label, by default use speedup (e.g. 2.10x).
+    :param label_color: Hexadecimal color used for labels.
+    :param max_only: Add only the label with highest value.
+    :param skip_bars: Start adding labels after the specified number of bars.
+    :param max_bars: Don't add labels after the specified bar.
+    :param skip_value: Don't add labels equal to the specified value.
+    :param skip_threshold: Threshold used to determine if a label's value is close enough to `skip_value` 
+        and should be skipped
+    :param skip_nan_bars: If True, skip bars with NaN height when placing labels.
+    :param max_height: If present, place labels at this maximum specified height (e.g. the y axis limit).
     """
     if not vertical_offsets:
         # 5% above each bar, by default;
@@ -302,261 +300,3 @@ def save_plot(
             figure.savefig(os.path.join(output_folder, output_filename), **kwargs)
         else:  # Save the current plot;
             plt.savefig(os.path.join(output_folder, output_filename), **kwargs)
-
-
-####################################
-# Utility functions for DataFrames #
-####################################
-
-
-def remove_outliers(data, sigmas: int = 3):
-    """
-    :param data: a sequence of numerical data, iterable
-    :param sigmas: number of standard deviations outside which a value is consider to be an outlier
-    :return: data without outliers
-
-    Filter a sequence of data by keeping only values within "sigma" standard deviations from the mean.
-    This is a simple way to filter outliers, it is more useful for visualizations than for sound statistical analyses;
-    """
-    return data[np.abs(st.zscore(data)) < sigmas]
-
-
-def remove_outliers_df(
-    data: pd.DataFrame, column: str, reset_index: bool = True, drop_index: bool = True, sigmas: int = 3
-) -> pd.DataFrame:
-    """
-    :param data: a pd.DataFrame
-    :param column: name of the column where data are filtered
-    :param reset_index: if True, reset the index after filtering
-    :param drop_index: if True, drop the index column after reset
-    :param sigmas: number of standard deviations outside which a value is consider to be an outlier
-    :return: data without outliers
-
-    Filter a sequence of data by keeping only values within "sigma" standard deviations from the mean.
-    This is a simple way to filter outliers, it is more useful for visualizations than for sound statistical analyses;
-    """
-    col = data[column]
-    res = data.loc[remove_outliers(col, sigmas).index]
-    if reset_index:
-        res = res.reset_index(drop=drop_index)
-    return res
-
-
-def remove_outliers_df_grouped(
-    data: pd.DataFrame,
-    column: str,
-    group: list,
-    reset_index: bool = True,
-    drop_index: bool = True,
-    sigmas: int = 3,
-    debug: bool = True,
-) -> pd.DataFrame:
-    """
-    Same as "remove_outliers_df", but also filter values after divided by the group of columns specified in "group";
-    """
-    old_len = len(data)
-    filtered = []
-    for i, g in data.groupby(group, sort=False):
-        filtered += [remove_outliers_df(g, column, reset_index, drop_index, sigmas)]
-    new_data = pd.concat(filtered, ignore_index=True)
-    if debug and (len(new_data) < old_len):
-        print(f"removed {old_len - len(new_data)} outliers")
-    return new_data
-
-
-def remove_outliers_iqr(data, quantile: float = 0.75, iqr_extension: float = 1.5):
-    """
-    :param data: a sequence of numerical data, iterable
-    :param quantile: upper quantile value used as filtering threshold. Also use (1 - quantile) as lower threshold. Should be in [0.5, 1]
-    :param iqr_extension: multiple of interquantile range (iqr) used to filter data, starting from the quantiles
-    :return: data without outliers
-
-    Filter a sequence of data by removing outliers looking at the quantiles of the distribution.
-    Find quantiles (by default, Q1 and Q3), and interquantile range (by default, Q3 - Q1),
-    and keep values in [Q1 - iqr_extension * IQR, Q3 + iqr_extension * IQR].
-    This is the same range used to identify whiskers in a boxplot (e.g. in pandas and seaborn);
-    """
-    assert quantile >= 0.5 and quantile <= 1
-    q1 = np.quantile(data, 1 - quantile)
-    q3 = np.quantile(data, quantile)
-    iqr = scipy.stats.iqr(data, rng=(100 - 100 * quantile, 100 * quantile))
-    return data[(data >= q1 - iqr * q1) & (data <= q3 + iqr * q3)]
-
-
-def remove_outliers_iqr_df(
-    data: pd.DataFrame,
-    column: str,
-    reset_index: bool = True,
-    drop_index: bool = True,
-    quantile: float = 0.75,
-    iqr_extension: float = 1.5,
-    debug: bool = True,
-) -> pd.DataFrame:
-    """
-    :param data: a pd.DataFrame
-    :param column: name of the column where data are filtered
-    :param reset_index: if True, reset the index after filtering
-    :param drop_index: if True, drop the index column after reset
-    :param quantile: upper quantile value used as filtering threshold. Also use (1 - quantile) as lower threshold. Should be in [0.5, 1]
-    :param iqr_extension: multiple of interquantile range (iqr) used to filter data, starting from the quantiles
-    :return: data without outliers
-
-    Filter a pd.DataFrame by removing outliers (on te specified column) looking at the quantiles of the distribution.
-    Find quantiles (by default, Q1 and Q3), and interquantile range (by default, Q3 - Q1),
-    and keep values in [Q1 - iqr_extension * IQR, Q3 + iqr_extension * IQR].
-    This is the same range used to identify whiskers in a boxplot (e.g. in pandas and seaborn);
-    """
-    old_len = len(data)
-    col = data[column]
-    new_data = data.loc[remove_outliers_iqr(col, quantile, iqr_extension).index]
-    if reset_index:
-        new_data = new_data.reset_index(drop=drop_index)
-    if debug and (len(new_data) < old_len):
-        print(f"removed {old_len - len(new_data)} outliers on column {column}")
-    return new_data
-
-
-def remove_outliers_df_iqr_grouped(
-    data: pd.DataFrame,
-    column: str,
-    group: list,
-    reset_index: bool = True,
-    drop_index: bool = True,
-    quantile: float = 0.75,
-    iqr_extension: float = 1.5,
-    debug: bool = True,
-) -> pd.DataFrame:
-    """
-    Same as "remove_outliers_iqr_df", but also filter values after divided by the group of columns specified in "group";
-    """
-    old_len = len(data)
-    filtered = []
-    for i, g in data.groupby(group, sort=False):
-        if debug:
-            print(f"filter {i}")
-        filtered += [remove_outliers_iqr_df(g, column, reset_index, drop_index, quantile, iqr_extension, debug)]
-    new_data = pd.concat(filtered, ignore_index=True)
-    if debug and (len(new_data) < old_len):
-        print(f"removed a total of {old_len - len(new_data)} outliers")
-    return new_data
-
-
-def compute_speedup(X: pd.DataFrame, col_slow: str, col_fast: str, col_speedup: str) -> None:
-    """
-    Add a column to a dataframe that represents a speedup,
-    and "col_slow", "col_fast" are execution times (e.g. CPU and GPU execution time);
-    """
-    X[col_speedup] = X[col_slow] / X[col_fast]
-
-
-def correct_speedup_df(
-    data: pd.DataFrame,
-    key: list,
-    baseline_filter_col,
-    baseline_filter_val,
-    speedup_col_name: str = "speedup",
-    speedup_col_name_reference: str = None,
-):
-    """
-    Divide the speedups in "speedup_col_name" by the geomean of "speedup_col_name_reference",
-    grouping values by the columns in "key" and specifying a baseline column and value to use as reference.
-    In most cases, speedup_col_name and speedup_col_name_reference are the same value.
-    Useful to ensure that the geomean baseline speedup is 1, and that the other speedups are corrected to reflect that;
-
-    Parameters
-    ----------
-    data : pd.DataFrame
-    key : list
-        list of columns on which the grouping is performed, e.g. ["benchmark_name", "implementation"].
-    baseline_filter_col : list
-        one or more columns used to recognize the baseline, e.g. ["hardware"].
-    baseline_filter_val : list
-        one or more values in "baseline_filter_col" used to recognize the baseline, e.g. ["cpu"]..
-    speedup_col_name : str, optional
-        Name of the speedup column to adjust. The default is "speedup".
-    speedup_col_name_reference : str, optional
-        Name of the reference speedup column, by default it is the same as "speedup_col_name"
-
-    Returns
-    -------
-    Updated DataFrame
-
-    """
-    if not speedup_col_name_reference:
-        speedup_col_name_reference = speedup_col_name
-    for i, g in data.groupby(key):
-        gmean_speedup = gmean(g.loc[g[baseline_filter_col] == baseline_filter_val, speedup_col_name_reference])
-        data.loc[g.index, speedup_col_name] /= gmean_speedup
-
-
-def compute_speedup_df(
-    data: pd.DataFrame,
-    key: list,
-    baseline_filter_col: list,
-    baseline_filter_val: list,
-    speedup_col_name: str = "speedup",
-    time_column: str = "exec_time",
-    baseline_col_name: str = "baseline_time",
-    correction: bool = True,
-    aggregation=np.median,
-    compute_relative_perf: bool = False,
-):
-    """
-    Compute speedups on a DataFrame by grouping values
-
-    Parameters
-    ----------
-    data : pd.DataFrame
-    key : list
-        list of columns on which the grouping is performed, e.g. ["benchmark_name", "implementation"].
-    baseline_filter_col : list
-        one or more columns used to recognize the baseline, e.g. ["hardware"].
-    baseline_filter_val : list
-        one or more values in "baseline_filter_col" used to recognize the baseline, e.g. ["cpu"]..
-    speedup_col_name : str, optional
-        Name of the new speedup column. The default is "speedup".
-    time_column : str, optional
-        Name of the execution time column. The default is "exec_time".
-    baseline_col_name : str, optional
-        Name of the new baseline execution time column. The default is "baseline_time".
-    correction : bool, optional
-        If True, ensure that the median of the baseline is 1. The default is True.
-    aggregation : function, optional
-        Function used to aggregate values. The default is np.median.
-    compute_relative_perf: bool, optional
-        If True, compute relative performance instead of speedup (i.e. 1 / speedup);
-
-    Returns
-    -------
-    A new DataFrame with the speedups
-    """
-
-    # Initialize speedup values;
-    data[speedup_col_name] = 1
-    data[baseline_col_name] = 0
-
-    if type(baseline_filter_col) is not list:
-        baseline_filter_col = [baseline_filter_col]
-    if type(baseline_filter_val) is not list:
-        baseline_filter_val = [baseline_filter_val]
-
-    assert len(baseline_filter_col) == len(baseline_filter_val)
-
-    grouped_data = data.groupby(key, as_index=False)
-    for group_key, group in grouped_data:
-        # Compute the median baseline computation time;
-        indices = [group[group[i] == j].index for i, j in zip(baseline_filter_col, baseline_filter_val)]
-        reduced_index = reduce(lambda x, y: x.intersection(y), indices)
-        mean_baseline = aggregation(data.loc[reduced_index, time_column])
-        # Compute the speedup for this group;
-        group.loc[:, speedup_col_name] = (
-            (group[time_column] / mean_baseline) if compute_relative_perf else (mean_baseline / group[time_column])
-        )
-        group.loc[:, baseline_col_name] = mean_baseline
-        data.loc[group.index, :] = group
-
-        # Guarantee that the geometric mean of speedup referred to the baseline is 1, and adjust speedups accordingly;
-        if correction:
-            gmean_speedup = gmean(data.loc[reduced_index, speedup_col_name])
-            group.loc[:, speedup_col_name] /= gmean_speedup
-            data.loc[group.index, :] = group

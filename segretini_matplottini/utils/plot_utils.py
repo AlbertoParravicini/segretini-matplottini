@@ -1,25 +1,29 @@
-import scipy.stats as st
-import pandas as pd
+import os
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Callable, Optional, Sequence, Union
+
+import matplotlib
+import matplotlib.legend
 import matplotlib.pyplot as plt
 import numpy as np
-import os
-from matplotlib.colors import rgb_to_hsv, to_rgb, to_hex, hsv_to_rgb
-from pathlib import Path
-from typing import Union, Sequence, Callable, Optional, Any
-from matplotlib.axis import Axis
-from matplotlib.patches import Patch
-from datetime import datetime
+import pandas as pd
+import scipy.stats as st
 import seaborn as sns
-import matplotlib
-from matplotlib.patches import Shadow
-import matplotlib.legend
 from matplotlib.artist import allow_rasterization
+from matplotlib.axis import Axis
+from matplotlib.colors import hsv_to_rgb, rgb_to_hsv, to_hex, to_rgb
+from matplotlib.patches import Patch, Shadow
 
 
 class LegendWithDarkShadow(matplotlib.legend.Legend):
     """
     A custom legend style with a rectangular box and a dark shadow around the box.
     """
+
+    def __post_init__(self):
+        self.shadow_offset = 2
+
     @allow_rasterization
     def draw(self, renderer):
         # docstring inherited
@@ -43,7 +47,7 @@ class LegendWithDarkShadow(matplotlib.legend.Legend):
         self.legendPatch.set_mutation_scale(fontsize)
 
         if self.shadow:
-            Shadow(self.legendPatch, 2, -2, alpha=1).draw(renderer)
+            Shadow(self.legendPatch, self.shadow_offset, -self.shadow_offset, alpha=1).draw(renderer)
 
         self.legendPatch.draw(renderer)
         self._legend_box.draw(renderer)
@@ -52,20 +56,36 @@ class LegendWithDarkShadow(matplotlib.legend.Legend):
         self.stale = False
 
 
-def add_legend_with_dark_shadow_to_axis(ax: Axis, *args: Any, **kwargs: Any) -> None:
+def add_legend_with_dark_shadow_to_axis(ax: Axis, shadow_offset: int = 2, *args: Any, **kwargs: Any) -> None:
     """
     Add a legend with dark shadow to the specified axis.
 
     :param ax: Axis where the legend is added.
+    :param shadow_offset: Offset of the shadow from the legend.
     :param args: Any argument passed to the legend constructor.
     :param kwargs: Any keyword argument passed to the legend constructor.
     """
     handles, labels, _, kwargs = matplotlib.legend._parse_legend_args([ax], *args, **kwargs)
-    ax.legend_ = LegendWithDarkShadow(ax, handles, labels, **kwargs)
+    ax.legend_ = LegendWithDarkShadow(
+        ax,
+        handles,
+        labels,
+        fancybox=False,
+        framealpha=1,
+        shadow=True,
+        edgecolor="#2f2f2f",
+        **kwargs,
+    )
+    ax.legend_.shadow_offset = shadow_offset
 
 
 def add_legend_with_dark_shadow(
-    fig: plt.Figure, patches: list[Patch], labels: list[str], ax: Optional[Axis] = None, **kwargs: Any
+    fig: plt.Figure,
+    patches: list[Patch],
+    labels: list[str],
+    ax: Optional[Axis] = None,
+    shadow_offset: int = 2,
+    **kwargs: Any,
 ) -> tuple[LegendWithDarkShadow, Axis]:
     """
     Add a legend with dark shadow to the specified figure.
@@ -74,15 +94,25 @@ def add_legend_with_dark_shadow(
     :param patches: List of legend color patches used to create the legend.
     :param labels: List of textual labels used to create the legend.
     :param ax: If present, add the legend to the specified axis.
+    :param shadow_offset: Offset of the shadow from the legend.
     :param kwargs: Any keyword argument passed to the legend constructor.
     :return: The created legend and the figure.
     """
     leg = LegendWithDarkShadow(
-        fig, patches, labels, fancybox=False, framealpha=1, shadow=True, edgecolor="#2f2f2f", **kwargs
+        fig if ax is None else ax,
+        patches,
+        labels,
+        fancybox=False,
+        framealpha=1,
+        shadow=True,
+        shadow_offset=shadow_offset,
+        edgecolor="#2f2f2f",
+        **kwargs,
     )
+    leg.shadow_offset = shadow_offset
     if ax is None:
         ax = plt.gca()
-    ax.legend_ = leg
+        ax.legend_ = leg
     return leg, fig
 
 
@@ -105,6 +135,17 @@ def reset_plot_style(
     plt.rcParams["xtick.major.pad"] = xtick_major_pad
     plt.rcParams["ytick.major.pad"] = ytick_major_pad
     plt.rcParams["axes.linewidth"] = border_width
+
+
+def extend_palette(palette: list[str], new_length: int) -> list[str]:
+    """
+    Replicate a palette (a list of colors) so that it matches the specified length
+
+    :param palette: A list of colors.
+    :param new_length: Desired palette length.
+    :return: New extended palette.
+    """
+    return (palette * int(new_length / len(palette)))[:new_length]
 
 
 def hex_color_to_grayscale(rgb: Union[str, tuple[int, int, int]]) -> str:

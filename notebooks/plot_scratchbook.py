@@ -13,15 +13,14 @@ this is a good place to start your search;
 
 import os
 
+import matplotlib.gridspec as gridspec
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import numpy as np
 import seaborn as sns
-import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
-from matplotlib.lines import Line2D
 from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
-import matplotlib.ticker as ticker
-
 from plot_utils import *
 
 #%%

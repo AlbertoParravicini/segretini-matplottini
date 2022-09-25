@@ -1,35 +1,27 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Aug 28 09:53:24 2021
-
-@author: albyr
-"""
-
-from json import load
-import pandas as pd
-import numpy as np
-
-import matplotlib.pyplot as plt
-import seaborn as sns
-import matplotlib.gridspec as gridspec
-from matplotlib import colors
-from matplotlib.dates import YearLocator, MonthLocator, num2date
 from datetime import datetime
-from matplotlib.ticker import FuncFormatter
-from sklearn import linear_model
 from pathlib import Path
 
-from segretini_matplottini.utils.plot_utils import reset_plot_style, save_plot, add_legend_with_dark_shadow
+import matplotlib.gridspec as gridspec
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from matplotlib import colors
+from matplotlib.dates import MonthLocator, YearLocator, num2date
+from matplotlib.ticker import FuncFormatter
+from sklearn import linear_model
+
+from segretini_matplottini.utils.plot_utils import reset_plot_style, save_plot
 
 ##############################
 # Setup ######################
 ##############################
 
-# # Color palette used for plotting;
+# Color palette used for plotting;
 PALETTE = ["#F0B390", "#90D6B4", "#7BB7BA"]
 MARKERS = ["o", "D", "X"]
 
-# # Axes limits used in the plot, change them accordingy to your data;
+# Axes limits used in the plot, change them accordingy to your data;
 X_LIMITS = (datetime(year=1996, month=1, day=1), datetime(year=2022, month=1, day=1))
 Y_LIMITS = (0.1, 5 * 1e6)
 
@@ -45,20 +37,16 @@ def performance_scaling(
     data: pd.DataFrame, set_axes_limits: bool = True, plot_regression: bool = True
 ) -> tuple[plt.Figure, plt.Axes]:
     """
-    Parameters
-    ----------
-    data : pd.DataFrame with 6 columns:
+    :param data: pd.DataFrame with 6 columns:
         "year",
         "performance",
         "kind" ∈ ["compute", "memory", "interconnect"],
         "name" (label shown in the plot, it can be empty),
         "base" (base value used for speedup, it can be empty),
         "comment" (e.g. data source or non-used label, it can be empty).
-
-    Returns
-    -------
-    fig : matplotlib figure containing the plot
-    ax : matplotlib axis containing the plot
+    :param set_axes_limits: If True, set the axes limits as specified in `X_LIMITS` and `Y_LIMITS`.
+    :param plot_regression: If True, plot a linear regression of the values.
+    :return: Matplotlib figure and axis containing the plot
     """
 
     ##############
@@ -185,25 +173,23 @@ def performance_scaling(
         else:
             return d.year
 
-    ax.xaxis.set_major_locator(YearLocator())
-    ax.xaxis.set_minor_locator(MonthLocator(interval=3))
-    ax.xaxis.set_major_formatter(FuncFormatter(year_formatter))
-    ax.yaxis.set_major_locator(plt.LogLocator(base=10, numticks=15))
-    ax.tick_params(axis="x", direction="out", which="both", bottom=True, top=False, labelsize=7, width=0.5, size=5)
-    ax.tick_params(axis="x", direction="out", which="minor", size=2)  # Update size of minor ticks;
-    ax.tick_params(axis="y", direction="out", which="both", left=True, right=False, labelsize=7, width=0.5, size=5)
-    ax.tick_params(axis="y", direction="out", which="minor", size=2)  # Update size of minor ticks;
-
     # Ticks, showing relative performance;
-    def format_speedup(l):
+    def speedup_formatter(l):
         if l >= 1:
             return str(int(l))
         else:
             return f"{l:.1f}"
 
-    ax.set_yticklabels(
-        labels=[format_speedup(l) + r"$\mathdefault{\times}$" for l in ax.get_yticks()], ha="right", fontsize=7
-    )
+    ax.xaxis.set_major_locator(YearLocator())
+    ax.xaxis.set_minor_locator(MonthLocator(interval=3))
+    ax.xaxis.set_major_formatter(FuncFormatter(year_formatter))
+    ax.yaxis.set_major_locator(plt.LogLocator(base=10, numticks=15))
+    ax.yaxis.set_major_formatter(lambda x, pos: speedup_formatter(x) + r"$\mathdefault{\times}$")
+    ax.tick_params(axis="x", direction="out", which="both", bottom=True, top=False, labelsize=7, width=0.5, size=5)
+    ax.tick_params(axis="x", direction="out", which="minor", size=2)  # Update size of minor ticks;
+    ax.tick_params(axis="y", direction="out", which="both", left=True, right=False, labelsize=7, width=0.5, size=5)
+    ax.tick_params(axis="y", direction="out", which="minor", size=2)  # Update size of minor ticks;
+    ax.tick_params(axis="y", direction="out", which="major", labelsize=7)
 
     # Add a fake legend with summary data.
     # We don't use a real legend as we need rows with different colors and we don't want patches on the left.
@@ -220,7 +206,6 @@ def performance_scaling(
 
     # Create a rectangle used as background;
     rectangle = {
-        # "boxstyle": "round",
         "facecolor": "white",
         "alpha": 1,
         "edgecolor": "#2f2f2f",
@@ -228,9 +213,11 @@ def performance_scaling(
         "pad": 2,
     }
     # Add padding to first label, to create a large rectangle that covers other labels;
-    pad = " " * 59 + "\n\n" 
+    pad = " " * 59 + "\n\n"
     # Create a second rectangle, used as shadow for the legend;
     shadow = rectangle.copy()
+    shadow.pop("facecolor")
+    shadow.pop("edgecolor")
     shadow["color"] = "#2f2f2f"
     ax.annotate(
         get_kind_label("compute") + ":" + pad,
@@ -238,7 +225,6 @@ def performance_scaling(
         xycoords="axes fraction",
         ha="left",
         va="top",
-        color="#2f2f2f",
         fontsize=7,
         bbox=shadow,
     )

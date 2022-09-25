@@ -8,15 +8,15 @@ Example of Ridge plot, inspired by https://seaborn.pydata.org/examples/kde_ridge
 @author: aparravi
 """
 
-import pandas as pd
-import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
-import matplotlib
-from matplotlib.patches import Patch, Rectangle
-import matplotlib.ticker as ticker
-
 import sys
+
+import matplotlib
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from matplotlib.patches import Patch, Rectangle
 
 sys.path.append("..")
 from plot_utils import *

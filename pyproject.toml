@@ -16,6 +16,7 @@ dependencies = [
     "statsmodels >= 0.10",
     "black >= 22.8",
     "scikit-learn >= 1.1.2",
+    "isort >= 5",
 ]
 
 [tool.setuptools]

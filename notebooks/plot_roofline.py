@@ -8,23 +8,22 @@ Plot a Roofline model of the performance of one or more algorithms w.r.t. a targ
 """
 
 
-import seaborn as sns
-import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
 import os
-import matplotlib.lines as lines
-import pandas as pd
-import numpy as np
-import scipy.stats as st
-from matplotlib.patches import Patch, Rectangle
-from matplotlib.collections import PatchCollection, LineCollection
-from matplotlib.lines import Line2D
-
 import sys
+
+import matplotlib.gridspec as gridspec
+import matplotlib.lines as lines
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import scipy.stats as st
+import seaborn as sns
+from matplotlib.collections import LineCollection, PatchCollection
+from matplotlib.lines import Line2D
+from matplotlib.patches import Patch, Rectangle
 
 sys.path.append("..")
 from plot_utils import *
-
 
 SCATTER_SIZE = 14
 

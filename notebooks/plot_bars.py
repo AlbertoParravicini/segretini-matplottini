@@ -6,14 +6,14 @@ Created on Thu Jun 18 09:40:35 2020
 @author: aparravi
 """
 
-import seaborn as sns
-import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
-import pandas as pd
-import numpy as np
-import matplotlib.ticker as ticker
-
 import sys
+
+import matplotlib.gridspec as gridspec
+import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
+import numpy as np
+import pandas as pd
+import seaborn as sns
 
 sys.path.append("..")
 from plot_utils import *

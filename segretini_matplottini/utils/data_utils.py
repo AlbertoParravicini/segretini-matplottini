@@ -1,10 +1,11 @@
-from scipy.stats.mstats import gmean
-import scipy.stats
 from functools import reduce
-import pandas as pd
+from typing import Any, Callable, Optional, Union
+
 import numpy as np
+import pandas as pd
+import scipy.stats
 import scipy.stats as st
-from typing import Union, Callable, Optional, Any
+from scipy.stats.mstats import gmean
 
 
 def remove_outliers_ci(data: Union[pd.Series, list[float], np.ndarray], sigmas: float = 3):

@@ -79,5 +79,5 @@ Minor updates to `plot_utils.py`: new palettes, improved robustness of `get_exp_
 
 Added **Roofline Plot**, find it in `notebooks/plot_roofline.py`.
 
-<!-- ![Roofline Example](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/roofline_double.png) -->
+![Roofline Example](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/2022-09-25/roofline_double.png)
 

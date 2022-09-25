@@ -1,5 +1,5 @@
 # segretini-matplottini
-A collection of useful matplolib/seaborn tips &amp; tricks collected over years of colorful plot-making
+A collection of useful Matplolib and Seaborn tips &amp; tricks collected over years of colorful plot-making.
 
 ## Installation
 
@@ -11,17 +11,17 @@ pip install segretini-matplottini
 
 ## Repository Structure
 
-* `segretini_matplottini/utils/plot_utils.py` contains many useful functions commonly used during plotting, to add labels above bars or writing nice labels with exponential notation
+* `segretini_matplottini/utils/plot_utils.py` contains many useful functions commonly used during plotting, to add labels above bars or writing nice labels with exponential notation.
 * `segretini_matplottini/utils/data_utils.py` contains functions useful for data preprocessing, such as removing outliers, computing and speedups.
 * `segretini_matplottini/plots` contains custom plotting functions that can be used like standard Seaborn plots.
 * `notebooks` contains examples that show how to create very complex custom prompts. Look at them if you are trying to replicate some specific feature, like having separate bar groups or adding fancy custom annotations.
-* `notebooks/scratchbook.py` contains common commands used to setup plots: creating plots, customizing tick labels, adding custom legends, etc. If you don't remember how to customize some part of your plot, this is a good starting point.
+* `notebooks/plot_scratchbook.py` contains common commands used to setup plots: creating plots, customizing tick labels, adding custom legends, etc. If you don't remember how to customize some part of your plot, this is a good starting point.
 * `data` contains files used for plots. For the most part, you can ignore it.
 * `plots` is where all the plots are stored. If you find something you like, the code to replicate it is in `notebooks`.
 
 ## Tips and Tricks
 
-An ever-growing collection of tips I've found or discovered along the way, together with some nice resources I like a lot
+An ever-growing collection of tips I've found or discovered along the way, together with some nice resources I like a lot.
 
 ### Resources
 
@@ -45,8 +45,9 @@ In scatterplots and lineplots you can use different markers (circles, diamonds, 
 ## Update 2022-09-25
 
 I'm revamping the structure of the repository, to make it easier to integrate in other repositories and create pretty plots.
-Some of the examples in `notebooks` might not work out-of-the-box, such as `plot_ridgeplot.py`. 
+* Some of the examples in `notebooks` might not work out-of-the-box, such as `plot_ridgeplot.py`. 
 I'll fix them as soon as possible! 
+* I also added a new legend style, and squashed many bugs in `plot_utils.py`
 
 ## Update 2021-08-28
 

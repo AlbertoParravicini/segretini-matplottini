@@ -9,6 +9,102 @@ from typing import Union, Sequence, Callable, Optional, Any
 from matplotlib.axis import Axis
 from matplotlib.patches import Patch
 from datetime import datetime
+import seaborn as sns
+import matplotlib
+from matplotlib.patches import Shadow
+import matplotlib.legend
+from matplotlib.artist import allow_rasterization
+
+
+class LegendWithDarkShadow(matplotlib.legend.Legend):
+    """
+    A custom legend style with a rectangular box and a dark shadow around the box.
+    """
+    @allow_rasterization
+    def draw(self, renderer):
+        # docstring inherited
+        if not self.get_visible():
+            return
+
+        renderer.open_group("legend", gid=self.get_gid())
+
+        fontsize = renderer.points_to_pixels(self._fontsize)
+
+        # if mode == fill, set the width of the legend_box to the
+        # width of the parent (minus pads)
+        if self._mode in ["expand"]:
+            pad = 2 * (self.borderaxespad + self.borderpad) * fontsize
+            self._legend_box.set_width(self.get_bbox_to_anchor().width - pad)
+
+        # update the location and size of the legend. This needs to
+        # be done in any case to clip the figure right.
+        bbox = self._legend_box.get_window_extent(renderer)
+        self.legendPatch.set_bounds(bbox.x0, bbox.y0, bbox.width, bbox.height)
+        self.legendPatch.set_mutation_scale(fontsize)
+
+        if self.shadow:
+            Shadow(self.legendPatch, 2, -2, alpha=1).draw(renderer)
+
+        self.legendPatch.draw(renderer)
+        self._legend_box.draw(renderer)
+
+        renderer.close_group("legend")
+        self.stale = False
+
+
+def add_legend_with_dark_shadow_to_axis(ax: Axis, *args: Any, **kwargs: Any) -> None:
+    """
+    Add a legend with dark shadow to the specified axis.
+
+    :param ax: Axis where the legend is added.
+    :param args: Any argument passed to the legend constructor.
+    :param kwargs: Any keyword argument passed to the legend constructor.
+    """
+    handles, labels, _, kwargs = matplotlib.legend._parse_legend_args([ax], *args, **kwargs)
+    ax.legend_ = LegendWithDarkShadow(ax, handles, labels, **kwargs)
+
+
+def add_legend_with_dark_shadow(
+    fig: plt.Figure, patches: list[Patch], labels: list[str], ax: Optional[Axis] = None, **kwargs: Any
+) -> tuple[LegendWithDarkShadow, Axis]:
+    """
+    Add a legend with dark shadow to the specified figure.
+
+    :param fig: Figure where the legend is added.
+    :param patches: List of legend color patches used to create the legend.
+    :param labels: List of textual labels used to create the legend.
+    :param ax: If present, add the legend to the specified axis.
+    :param kwargs: Any keyword argument passed to the legend constructor.
+    :return: The created legend and the figure.
+    """
+    leg = LegendWithDarkShadow(
+        fig, patches, labels, fancybox=False, framealpha=1, shadow=True, edgecolor="#2f2f2f", **kwargs
+    )
+    if ax is None:
+        ax = plt.gca()
+    ax.legend_ = leg
+    return leg, fig
+
+
+def reset_plot_style(
+    label_pad: float = 0, xtick_major_pad: float = 1, ytick_major_pad: float = 1, border_width: float = 0.8
+):
+    """
+    Initialize the plot with a consistent style.
+
+    :param label_pad: Padding between axis and axis label.
+    :param xtick_major_pad: Padding between axis ticks and tick labels.
+    :param ytick_major_pad: Padding between axis ticks and tick labels.
+    :param border_width: Line width of the axis borders.
+    """
+    # Reset matplotlib settings;
+    plt.rcdefaults()
+    # Setup general plotting settings;
+    sns.set_style("white", {"ytick.left": True, "xtick.bottom": True})
+    plt.rcParams["axes.labelpad"] = label_pad
+    plt.rcParams["xtick.major.pad"] = xtick_major_pad
+    plt.rcParams["ytick.major.pad"] = ytick_major_pad
+    plt.rcParams["axes.linewidth"] = border_width
 
 
 def hex_color_to_grayscale(rgb: Union[str, tuple[int, int, int]]) -> str:
@@ -150,7 +246,7 @@ def add_labels(
     :param skip_bars: Start adding labels after the specified number of bars.
     :param max_bars: Don't add labels after the specified bar.
     :param skip_value: Don't add labels equal to the specified value.
-    :param skip_threshold: Threshold used to determine if a label's value is close enough to `skip_value` 
+    :param skip_threshold: Threshold used to determine if a label's value is close enough to `skip_value`
         and should be skipped
     :param skip_nan_bars: If True, skip bars with NaN height when placing labels.
     :param max_height: If present, place labels at this maximum specified height (e.g. the y axis limit).
@@ -237,9 +333,11 @@ def transpose_legend_labels(
     return labels, patches
 
 
-def assemble_output_directory_name(directory: Union[str, Path], date: Optional[str] = None, create_date_dir: bool = True) -> str:
+def assemble_output_directory_name(
+    directory: Union[str, Path], date: Optional[str] = None, create_date_dir: bool = True
+) -> str:
     """
-    Create the output directory where plots are saved. 
+    Create the output directory where plots are saved.
     Optionally, create a subfolder with todays' date formatted as `%Y-%m-%d`,
     and save plots inside it. Parent folders of `directory` are assumed to exist.
 
@@ -271,7 +369,7 @@ def save_plot(
 ):
     """
     :param directory: Where the plot is stored.
-    :param filename: Name of the plot. It should be of format 'myplot_{}.{}', 
+    :param filename: Name of the plot. It should be of format 'myplot_{}.{}',
         where the first placeholder is used for the date and the second for the extension,
         or 'myplot.{}', or 'myplot.extension'.
     :param figure: A specific figure to save. If None, save the last plot that has been drawn.
@@ -279,7 +377,7 @@ def save_plot(
     :param create_date_dir: If True, create a sub-folder with the date. If `date` is None, use `%Y-%m-%d`.
     :param extension: List of extension used to store the plot.
     :param dpi: DPI of the image, when saved as a raster image format such as PNG.
-    :param remove_white_margin: If True, remove the white margin around the plot. 
+    :param remove_white_margin: If True, remove the white margin around the plot.
         Suitable to plot images without any border around them.
     :param kwargs: Other arguments passed to `plt.savefig`.
     """

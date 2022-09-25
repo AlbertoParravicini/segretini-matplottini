@@ -5,6 +5,7 @@ Created on Sat Aug 28 09:53:24 2021
 @author: albyr
 """
 
+from json import load
 import pandas as pd
 import numpy as np
 
@@ -16,13 +17,12 @@ from matplotlib.dates import YearLocator, MonthLocator, num2date
 from datetime import datetime
 from matplotlib.ticker import FuncFormatter
 from sklearn import linear_model
+from pathlib import Path
 
-import sys
-
-sys.path.append("..")
-from plot_utils import *
+from segretini_matplottini.utils.plot_utils import reset_plot_style, save_plot, add_legend_with_dark_shadow
 
 ##############################
+# Setup ######################
 ##############################
 
 # # Color palette used for plotting;
@@ -33,13 +33,17 @@ MARKERS = ["o", "D", "X"]
 X_LIMITS = (datetime(year=1996, month=1, day=1), datetime(year=2022, month=1, day=1))
 Y_LIMITS = (0.1, 5 * 1e6)
 
+PLOT_DIR = (Path(__file__).parent.parent / "plots").resolve()
+DATA_DIR = (Path(__file__).parent.parent / "data").resolve()
+
 ##############################
+# Plotting functions #########
 ##############################
 
 
 def performance_scaling(
     data: pd.DataFrame, set_axes_limits: bool = True, plot_regression: bool = True
-) -> (plt.Figure, plt.Axes):
+) -> tuple[plt.Figure, plt.Axes]:
     """
     Parameters
     ----------
@@ -61,15 +65,7 @@ def performance_scaling(
     # Plot setup #
     ##############
 
-    # Reset matplotlib settings;
-    plt.rcdefaults()
-    # Setup general plotting settings;
-    sns.set_style("white", {"ytick.left": True, "xtick.bottom": True})
-    plt.rcParams["font.family"] = ["Latin Modern Roman Demi"]
-    plt.rcParams["axes.labelpad"] = 0  # Padding between axis and axis label;
-    plt.rcParams["xtick.major.pad"] = 1  # Padding between axis ticks and tick labels;
-    plt.rcParams["ytick.major.pad"] = 1  # Padding between axis ticks and tick labels;
-    plt.rcParams["axes.linewidth"] = 0.8  # Line width of the axis borders;
+    reset_plot_style()
 
     # Create a figure for the plot, and adjust margins;
     fig = plt.figure(figsize=(6, 2.5))
@@ -138,7 +134,7 @@ def performance_scaling(
 
     # Associate a color to each kind of hardware (compute, memory, interconnection)
     def get_color(c):  # Make the color darker, to use it for text;
-        hue, saturation, brightness = colors.rgb_to_hsv(colors.to_rgb(c))
+        _, saturation, brightness = colors.rgb_to_hsv(colors.to_rgb(c))
         return sns.set_hls_values(c, l=brightness * 0.6, s=saturation * 0.7)
 
     kind_to_col = {k: get_color(PALETTE[i]) for i, k in enumerate(data["kind"].unique())}
@@ -211,7 +207,7 @@ def performance_scaling(
 
     # Add a fake legend with summary data.
     # We don't use a real legend as we need rows with different colors and we don't want patches on the left.
-    # Also, we want the text to look justified.
+    # Also, we want the text to look justified;
     def get_kind_label(k):
         kind_name = ""
         if k == "compute":
@@ -224,15 +220,30 @@ def performance_scaling(
 
     # Create a rectangle used as background;
     rectangle = {
-        "boxstyle": "round",
+        # "boxstyle": "round",
         "facecolor": "white",
-        "alpha": 0.8,
-        "edgecolor": "#B8B8B8",
+        "alpha": 1,
+        "edgecolor": "#2f2f2f",
         "linewidth": 0.5,
-        "pad": 0.5,
+        "pad": 2,
     }
+    # Add padding to first label, to create a large rectangle that covers other labels;
+    pad = " " * 59 + "\n\n" 
+    # Create a second rectangle, used as shadow for the legend;
+    shadow = rectangle.copy()
+    shadow["color"] = "#2f2f2f"
+    ax.annotate(
+        get_kind_label("compute") + ":" + pad,
+        xy=(0.026, 0.93),
+        xycoords="axes fraction",
+        ha="left",
+        va="top",
+        color="#2f2f2f",
+        fontsize=7,
+        bbox=shadow,
+    )
+
     for i, (k, v) in enumerate(kind_increase.items()):
-        pad = " " * 48 + "\n\n"  # Add padding to first label, to create a large rectangle that covers other labels;
         # Use two annotations, to make the text look justified;
         ax.annotate(
             get_kind_label(k) + ":" + (pad if i == 0 else ""),
@@ -266,17 +277,27 @@ def performance_scaling(
 
 
 ##############################
+# Load data and plot #########
+##############################
+
+
+def load_data() -> pd.DataFrame:
+    # Load data;
+    data = pd.read_csv(DATA_DIR / "performance_scaling.csv")
+    # Convert date;
+    data["year"] = pd.to_datetime(data["year"], format="%Y-%m")
+    return data
+
+
+def plot(data: pd.DataFrame) -> tuple[plt.Figure, plt.Axes]:
+    return performance_scaling(data, set_axes_limits=True, plot_regression=True)
+
+
+##############################
+# Main #######################
 ##############################
 
 if __name__ == "__main__":
-
-    # Load data;
-    data = pd.read_csv("../../data/performance_scaling.csv")
-    # Convert date;
-    data["year"] = pd.to_datetime(data["year"], format="%Y-%m")
-
-    # Create the plot;
-    fig, ax = performance_scaling(data)
-
-    # Save the plot;
-    save_plot("../../plots", "performance_scaling.{}")
+    data = load_data()
+    fig, ax = plot(data)
+    save_plot(PLOT_DIR, "performance_scaling.{}")

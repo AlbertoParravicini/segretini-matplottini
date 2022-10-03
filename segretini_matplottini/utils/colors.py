@@ -56,3 +56,6 @@ PALETTE_G3 = ["#E7F7DF", "#B5E8B5", "#71BD8A", "#469C7F", "#257A7A"]
 PALETTE_O = ["#FDCE7C", "#EBB25E", "#E6A37C", "#FAB187", "#E3896F", "#E37E62", "#FD867C"]
 # Palette with orange baseline + green tones;
 PALETTE_OG = ["#E8CFB5", "#81C798", "#55A68B", "#358787"]
+
+# Used for plots with a dark background;
+BACKGROUND_BLACK = "#0E1117"

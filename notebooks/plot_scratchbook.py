@@ -11,7 +11,6 @@ this is a good place to start your search;
 @author: aparravi
 """
 
-import os
 from pathlib import Path
 
 import matplotlib.gridspec as gridspec

@@ -15,6 +15,7 @@ from matplotlib.axis import Axis
 from matplotlib.colors import hsv_to_rgb, rgb_to_hsv, to_hex, to_rgb
 from matplotlib.figure import Figure
 from matplotlib.patches import Patch, Shadow
+from segretini_matplottini.utils.colors import BACKGROUND_BLACK
 
 
 class LegendWithDarkShadow(matplotlib.legend.Legend):
@@ -35,14 +36,14 @@ class LegendWithDarkShadow(matplotlib.legend.Legend):
 
         fontsize = renderer.points_to_pixels(self._fontsize)
 
-        # if mode == fill, set the width of the legend_box to the
-        # width of the parent (minus pads)
+        # If mode == fill, set the width of the legend_box to the
+        # width of the parent (minus pads);
         if self._mode in ["expand"]:
             pad = 2 * (self.borderaxespad + self.borderpad) * fontsize
             self._legend_box.set_width(self.get_bbox_to_anchor().width - pad)
 
-        # update the location and size of the legend. This needs to
-        # be done in any case to clip the figure right.
+        # Update the location and size of the legend. This needs to
+        # be done in any case to clip the figure right;
         bbox = self._legend_box.get_window_extent(renderer)
         self.legendPatch.set_bounds(bbox.x0, bbox.y0, bbox.width, bbox.height)
         self.legendPatch.set_mutation_scale(fontsize)
@@ -78,7 +79,7 @@ def add_legend_with_dark_shadow(
     :param args: Any argument passed to the legend constructor.
     :param kwargs: Any keyword argument passed to the legend constructor.
     """
-    # If both figure and axis are missing, draw in the current figure
+    # If both figure and axis are missing, draw in the current figure;
     if fig is None and ax is None:
         fig = plt.gcf()
     legend_kwargs = (
@@ -90,10 +91,10 @@ def add_legend_with_dark_shadow(
         )
         | kwargs
     )
-    # If the axis is specified, always draw in the axis
+    # If the axis is specified, always draw in the axis;
     where_to_draw = fig
     if ax is not None:
-        # Draw in the current axis
+        # Draw in the current axis;
         handles, labels, _, kwargs = matplotlib.legend._parse_legend_args(
             [ax], handles=handles, labels=labels, *args, **kwargs
         )
@@ -106,7 +107,7 @@ def add_legend_with_dark_shadow(
     )
     leg.shadow_offset = shadow_offset
     leg.get_frame().set_linewidth(line_width)
-    # Add legend to the axis
+    # Add legend to the axis;
     if ax is None:
         ax = plt.gca()
     ax.legend_ = leg
@@ -122,6 +123,7 @@ def reset_plot_style(
     title_size: Optional[float] = None,
     title_pad: Optional[float] = None,
     label_size: Optional[float] = None,
+    dark_background: bool = False
 ):
     """
     Initialize the plot with a consistent style.
@@ -134,14 +136,20 @@ def reset_plot_style(
     :param title_pad: Padding of the title.
     :param label_size: Size of the labels.
     :param border_width: Line width of the axis borders.
+    :param dark_background: If True, use a dark background.
     """
     # Reset matplotlib settings;
     plt.rcdefaults()
     # Setup general plotting settings;
     style_dict = {"ytick.left": True, "xtick.bottom": True}
     if grid_linewidth is not None:
+        # Turn on the grid for the y-axis
+        style_dict["axes.grid"] = True
+        style_dict["axes.grid.axis"] = "y"
         style_dict["grid_linewidth"] = grid_linewidth
     sns.set_style("white", style_dict)
+    if dark_background:
+        plt.style.use("dark_background")
     # Other parameters
     plt.rcParams["axes.labelpad"] = label_pad
     plt.rcParams["xtick.major.pad"] = xtick_major_pad
@@ -153,6 +161,10 @@ def reset_plot_style(
         plt.rcParams["axes.titlepad"] = title_pad
     if label_size is not None:
         plt.rcParams["axes.labelsize"] = label_size
+    # Background color
+    if dark_background:
+        plt.rcParams["axes.facecolor"] = BACKGROUND_BLACK
+        plt.rcParams["savefig.facecolor"] = BACKGROUND_BLACK
 
 
 def extend_palette(palette: list[str], new_length: int) -> list[str]:
@@ -395,8 +407,8 @@ def transpose_legend_labels(
     elements_per_row = min(
         int(np.ceil(len(labels) / default_elements_per_col)), max_elements_per_row
     )  # Don't add too many elements per row;
-    labels = np.concatenate([labels[i::elements_per_row] for i in range(elements_per_row)], axis=0)
-    handles = np.concatenate([handles[i::elements_per_row] for i in range(elements_per_row)], axis=0)
+    labels = np.concatenate([labels[i::elements_per_row] for i in range(elements_per_row)], axis=0).tolist()
+    handles = np.concatenate([handles[i::elements_per_row] for i in range(elements_per_row)], axis=0).tolist()
     return labels, handles
 
 

@@ -44,8 +44,7 @@ In scatterplots and lineplots you can use different markers (circles, diamonds, 
 
 ## Update 2022-09-25
 
-I'm revamping the structure of the repository, to make it easier to integrate in other repositories and create pretty plots.
-* I also added a new legend style, and squashed many bugs in `plot_utils.py`
+I'm revamping the structure of the repository, to make it easier to integrate in other repositories and create pretty plots. I also added a new legend style, and squashed many bugs in `plot_utils.py`
 
 ## Update 2021-08-28
 

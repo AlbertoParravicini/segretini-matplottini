@@ -15,6 +15,7 @@ from matplotlib.axis import Axis
 from matplotlib.colors import hsv_to_rgb, rgb_to_hsv, to_hex, to_rgb
 from matplotlib.figure import Figure
 from matplotlib.patches import Patch, Shadow
+
 from segretini_matplottini.utils.colors import BACKGROUND_BLACK
 
 
@@ -123,7 +124,7 @@ def reset_plot_style(
     title_size: Optional[float] = None,
     title_pad: Optional[float] = None,
     label_size: Optional[float] = None,
-    dark_background: bool = False
+    dark_background: bool = False,
 ):
     """
     Initialize the plot with a consistent style.

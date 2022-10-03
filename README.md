@@ -42,6 +42,12 @@ If your plot is not explicitely comparing classes (for example, you want to show
 * **Add redundant information**: if you are plotting many different classes, and use one color per class, it can be difficult to distinguish among them. Instead, add some kind of redundant information.
 In scatterplots and lineplots you can use different markers (circles, diamonds, etc.), while in barplots you can use different hatches (//// or \\\\) or add labels to each class.
 
+## Update 2022-10-03
+
+Added a new **timeseries plot**, find it it `notebooks/plot_timeseries.py`. I also added a sleek `dark background` setting in `utils.plot_utils.reset_plot_style`.
+
+![Timeseries](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/2022-10-03/timeseries.png)
+
 ## Update 2022-09-25
 
 I'm revamping the structure of the repository, to make it easier to integrate in other repositories and create pretty plots. I also added a new legend style, and squashed many bugs in `plot_utils.py`
@@ -50,7 +56,7 @@ I'm revamping the structure of the repository, to make it easier to integrate in
 
 Update style of **Ridgeplot** to be readable in black & white. Added *large* layout to **Ridgeplot**
 
-![Ridgeplot Example](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/2022-09-25/ridgeplot_large.png)
+![Ridgeplot](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/2022-09-25/ridgeplot_large.png)
 
 Updates to `plot_utils.py`: added option to directly provide vertical coordinates to `add_labels`. Added better outlier removal based on interquantile range (the same approach used to find outliers in box-plots)
 
@@ -71,11 +77,11 @@ Updated **Ridgeplot** to have confidence intervals and be more user-friendly (`n
 Added **Correlation Scatterplot**, find it in `notebooks/plot_correlation_scatterplot.py`.
 Minor updates to `plot_utils.py`: new palettes, improved robustness of `get_exp_label`, minor bugfixes.
 
-![Correlation Example](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/2022-09-25/correlation_scatterplot.png)
+![Correlation Scatterplot](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/2022-09-25/correlation_scatterplot.png)
 
 ## Update 2020-11-25
 
 Added **Roofline Plot**, find it in `notebooks/plot_roofline.py`.
 
-![Roofline Example](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/2022-09-25/roofline_double.png)
+![Roofline](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/2022-09-25/roofline_double.png)
 

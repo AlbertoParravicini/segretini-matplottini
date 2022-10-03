@@ -1,11 +1,13 @@
+from typing import Optional
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib.dates import DateFormatter, MinuteLocator, SecondLocator, HourLocator
-from matplotlib.ticker import LinearLocator
-from matplotlib.figure import Figure
 from matplotlib.axis import Axis
-from typing import Optional
+from matplotlib.dates import (DateFormatter, HourLocator, MinuteLocator,
+                              SecondLocator)
+from matplotlib.figure import Figure
+from matplotlib.ticker import LinearLocator
 
 from segretini_matplottini.utils.plot_utils import reset_plot_style
 

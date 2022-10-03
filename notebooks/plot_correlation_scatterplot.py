@@ -3,8 +3,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from segretini_matplottini.plot.correlation_scatterplot import \
-    correlation_scatterplot
+from segretini_matplottini.plot import correlation_scatterplot
 from segretini_matplottini.utils.colors import PALETTE_G
 from segretini_matplottini.utils.plot_utils import save_plot
 

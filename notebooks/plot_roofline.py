@@ -4,7 +4,8 @@ from typing import Any
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 
-from segretini_matplottini.plot.roofline import MARKERS, PALETTE, roofline
+from segretini_matplottini.plot import roofline
+from segretini_matplottini.utils.colors import BB4, BB5, G2, PEACH1
 from segretini_matplottini.utils.plot_utils import save_plot
 
 ##############################
@@ -12,6 +13,8 @@ from segretini_matplottini.utils.plot_utils import save_plot
 ##############################
 
 PLOT_DIR = (Path(__file__).parent.parent / "plots").resolve()
+MARKERS = ["o", "X", "D", "P"]
+PALETTE = [PEACH1, G2, BB4, BB5]
 
 ##############################
 # Load data and plot #########

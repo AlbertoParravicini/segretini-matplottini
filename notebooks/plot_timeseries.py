@@ -1,12 +1,13 @@
 import datetime
 from pathlib import Path
+
 import numpy as np
 import pandas as pd
-from matplotlib.figure import Figure
 from matplotlib.axis import Axis
+from matplotlib.figure import Figure
 
+from segretini_matplottini.plot import timeseries
 from segretini_matplottini.utils.plot_utils import save_plot
-from segretini_matplottini.plot.timeseries import timeseries
 
 ##############################
 # Setup ######################

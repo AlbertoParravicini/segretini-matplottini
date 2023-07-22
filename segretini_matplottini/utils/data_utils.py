@@ -46,7 +46,7 @@ def find_outliers_right_quantile(data, quantile: float = 0.75, quantile_multipli
     Since the distribution is not symmetrical, look just at the right quantile,
     and remove values above the specified quantile multiplier.
     In other words, flag as outliers values such that `data > quantile(data) * quantile_multiplier`.
-    
+
     :param data: A sequence of numerical data, iterable.
     :param quantile: Upper quantile value used as filtering threshold.
        Must be in `[0.5, 1]`.

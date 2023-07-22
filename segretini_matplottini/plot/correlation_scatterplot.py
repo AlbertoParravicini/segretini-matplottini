@@ -1,4 +1,4 @@
-from typing import Optional, Callable, Any
+from typing import Any, Callable, Optional
 
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
@@ -160,7 +160,9 @@ def correlation_scatterplot(
         else:
             d = data
         for _, row in d.iterrows():
-            ax.annotate(row[label], xy=(row[x], row[y]), fontsize=font_size - 2, color="#2f2f2f", ha="left", zorder=100)
+            ax.annotate(
+                row[label], xy=(row[x], row[y]), fontsize=font_size - 2, color="#2f2f2f", ha="left", zorder=100
+            )
     if ax.legend_ is not None:
         ax.legend_.remove()  # Hack to remove legend;
 
@@ -191,7 +193,6 @@ def correlation_scatterplot(
             color=label_color,
             zorder=100,
         )
-
 
     # Turn on the grid;
     ax.yaxis.grid(True, linewidth=0.5)

@@ -1,23 +1,63 @@
 # segretini-matplottini
-A collection of useful Matplolib and Seaborn tips &amp; tricks collected over years of colorful plot-making.
+
+A collection of Matplotlib and Seaborn recipes and utilities collected over years of colorful plot-making,
+to help researchers create publication-ready plots with ease.
 
 ## Installation
 
-Simply run the following.
+Clone the repository and install `segretini-matplottini` with `pip`.
+
+```shell
+git clone https://github.com/AlbertoParravicini/segretini-matplottini.git
+cd segretini-matplottini
+pip install .
 ```
+
+If you want to hack `segretini-matplottini` itself, you will most likely want to clone it with SSH, install it inside a `conda` environment, in `editable` mode, and with `dev` dependencies.
+    
+```shell
 git clone git@github.com:AlbertoParravicini/segretini-matplottini.git
-pip install segretini-matplottini
+cd segretini-matplottini
+conda create -n segretini_matplottini python=3.9
+conda activate segretini_matplottini
+pip install -e ".[dev]"
 ```
+
+# TODO
+
+[] new code structure in readme, with tree
+[] rename files in `data` to end with `data.csv`
+[x] delete scratchbook
+[] add ruff and isort
+[] add pre-commit hooks
+[] linting
+[] reverse gitignore
+[] modify plots structure not to have dates
+[] create imports for utils inside __init__, to hide private stuff
+[] changelog
+[] new barplot code
+[] add util for arrow of metric
+[] add util for color palette
+[] add image with plot grid inside readme
+[] add list of examples to readme, add images for the pretties ones
+[] tests
+    [] unit tests
+    [] e2e tests for examples, check if they don't crash
+[] github
+    [] protect master branch
+    [] add automated tests check
+    [] add automated linting check
+[] create notebook to create good plot from scratch (some barplot)
+[] delete this list
 
 ## Repository Structure
 
 * `segretini_matplottini/utils/plot_utils.py` contains many useful functions commonly used during plotting, to add labels above bars or writing nice labels with exponential notation.
 * `segretini_matplottini/utils/data_utils.py` contains functions useful for data preprocessing, such as removing outliers, computing and speedups.
 * `segretini_matplottini/plots` contains custom plotting functions that can be used like standard Seaborn plots.
-* `notebooks` contains examples that show how to create very complex custom prompts. Look at them if you are trying to replicate some specific feature, like having separate bar groups or adding fancy custom annotations.
-* `notebooks/plot_scratchbook.py` contains common commands used to setup plots: creating plots, customizing tick labels, adding custom legends, etc. If you don't remember how to customize some part of your plot, this is a good starting point.
+* `examples` contains examples that show how to create very complex custom prompts. Look at them if you are trying to replicate some specific feature, like having separate bar groups or adding fancy custom annotations.
 * `data` contains files used for plots. For the most part, you can ignore it.
-* `plots` is where all the plots are stored. If you find something you like, the code to replicate it is in `notebooks`.
+* `plots` is where all the plots are stored. If you find something you like, the code to replicate it is in `examples`.
 
 ## Tips and Tricks
 
@@ -44,7 +84,7 @@ In scatterplots and lineplots you can use different markers (circles, diamonds, 
 
 ## Update 2022-10-03
 
-Added a new **timeseries plot**, find it it `notebooks/plot_timeseries.py`. I also added a sleek `dark background` setting in `utils.plot_utils.reset_plot_style`.
+Added a new **timeseries plot**, find it it `examples/plot_timeseries.py`. I also added a sleek `dark background` setting in `utils.plot_utils.reset_plot_style`.
 
 ![Timeseries](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/2022-10-03/timeseries.png)
 
@@ -60,7 +100,7 @@ Update style of **Ridgeplot** to be readable in black & white. Added *large* lay
 
 Updates to `plot_utils.py`: added option to directly provide vertical coordinates to `add_labels`. Added better outlier removal based on interquantile range (the same approach used to find outliers in box-plots)
 
-Added `notebooks/plot_performance_scaling.py`: this plot shows the relative performance increase of processors, memory and interconnection technologies from 1996 to 2021. 
+Added `examples/plot_performance_scaling.py`: this plot shows the relative performance increase of processors, memory and interconnection technologies from 1996 to 2021. 
 Shamefully copied from [AI and Memory Wall](https://medium.com/riselab/ai-and-memory-wall-2cb4265cb0b8) by Amir Gholami.
 This plot shows how to use dates for the x-axis, and do fairly complex visualization on log-scale axes (i.e. linear regressions on data with exponential increase).
 
@@ -68,20 +108,20 @@ This plot shows how to use dates for the x-axis, and do fairly complex visualiza
 
 ## Update 2021-03-22
 
-Updated **Ridgeplot** to have confidence intervals and be more user-friendly (`notebooks/plot_ridgeplot.py`). Added some general tips about choosing colors.
+Updated **Ridgeplot** to have confidence intervals and be more user-friendly (`examples/plot_ridgeplot.py`). Added some general tips about choosing colors.
 
 <!-- ![Ridgeplot Example](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/2022-09-25/ridgeplot.png) -->
 
 ## Update 2021-03-20
 
-Added **Correlation Scatterplot**, find it in `notebooks/plot_correlation_scatterplot.py`.
+Added **Correlation Scatterplot**, find it in `examples/plot_correlation_scatterplot.py`.
 Minor updates to `plot_utils.py`: new palettes, improved robustness of `get_exp_label`, minor bugfixes.
 
 ![Correlation Scatterplot](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/2022-09-25/correlation_scatterplot.png)
 
 ## Update 2020-11-25
 
-Added **Roofline Plot**, find it in `notebooks/plot_roofline.py`.
+Added **Roofline Plot**, find it in `examples/plot_roofline.py`.
 
 ![Roofline](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/2022-09-25/roofline_double.png)
 

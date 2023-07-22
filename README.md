@@ -31,7 +31,7 @@ pip install -e ".[dev]"
 [] add ruff and isort
 [] add pre-commit hooks
 [] linting
-[] reverse gitignore
+[x] reverse gitignore
 [] modify plots structure not to have dates
 [] create imports for utils inside __init__, to hide private stuff
 [] changelog

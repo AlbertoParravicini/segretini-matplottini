@@ -269,7 +269,7 @@ def performance_scaling(
 
 def load_data() -> pd.DataFrame:
     # Load data;
-    data = pd.read_csv(DATA_DIR / "performance_scaling.csv")
+    data = pd.read_csv(DATA_DIR / "performance_scaling_data.csv")
     # Convert date;
     data["year"] = pd.to_datetime(data["year"], format="%Y-%m")
     return data

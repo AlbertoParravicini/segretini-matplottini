@@ -12,5 +12,6 @@
 !segretini_matplottini/util
 !examples/
 !data/
+!data/*.csv
 !plots/
 !.vscode/

@@ -41,7 +41,7 @@ def load_data() -> pd.Series:
 def plot(data: np.ndarray) -> tuple[Figure, Axis]:
     return timeseries(
         data,
-        xlabel="Time [sec]",
+        xlabel="Time [min]",
         ylabel="Intensity",
         date_format="%H:%M:%S",
         line_width=0.6,

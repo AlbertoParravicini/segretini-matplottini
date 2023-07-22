@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Callable, Any
 
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
@@ -17,18 +17,26 @@ from segretini_matplottini.utils.plot_utils import \
 
 def correlation_scatterplot(
     data: pd.DataFrame,
-    x: str = "estimate0",
-    y: str = "estimate1",
+    x: str,
+    y: str,
     hue: Optional[str] = None,
+    label: Optional[str] = None,
     palette: Optional[list[str]] = None,
-    xlabel: str = "Speedup estimate, method A (%)",
-    ylabel: str = "Speedup estimate, method B (%)",
+    xlabel: Optional[str] = None,
+    ylabel: Optional[str] = None,
     plot_kde: bool = True,
     plot_regression: bool = True,
     highlight_negative_area: bool = True,
     xlimits: Optional[tuple[float, float]] = None,
     ylimits: Optional[tuple[float, float]] = None,
+    x_ticks_formatter: Callable[[Any, int], str] = lambda x, pos: f"{x * 100:.0f}%",
+    y_ticks_formatter: Callable[[Any, int], str] = lambda x, pos: f"{x * 100:.0f}%",
     reset_plot_style: bool = True,
+    vertical_legend: bool = False,
+    legend_position: str = "best",
+    label_color: str = "#2f2f2f",
+    font_size: int = 8,
+    figure_size: tuple[float, float] = (3.4, 3.1),
 ) -> tuple[plt.Figure, plt.Axes]:
     """
     Plot a detailed correlation analysis between two variables.
@@ -49,7 +57,13 @@ def correlation_scatterplot(
     :param plot_regression: If True, add a Seaborn linear regression plot.
     :param xlimits: If specified, truncate the x-axis to this interval.
     :param ylimits: If specified, truncate the y-axis to this interval.
+    :param x_ticks_formatter: Callable function used to format x-axis tick labels.
+    :param y_ticks_formatter: Callable function used to format y-axis tick labels.
     :param reset_plot_style: If True, reset the style of the plot before plotting.
+    :param vertical_legend: If True, draw a vertical legend instead of an horizontal one.
+    :param legend_position: Position of the legend.
+    :param label_color: Color of the linear regression label.
+    :param font_size: Base font size used for annotations and titles.
     :return: Matplotlib figure and axis containing the plot
     """
 
@@ -58,9 +72,14 @@ def correlation_scatterplot(
     ##############
     if reset_plot_style:
         _reset_plot_style(label_pad=5)
+    if palette is None:
+        if hue is None:
+            palette = sns.color_palette("rocket").as_hex()
+        else:
+            palette = sns.color_palette("rocket", len(data[hue].unique())).as_hex()
 
     # Create a figure for the plot, and adjust margins;
-    fig = plt.figure(figsize=(3.4, 3.1))
+    fig = plt.figure(figsize=figure_size)
     gs = gridspec.GridSpec(1, 1)
     plt.subplots_adjust(top=0.95, bottom=0.15, left=0.19, right=0.93)
     ax = fig.add_subplot(gs[0, 0])
@@ -116,7 +135,7 @@ def correlation_scatterplot(
             truncate=False,
             scatter=False,
             ci=95,
-            line_kws={"linewidth": 0.8, "linestyle": "--", "zorder": 3},
+            line_kws={"linewidth": 0.8, "linestyle": "--", "zorder": 4},
         )
         # Update regression confidence intervals,
         #   to set the confidence bands as semi-transparent and change style and colors of borders;
@@ -127,14 +146,21 @@ def correlation_scatterplot(
         x=x,
         y=y,
         hue=hue,
-        palette=extend_palette(palette, len(data[hue].unique())),
+        palette=extend_palette(palette, len(data[hue].unique())) if hue is not None else None,
         s=15,
         data=data,
         ax=ax,
         edgecolor="#2f2f2f",
         linewidth=0.5,
-        zorder=4,
+        zorder=3,
     )
+    if label:
+        if hue:
+            d = data.groupby(hue).mean().reset_index()
+        else:
+            d = data
+        for _, row in d.iterrows():
+            ax.annotate(row[label], xy=(row[x], row[y]), fontsize=font_size - 2, color="#2f2f2f", ha="left", zorder=100)
     if ax.legend_ is not None:
         ax.legend_.remove()  # Hack to remove legend;
 
@@ -150,27 +176,34 @@ def correlation_scatterplot(
         # Transform angle to adapt to axes with different scale;
         trans_angle = ax.transData.transform_angles([angle], np.array([0, 0]).reshape((1, 2)))[0]
         # Add label with Latex Math font, at the right angle;
+        if xlimits is None:
+            x_coord = (data[x].max() - data[x].min()) * 0.2 + data[x].min()
+        else:
+            x_coord = (xlimits[1] - xlimits[0]) * 0.2 + xlimits[0]
+        y_coord = x_coord * 1.05 * slope + intercept
         ax.annotate(
             r"$\mathdefault{R^2=" + f"{r_value:.2f}}}$",
             rotation_mode="anchor",
-            xy=(0.42, 0.45 * slope + intercept),
+            xy=(x_coord, y_coord),
             rotation=trans_angle,
-            fontsize=8,
+            fontsize=font_size,
             ha="left",
-            color="#2f2f2f",
+            color=label_color,
+            zorder=100,
         )
+
 
     # Turn on the grid;
     ax.yaxis.grid(True, linewidth=0.5)
     ax.xaxis.grid(True, linewidth=0.5)
 
-    # Ticks, showing speedup percentage (0% is no speedup);
-    ax.yaxis.set_major_locator(plt.LinearLocator(9))
-    ax.yaxis.set_major_formatter(lambda x, pos: f"{x * 100:.0f}%")
-    ax.tick_params(axis="y", labelsize=6)
+    # Ticks and tick labels;
     ax.xaxis.set_major_locator(plt.LinearLocator(9))
-    ax.xaxis.set_major_formatter(lambda x, pos: f"{x * 100:.0f}%")
-    ax.tick_params(axis="x", labelsize=6)
+    ax.xaxis.set_major_formatter(x_ticks_formatter)
+    ax.tick_params(axis="x", labelsize=font_size - 2)
+    ax.yaxis.set_major_locator(plt.LinearLocator(9))
+    ax.yaxis.set_major_formatter(y_ticks_formatter)
+    ax.tick_params(axis="y", labelsize=font_size - 2)
 
     # Add legend;
     if hue:
@@ -181,17 +214,18 @@ def correlation_scatterplot(
             ax=ax,
             handles=custom_lines,
             labels=labels,
-            bbox_to_anchor=(1, 0.0),
-            fontsize=6,
-            ncol=len(labels),
-            loc="lower right",
+            bbox_to_anchor=(1, 0.0) if legend_position == "lower right" else None,
+            fontsize=font_size - 2,
+            ncol=1 if vertical_legend else len(labels),
+            loc=legend_position,
             handletextpad=0.3,
             columnspacing=1,
             shadow_offset=1,
         )
 
     # Add axes labels;
-    plt.ylabel(ylabel=ylabel, fontsize=8)
-    plt.xlabel(xlabel=xlabel, fontsize=8)
-
+    if xlabel is not None:
+        plt.xlabel(xlabel=xlabel, fontsize=font_size)
+    if xlabel is not None:
+        plt.ylabel(ylabel=ylabel, fontsize=font_size)
     return fig, ax

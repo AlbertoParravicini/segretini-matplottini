@@ -40,6 +40,24 @@ def remove_outliers_iqr(data, quantile: float = 0.75):
     return data[(data >= q1 - iqr * q1) & (data <= q3 + iqr * q3)]
 
 
+def find_outliers_right_quantile(data, quantile: float = 0.75, quantile_multiplier: float = 2):
+    """
+    Filter a sequence of data by removing outliers looking at the quantiles of the distribution.
+    Since the distribution is not symmetrical, look just at the right quantile,
+    and remove values above the specified quantile multiplier.
+    In other words, flag as outliers values such that `data > quantile(data) * quantile_multiplier`.
+    
+    :param data: A sequence of numerical data, iterable.
+    :param quantile: Upper quantile value used as filtering threshold.
+       Must be in `[0.5, 1]`.
+    :param quantile_multiplier: multiplier used to filter out outliers.
+    :return: Boolean array that says which values are outliers
+    """
+    assert quantile <= 1
+    q = np.quantile(data, quantile)
+    return data > q * quantile_multiplier
+
+
 def _remove_outliers_from_dataframe(
     data: pd.DataFrame,
     column: str,

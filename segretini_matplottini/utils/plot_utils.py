@@ -472,7 +472,7 @@ def save_plot(
         # Format the filename
         try:
             output_filename = filename.format(e)
-        except ValueError:
+        except (ValueError, IndexError):
             output_filename = filename.format(date, e)
         if figure:
             figure.savefig(os.path.join(output_folder, output_filename), **kwargs)

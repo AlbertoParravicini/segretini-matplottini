@@ -21,6 +21,8 @@ dependencies = [
 dev = [
     "black >= 22.8",
     "isort >= 5",
+    "ruff >= 0.0.280",
+    "pre-commit >= 3.3.3"
 ]
 
 [tool.setuptools]

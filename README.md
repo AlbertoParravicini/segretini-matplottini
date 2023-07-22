@@ -26,7 +26,7 @@ pip install -e ".[dev]"
 # TODO
 
 [] new code structure in readme, with tree
-[] rename files in `data` to end with `data.csv`
+[x] rename files in `data` to end with `data.csv`
 [x] delete scratchbook
 [] add ruff and isort
 [] add pre-commit hooks

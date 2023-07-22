@@ -9,9 +9,10 @@ from matplotlib.lines import Line2D
 
 from segretini_matplottini.utils.colors import BB4, BB5, G2, PEACH1
 from segretini_matplottini.utils.plot_utils import (
-    add_legend_with_dark_shadow, get_exp_label)
-from segretini_matplottini.utils.plot_utils import \
-    reset_plot_style as _reset_plot_style
+    add_legend_with_dark_shadow,
+    get_exp_label,
+)
+from segretini_matplottini.utils.plot_utils import reset_plot_style as _reset_plot_style
 
 MARKERS = ["o", "X", "D", "P"]
 PALETTE = [PEACH1, G2, BB4, BB5]

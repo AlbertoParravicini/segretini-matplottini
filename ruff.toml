@@ -1,0 +1,19 @@
+select = [
+    "F", # Pyflakes
+    "E", # pycodestyle
+    "I", # isort
+]
+
+exclude = [
+    ".git",
+    ".ipynb_checkpoints",
+    "__pycache__",
+    "build",
+    "dist",
+    "segretini_matplottini.egg-info",
+]
+
+ignore = [
+    "E203", # Whitespace before ':' (in conflict with Black)
+    "E501", # Let black handle lines too long
+]

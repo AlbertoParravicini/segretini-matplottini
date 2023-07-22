@@ -174,11 +174,11 @@ def performance_scaling(
             return d.year
 
     # Ticks, showing relative performance;
-    def speedup_formatter(l):
-        if l >= 1:
-            return str(int(l))
+    def speedup_formatter(_l):
+        if _l >= 1:
+            return str(int(_l))
         else:
-            return f"{l:.1f}"
+            return f"{_l:.1f}"
 
     ax.xaxis.set_major_locator(YearLocator())
     ax.xaxis.set_minor_locator(MonthLocator(interval=3))

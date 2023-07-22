@@ -247,11 +247,11 @@ def fix_label_length(labels: list[str], max_length: int = 20) -> list[str]:
     :return: A list of possibly truncated labels.
     """
     fixed_labels = []
-    for l in labels:
-        if len(l) <= max_length:
-            fixed_labels += [l]
+    for _l in labels:
+        if len(_l) <= max_length:
+            fixed_labels += [_l]
         else:
-            fixed_labels += [l[: max_length - 3] + "..."]
+            fixed_labels += [_l[: max_length - 3] + "..."]
     return fixed_labels
 
 
@@ -302,7 +302,7 @@ def add_labels(
     format_str: str = "{:.2f}x",
     label_color: str = "#2f2f2f",
     max_only: bool = False,
-    skip_bars: int = 0,
+    skip_bars=0,
     max_bars: Optional[int] = None,
     skip_value: Optional[float] = None,
     skip_threshold: float = 1e-6,
@@ -344,7 +344,7 @@ def add_labels(
     else:
         patches = [p for i, p in enumerate(ax.patches) if i in patch_num]
     if skip_nan_bars:
-        labels = [l for l in labels if not pd.isna(l)]
+        labels = [_l for _l in labels if not pd.isna(_l)]
         patches = [p for p in patches if not pd.isna(p.get_height())]
 
     # Iterate through the list of axes' patches

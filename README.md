@@ -28,9 +28,9 @@ pip install -e ".[dev]"
 [] new code structure in readme, with tree
 [x] rename files in `data` to end with `data.csv`
 [x] delete scratchbook
-[] add ruff and isort
-[] add pre-commit hooks
-[] linting
+[x] add ruff and isort
+[x] add pre-commit hooks
+[x] linting
 [x] reverse gitignore
 [] modify plots structure not to have dates
 [] create imports for utils inside __init__, to hide private stuff
@@ -81,6 +81,15 @@ If your plot is not explicitely comparing classes (for example, you want to show
 
 * **Add redundant information**: if you are plotting many different classes, and use one color per class, it can be difficult to distinguish among them. Instead, add some kind of redundant information.
 In scatterplots and lineplots you can use different markers (circles, diamonds, etc.), while in barplots you can use different hatches (//// or \\\\) or add labels to each class.
+
+## Development notes
+
+We use `black` and `ruff` for formatting, linting, and sorting imports. Each commit must pass their checks. To run checks manually, run the following.
+
+```shell
+black . --config pyproject.toml 
+ruff . --fix --config ruff.toml
+```
 
 ## Update 2022-10-03
 

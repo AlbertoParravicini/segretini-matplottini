@@ -5,6 +5,7 @@
 !pyproject.toml
 !.gitignore
 !.pre-commit-config.yaml
+!ruff.toml
 !README.md
 !LICENSE
 !segretini_matplottini

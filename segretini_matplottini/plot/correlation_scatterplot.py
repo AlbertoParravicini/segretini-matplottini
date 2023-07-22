@@ -10,9 +10,10 @@ from scipy import stats
 
 from segretini_matplottini.utils.colors import PALETTE_G, PALETTE_O
 from segretini_matplottini.utils.plot_utils import (
-    add_legend_with_dark_shadow, extend_palette)
-from segretini_matplottini.utils.plot_utils import \
-    reset_plot_style as _reset_plot_style
+    add_legend_with_dark_shadow,
+    extend_palette,
+)
+from segretini_matplottini.utils.plot_utils import reset_plot_style as _reset_plot_style
 
 
 def correlation_scatterplot(
@@ -210,7 +211,9 @@ def correlation_scatterplot(
     if hue:
         labels = list(data[hue].unique())
         palette = extend_palette(palette, len(labels))
-        custom_lines = [Patch(facecolor=palette[::-1][i], edgecolor="#2f2f2f", label=l) for i, l in enumerate(labels)]
+        custom_lines = [
+            Patch(facecolor=palette[::-1][i], edgecolor="#2f2f2f", label=_l) for i, _l in enumerate(labels)
+        ]
         add_legend_with_dark_shadow(
             ax=ax,
             handles=custom_lines,

@@ -4,8 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.axis import Axis
-from matplotlib.dates import (DateFormatter, HourLocator, MinuteLocator,
-                              SecondLocator)
+from matplotlib.dates import DateFormatter, HourLocator, MinuteLocator, SecondLocator
 from matplotlib.figure import Figure
 from matplotlib.ticker import LinearLocator
 

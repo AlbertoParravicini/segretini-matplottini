@@ -9,7 +9,10 @@ import seaborn as sns
 from matplotlib.patches import Patch, Rectangle
 
 from segretini_matplottini.utils.plot_utils import (
-    add_legend_with_dark_shadow, get_ci_size, reset_plot_style)
+    add_legend_with_dark_shadow,
+    get_ci_size,
+    reset_plot_style,
+)
 
 
 def ridgeplot(
@@ -256,7 +259,7 @@ def ridgeplot(
                 tic.tick1line.set_visible(False)
 
     # Add custom legend;
-    custom_lines = [Patch(facecolor=palette[i], edgecolor="#2f2f2f", label=l) for i, l in enumerate(legend_labels)]
+    custom_lines = [Patch(facecolor=palette[i], edgecolor="#2f2f2f", label=_l) for i, _l in enumerate(legend_labels)]
     leg, _ = add_legend_with_dark_shadow(
         fig=g.fig,
         handles=custom_lines,

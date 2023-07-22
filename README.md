@@ -84,10 +84,11 @@ In scatterplots and lineplots you can use different markers (circles, diamonds, 
 
 ## Development notes
 
-We use `black` and `ruff` for formatting, linting, and sorting imports. Each commit must pass their checks. To run checks manually, run the following.
+We use `black`, `mypy`, and `ruff` for formatting, type checking, linting, and sorting imports. Each commit must pass their checks. To run checks manually, run the following.
 
 ```shell
 black . --config pyproject.toml 
+mypy . --config mypy.ini
 ruff . --fix --config ruff.toml
 ```
 

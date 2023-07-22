@@ -302,7 +302,7 @@ def add_labels(
     format_str: str = "{:.2f}x",
     label_color: str = "#2f2f2f",
     max_only: bool = False,
-    skip_bars=0,
+    skip_bars: int = 0,
     max_bars: Optional[int] = None,
     skip_value: Optional[float] = None,
     skip_threshold: float = 1e-6,

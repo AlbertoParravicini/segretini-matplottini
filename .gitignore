@@ -6,12 +6,13 @@
 !.gitignore
 !.pre-commit-config.yaml
 !ruff.toml
+!mypy.ini
 !README.md
 !LICENSE
 !segretini_matplottini
 !segretini_matplottini/py.typed
 !segretini_matplottini/plot
-!segretini_matplottini/util
+!segretini_matplottini/utils
 !examples/
 !data/
 !data/*.csv

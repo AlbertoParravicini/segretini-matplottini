@@ -1,6 +1,16 @@
-**.pyc
-segretini_matplottini.egg-info/
-build/
-**/__pycache__/
-dist/
-**/.DS_Store
+# Ignore all by default
+*
+# Add back specific files
+!*.py
+!pyproject.toml
+!.gitignore
+!README.md
+!LICENSE
+!segretini_matplottini
+!segretini_matplottini/py.typed
+!segretini_matplottini/plot
+!segretini_matplottini/util
+!examples/
+!data/
+!plots/
+!.vscode/

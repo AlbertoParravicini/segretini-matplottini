@@ -16,8 +16,7 @@ import pandas as pd
 import seaborn as sns
 
 from segretini_matplottini.plot import ridgeplot
-from segretini_matplottini.utils.data_utils import remove_outliers_from_dataframe_ci
-from segretini_matplottini.utils.plot_utils import save_plot
+from segretini_matplottini.utils import remove_outliers_from_dataframe_ci, save_plot
 
 ##############################
 # Setup ######################

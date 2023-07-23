@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
+from segretini_matplottini.utils import save_plot
 from segretini_matplottini.utils.colors import PALETTE_G
-from segretini_matplottini.utils.plot_utils import save_plot
 
 ##############################
 # Setup ######################

@@ -7,7 +7,7 @@ from matplotlib.axis import Axis
 from matplotlib.figure import Figure
 
 from segretini_matplottini.plot import timeseries
-from segretini_matplottini.utils.plot_utils import save_plot
+from segretini_matplottini.utils import save_plot
 
 ##############################
 # Setup ######################

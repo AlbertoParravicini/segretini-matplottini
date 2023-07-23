@@ -12,7 +12,7 @@ from matplotlib.dates import MonthLocator, YearLocator, num2date
 from matplotlib.ticker import FuncFormatter
 from sklearn import linear_model
 
-from segretini_matplottini.utils.plot_utils import reset_plot_style, save_plot
+from segretini_matplottini.utils import reset_plot_style, save_plot
 
 ##############################
 # Setup ######################

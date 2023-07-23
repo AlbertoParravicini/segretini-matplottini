@@ -8,12 +8,12 @@ import seaborn as sns
 from matplotlib.patches import Patch, Rectangle
 from scipy import stats
 
-from segretini_matplottini.utils.colors import PALETTE_G, PALETTE_O
-from segretini_matplottini.utils.plot_utils import (
+from segretini_matplottini.utils import (
     add_legend_with_dark_shadow,
     extend_palette,
 )
-from segretini_matplottini.utils.plot_utils import reset_plot_style as _reset_plot_style
+from segretini_matplottini.utils import reset_plot_style as _reset_plot_style
+from segretini_matplottini.utils.colors import PALETTE_G, PALETTE_O
 
 
 def correlation_scatterplot(

@@ -5,8 +5,8 @@ import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 
 from segretini_matplottini.plot import roofline
+from segretini_matplottini.utils import save_plot
 from segretini_matplottini.utils.colors import BB4, BB5, G2, PEACH1
-from segretini_matplottini.utils.plot_utils import save_plot
 
 ##############################
 # Setup ######################
@@ -148,7 +148,6 @@ def plot_3(data_dict_1: dict[str, Any], data_dict_2: dict[str, Any]) -> tuple[pl
 ##############################
 
 if __name__ == "__main__":
-
     # Create a single Roofline model;
     data_dict = load_data_1()
     fig, ax = plot_1(data_dict)

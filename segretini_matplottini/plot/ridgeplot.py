@@ -10,7 +10,7 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.patches import Patch, Rectangle
 
-from segretini_matplottini.utils.plot_utils import (
+from segretini_matplottini.utils import (
     add_legend_with_dark_shadow,
     get_ci_size,
     reset_plot_style,

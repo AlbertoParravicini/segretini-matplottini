@@ -8,7 +8,7 @@ from matplotlib.dates import DateFormatter, HourLocator, MinuteLocator, SecondLo
 from matplotlib.figure import Figure
 from matplotlib.ticker import LinearLocator
 
-from segretini_matplottini.utils.plot_utils import reset_plot_style
+from segretini_matplottini.utils import reset_plot_style
 
 
 def timeseries(

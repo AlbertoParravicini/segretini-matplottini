@@ -11,8 +11,8 @@
 !LICENSE
 !segretini_matplottini
 !segretini_matplottini/py.typed
-!segretini_matplottini/plot
-!segretini_matplottini/utils
+!segretini_matplottini/plot/
+!segretini_matplottini/utils/
 !examples/
 !data/
 !data/*.csv

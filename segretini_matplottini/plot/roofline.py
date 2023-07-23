@@ -7,12 +7,14 @@ from matplotlib.axis import Axis
 from matplotlib.figure import Figure
 from matplotlib.lines import Line2D
 
-from segretini_matplottini.utils.colors import BB4, BB5, G2, PEACH1
-from segretini_matplottini.utils.plot_utils import (
+from segretini_matplottini.utils import (
     add_legend_with_dark_shadow,
     get_exp_label,
 )
-from segretini_matplottini.utils.plot_utils import reset_plot_style as _reset_plot_style
+from segretini_matplottini.utils import (
+    reset_plot_style as _reset_plot_style,
+)
+from segretini_matplottini.utils.colors import BB4, BB5, G2, PEACH1
 
 MARKERS = ["o", "X", "D", "P"]
 PALETTE = [PEACH1, G2, BB4, BB5]
@@ -28,8 +30,8 @@ def roofline(
     xmax: Optional[float] = None,
     ymin: Optional[float] = None,
     ymax: Optional[float] = None,
-    palette: Optional[list[str]] = None,
-    markers: Optional[list[str]] = None,
+    palette: Optional[Union[list[str], str]] = None,
+    markers: Optional[Union[list[str], str]] = None,
     base_font_size: float = 6,
     scatter_size: float = 14,
     xlabel: str = "Operational Intensity [{}/B]",

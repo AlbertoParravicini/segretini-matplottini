@@ -108,7 +108,7 @@ def find_outliers_right_quantile(
 def _remove_outliers_from_dataframe(
     data: pd.DataFrame,
     column: str,
-    remove_outliers_func: Callable[[pd.Series], pd.Series],
+    remove_outliers_func: Callable[..., pd.Series],
     groupby: Optional[list[str]] = None,
     reset_index: bool = True,
     drop_index: bool = True,

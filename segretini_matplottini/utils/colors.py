@@ -1,3 +1,7 @@
+from typing import Union
+
+from matplotlib.colors import hsv_to_rgb, rgb_to_hsv, to_hex, to_rgb
+
 # Define some colors for later use.
 # Tool to create paletters: https://color.adobe.com/create
 # Guide to make nice palettes: https://earthobservatory.nasa.gov/blogs/elegantfigures/2013/08/05/subtleties-of-color-part-1-of-6/
@@ -59,3 +63,27 @@ PALETTE_OG = ["#E8CFB5", "#81C798", "#55A68B", "#358787"]
 
 # Used for plots with a dark background;
 BACKGROUND_BLACK = "#0E1117"
+
+
+def extend_palette(palette: list[str], new_length: int) -> list[str]:
+    """
+    Replicate a palette (a list of colors) so that it matches the specified length
+
+    :param palette: A list of colors.
+    :param new_length: Desired palette length.
+    :return: New extended palette.
+    """
+    return (palette * int(new_length / len(palette)))[:new_length]
+
+
+def hex_color_to_grayscale(rgb: Union[str, tuple[int, int, int]]) -> str:
+    """
+    Convert a color expressed as RGB (either hex or tuple of 3 integers in [0, 255])
+    into the corresponding grayscale color, by setting the saturation to 0.
+
+    :param rgb: An input RGB color.
+    :return: Output grayscale color, as hex.
+    """
+    hsv = rgb_to_hsv(to_rgb(rgb))
+    hsv[1] = 0  # Set saturation to 0;
+    return str(to_hex(hsv_to_rgb(hsv)))

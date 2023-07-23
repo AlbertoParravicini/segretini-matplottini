@@ -1,122 +1,14 @@
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable, Optional, TypeVar, Union
+from typing import Any, Optional, Union
 
-import matplotlib
 import matplotlib.pyplot as plt
-import numpy as np
-import scipy.stats as st
 import seaborn as sns
-from jaxtyping import Float
-from matplotlib.artist import allow_rasterization
 from matplotlib.axis import Axis
-from matplotlib.backend_bases import RendererBase
-from matplotlib.colors import hsv_to_rgb, rgb_to_hsv, to_hex, to_rgb
 from matplotlib.figure import Figure
-from matplotlib.legend import Legend
-from matplotlib.patches import Patch, Shadow
 
 from segretini_matplottini.utils.colors import BACKGROUND_BLACK
-
-N = TypeVar("N")
-M = TypeVar("M")
-
-
-class LegendWithDarkShadow(Legend):
-    """
-    A custom legend style with a rectangular box and a dark shadow around the box.
-    """
-
-    def __post_init__(self) -> None:
-        self.shadow_offset = 2
-
-    @allow_rasterization
-    def draw(self, renderer: RendererBase) -> None:
-        # docstring inherited
-        if not self.get_visible():
-            return
-
-        renderer.open_group("legend", gid=self.get_gid())
-
-        fontsize = renderer.points_to_pixels(self._fontsize)
-
-        # If mode == fill, set the width of the legend_box to the
-        # width of the parent (minus pads);
-        if self._mode in ["expand"]:
-            pad = 2 * (self.borderaxespad + self.borderpad) * fontsize
-            self._legend_box.set_width(self.get_bbox_to_anchor().width - pad)
-
-        # Update the location and size of the legend. This needs to
-        # be done in any case to clip the figure right;
-        bbox = self._legend_box.get_window_extent(renderer)
-        self.legendPatch.set_bounds(bbox.x0, bbox.y0, bbox.width, bbox.height)
-        self.legendPatch.set_mutation_scale(fontsize)
-
-        if self.shadow:
-            Shadow(self.legendPatch, self.shadow_offset, -self.shadow_offset, alpha=1).draw(renderer)
-
-        self.legendPatch.draw(renderer)
-        self._legend_box.draw(renderer)
-
-        renderer.close_group("legend")
-        self.stale = False
-
-
-def add_legend_with_dark_shadow(
-    handles: list[Patch],
-    labels: list[str],
-    fig: Optional[Figure] = None,
-    ax: Optional[Axis] = None,
-    shadow_offset: int = 2,
-    line_width: float = 0.5,
-    *args: Any,
-    **kwargs: Any,
-) -> tuple[LegendWithDarkShadow, Axis]:
-    """
-    Add a legend with dark shadow to the specified axis.
-
-    :param fig: Figure where the legend is added.
-    :param ax: Axis where the legend is added. If both figure and axis are specified,
-        draw the legend in the axis. If neither figure nor axis are specified, draw the legend in the current figure.
-    :param shadow_offset: Offset of the shadow from the legend.
-    :param line_width: Width of the legend box.
-    :param args: Any argument passed to the legend constructor.
-    :param kwargs: Any keyword argument passed to the legend constructor.
-    """
-    # If both figure and axis are missing, draw in the current figure;
-    if fig is None and ax is None:
-        fig = plt.gcf()
-    legend_kwargs = (
-        dict(
-            fancybox=False,
-            framealpha=1,
-            shadow=True,
-            edgecolor="#2f2f2f",
-        )
-        | kwargs
-    )
-    # If the axis is specified, always draw in the axis;
-    where_to_draw = fig
-    if ax is not None:
-        # Draw in the current axis;
-        handles, labels, _, kwargs = matplotlib.legend._parse_legend_args(
-            [ax], handles=handles, labels=labels, *args, **kwargs
-        )
-        where_to_draw = ax
-    leg = LegendWithDarkShadow(
-        where_to_draw,
-        handles,
-        labels,
-        **legend_kwargs,
-    )
-    leg.shadow_offset = shadow_offset
-    leg.get_frame().set_linewidth(line_width)
-    # Add legend to the axis;
-    if ax is None:
-        ax = plt.gca()
-    ax.legend_ = leg
-    return leg, ax
 
 
 def reset_plot_style(
@@ -170,30 +62,6 @@ def reset_plot_style(
     if dark_background:
         plt.rcParams["axes.facecolor"] = BACKGROUND_BLACK
         plt.rcParams["savefig.facecolor"] = BACKGROUND_BLACK
-
-
-def extend_palette(palette: list[str], new_length: int) -> list[str]:
-    """
-    Replicate a palette (a list of colors) so that it matches the specified length
-
-    :param palette: A list of colors.
-    :param new_length: Desired palette length.
-    :return: New extended palette.
-    """
-    return (palette * int(new_length / len(palette)))[:new_length]
-
-
-def hex_color_to_grayscale(rgb: Union[str, tuple[int, int, int]]) -> str:
-    """
-    Convert a color expressed as RGB (either hex or tuple of 3 integers in [0, 255])
-    into the corresponding grayscale color, by setting the saturation to 0.
-
-    :param rgb: An input RGB color.
-    :return: Output grayscale color, as hex.
-    """
-    hsv = rgb_to_hsv(to_rgb(rgb))
-    hsv[1] = 0  # Set saturation to 0;
-    return str(to_hex(hsv_to_rgb(hsv)))
 
 
 def get_exp_label(
@@ -260,45 +128,21 @@ def fix_label_length(labels: list[str], max_length: int = 20) -> list[str]:
     return fixed_labels
 
 
-def get_ci_size(
-    x: Float[np.ndarray, N],
-    ci: float = 0.95,
-    estimator_func: Callable[[Float[np.ndarray, N]], float] = np.mean,
-    get_raw_location: bool = False,
-) -> tuple[float, float, float]:
+def update_bars_width(ax: Axis, percentage_width: float = 1) -> None:
     """
-    Compute the size of the upper and lower confidence interval for a sequence of values.
-    and return the center of the confidence interval, plus the lower and upper sizes.
+    Given an axis with a barplot, scale the width of each bar to the provided percentage,
+      and align them to their center.
 
-    :param x: A sequence of numerical data, iterable.
-    :param ci: Confidence interval to compute.
-    :param estimator_func: Callable applied to the sequence, and used to compute the center of the confidence interval.
-    :param get_raw_location: If True, report the values of upper and lower intervals,
-        instead of their sizes from the center.
-    :return: Size of upper confidence interval, size of lower confidence interval, mean.
+    :param ax: Axis where bars are located.
+    :param percentage_width: Percentage width to which bars are rescaled. By default, do not change their size.
     """
-    center = estimator_func(x)
-    ci_lower, ci_upper = st.t.interval(ci, len(x) - 1, loc=center, scale=st.sem(x))
-    if not get_raw_location:
-        ci_upper -= center
-        ci_lower = -center
-    return ci_upper, ci_lower, center
-
-
-def get_upper_ci_size(
-    x: Float[np.ndarray, N], ci: float = 0.95, estimator_func: Callable[[Float[np.ndarray, N]], float] = np.mean
-) -> float:
-    """
-    Compute the size of the upper confidence interval,
-    i.e. the size between the top of the bar and the top of the error bar as it is generated by Seaborn.
-    Useful for adding labels above error bars, or to create by hand the error bars.
-
-    :param x: A sequence of numerical data, iterable.
-    :param ci: Confidence interval to compute.
-    :param estimator_func: Callable applied to the sequence, and used to compute the center of the confidence interval.
-    :return: Size of upper confidence interval
-    """
-    return get_ci_size(x, ci, estimator_func=estimator_func)[0]
+    for patch in ax.patches:
+        current_width = patch.get_width()
+        diff = current_width - percentage_width
+        # Change the bar width
+        patch.set_width(percentage_width)
+        # Recenter the bar
+        patch.set_x(patch.get_x() + 0.5 * diff)
 
 
 def add_labels(
@@ -381,47 +225,7 @@ def add_labels(
     #             ha="center",
     #             va="bottom",
     #             rotation=rotation,
-    #         )
-
-
-def update_bars_width(ax: Axis, percentage_width: float = 1) -> None:
-    """
-    Given an axis with a barplot, scale the width of each bar to the provided percentage,
-      and align them to their center.
-
-    :param ax: Axis where bars are located.
-    :param percentage_width: Percentage width to which bars are rescaled. By default, do not change their size.
-    """
-    for patch in ax.patches:
-        current_width = patch.get_width()
-        diff = current_width - percentage_width
-        # Change the bar width
-        patch.set_width(percentage_width)
-        # Recenter the bar
-        patch.set_x(patch.get_x() + 0.5 * diff)
-
-
-def transpose_legend_labels(
-    labels: list[str], handles: list[Patch], max_elements_per_row: int = 6, default_elements_per_col: int = 2
-) -> tuple[list[str], list[Patch]]:
-    """
-    Matplotlib by defaults places elements in the legend from top to bottom.
-    In most cases, placing them left-to-right is more readable (English is read left-to-right, not top-to-bottom)
-    This function transposes the elements in the legend,
-    allowing to set the maximum number of values you want in each row.
-
-    :param labels: List of textual labels in the legend.
-    :param handles: List of color patches in the legend.
-    :param max_elements_per_row: Maximum number of legend elements per row.
-    :param default_elements_per_col: By default, try having default_elements_per_col elements
-        in each column (could be more if max_elements_per_row is reached).
-    """
-    elements_per_row = min(
-        int(np.ceil(len(labels) / default_elements_per_col)), max_elements_per_row
-    )  # Don't add too many elements per row;
-    labels = np.concatenate([labels[i::elements_per_row] for i in range(elements_per_row)], axis=0).tolist()
-    handles = np.concatenate([handles[i::elements_per_row] for i in range(elements_per_row)], axis=0).tolist()
-    return labels, handles
+    #
 
 
 def assemble_output_directory_name(

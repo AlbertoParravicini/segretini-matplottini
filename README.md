@@ -25,14 +25,15 @@ pip install -e ".[dev]"
 
 # TODO
 
-[] new code structure in readme, with tree
 [x] rename files in `data` to end with `data.csv`
 [x] delete scratchbook
 [x] add ruff and isort
 [x] add pre-commit hooks
 [x] linting
 [x] reverse gitignore
+[] new code structure in readme, with tree
 [] modify plots structure not to have dates
+[] recreate sample plots
 [] create imports for utils inside __init__, to hide private stuff
 [] changelog
 [] new barplot code

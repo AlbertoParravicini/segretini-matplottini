@@ -40,6 +40,7 @@ pip install -e ".[dev]"
 [] add util for color palette
 [] add image with plot grid inside readme
 [] add list of examples to readme, add images for the pretties ones
+[] compute_speedup should not mention speedup, and clean API. Maybe ranz correct_speedup, and add test
 [] tests
     [] unit tests
     [] e2e tests for examples, check if they don't crash
@@ -47,6 +48,8 @@ pip install -e ".[dev]"
     [] protect master branch
     [] add automated tests check
     [] add automated linting check
+[] revisit save_plot? Take as input a path or a list of paths. And have another function to assemble the paths from root dir, plot name (not as format string), folder date (as format string, e.g Y_M_D) and suffix date (_Y_M_D_H_M_S), extensions
+[] revisit add_labels: create get_labels_for_barplot and add_labels_to_barplot that takes mandatory labels (and checks that num labels == num bars)
 [] create notebook to create good plot from scratch (some barplot)
 [] delete this list
 

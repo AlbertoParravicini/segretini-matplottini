@@ -38,6 +38,8 @@ def load_data() -> pd.DataFrame:
 def plot(data: pd.DataFrame) -> tuple[plt.Figure, plt.Axes]:
     return correlation_scatterplot(
         data=data,
+        x="estimate0",
+        y="estimate1",
         hue="significant",
         xlimits=X_LIMITS,
         ylimits=Y_LIMITS,

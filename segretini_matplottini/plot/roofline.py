@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
@@ -40,7 +40,7 @@ def roofline(
     add_operational_intensity_label: bool = True,
     operational_intensity_label: str = "OI={:.2f}",
     add_legend: bool = False,
-    legend_labels: list[str] = None,
+    legend_labels: Optional[Union[str, list[str]]] = None,
     reset_plot_style: bool = True,
 ) -> tuple[Figure, Axis]:
     """
@@ -83,13 +83,13 @@ def roofline(
         markers = MARKERS
 
     # Make sure that all inputs are lists;
-    if type(performance) is not list:
+    if isinstance(performance, (int, float)):
         performance = [performance]
-    if type(operational_intensity) is not list:
+    if isinstance(operational_intensity, (int, float)):
         operational_intensity = [operational_intensity]
-    if type(peak_performance) is not list:
+    if isinstance(peak_performance, (int, float)):
         peak_performance = [peak_performance]
-    if type(peak_bandwidth) is not list:
+    if isinstance(peak_bandwidth, (int, float)):
         peak_bandwidth = [peak_bandwidth]
     num_rooflines = len(performance)
 
@@ -98,15 +98,15 @@ def roofline(
     assert num_rooflines == len(peak_performance)
     assert num_rooflines == len(peak_bandwidth)
     # Check that the list of colors and markers is compatible with the number of Rooflines to plot;
-    if type(palette) is list and len(palette) < num_rooflines:
-        repetitions = (num_rooflines + len(palette) - 1) / len(palette)
+    if isinstance(palette, list) and len(palette) < num_rooflines:
+        repetitions = (num_rooflines + len(palette) - 1) // len(palette)
         palette *= repetitions
-    elif palette and type(palette) is not list:
+    elif palette and not isinstance(palette, list):
         palette = [palette] * num_rooflines
-    if type(markers) is list and len(markers) < num_rooflines:
-        repetitions = (num_rooflines + len(markers) - 1) / len(markers)
+    if isinstance(markers, list) and len(markers) < num_rooflines:
+        repetitions = (num_rooflines + len(markers) - 1) // len(markers)
         markers *= repetitions
-    elif markers and type(markers) is not list:
+    elif markers and not isinstance(markers, list):
         markers = [markers] * num_rooflines
 
     ##############
@@ -244,7 +244,7 @@ def roofline(
     if add_legend:
         if not legend_labels:
             legend_labels = ["???"] * num_rooflines
-        elif type(legend_labels) is not list:
+        elif not isinstance(legend_labels, list):
             legend_labels = [legend_labels]
         if len(legend_labels) < num_rooflines:
             legend_labels += ["???"] * (num_rooflines - len(legend_labels))

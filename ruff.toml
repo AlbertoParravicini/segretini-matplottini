@@ -16,4 +16,5 @@ exclude = [
 ignore = [
     "E203", # Whitespace before ':' (in conflict with Black)
     "E501", # Let black handle lines too long
+    # "F722", # F722 - Compatibility with Jaxtyping annotations, https://github.com/google/jaxtyping/blob/main/FAQ.md
 ]

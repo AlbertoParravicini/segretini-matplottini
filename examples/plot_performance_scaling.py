@@ -1,5 +1,6 @@
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
@@ -121,9 +122,11 @@ def performance_scaling(
     #####################
 
     # Associate a color to each kind of hardware (compute, memory, interconnection)
-    def get_color(c):  # Make the color darker, to use it for text;
+    def get_color(c: str) -> tuple[float, float, float]:
         _, saturation, brightness = colors.rgb_to_hsv(colors.to_rgb(c))
-        return sns.set_hls_values(c, l=brightness * 0.6, s=saturation * 0.7)
+        # Make the color darker, to use it for text;
+        r, g, b = sns.set_hls_values(c, l=brightness * 0.6, s=saturation * 0.7)
+        return r, g, b
 
     kind_to_col = {k: get_color(PALETTE[i]) for i, k in enumerate(data["kind"].unique())}
 
@@ -166,19 +169,19 @@ def performance_scaling(
     ax.xaxis.grid(True, linewidth=0.3)
 
     # Set tick number and parameters on x and y axes;
-    def year_formatter(x, pos=None):
+    def year_formatter(x: float, pos: Optional[str] = None) -> str:
         d = num2date(x)
         if (d.year - X_LIMITS[0].year) % 3 != 0:
             return ""
         else:
-            return d.year
+            return str(d.year)
 
     # Ticks, showing relative performance;
-    def speedup_formatter(_l):
-        if _l >= 1:
-            return str(int(_l))
+    def speedup_formatter(label: float) -> str:
+        if label >= 1:
+            return str(int(label))
         else:
-            return f"{_l:.1f}"
+            return f"{label:.1f}"
 
     ax.xaxis.set_major_locator(YearLocator())
     ax.xaxis.set_minor_locator(MonthLocator(interval=3))
@@ -194,15 +197,12 @@ def performance_scaling(
     # Add a fake legend with summary data.
     # We don't use a real legend as we need rows with different colors and we don't want patches on the left.
     # Also, we want the text to look justified;
-    def get_kind_label(k):
-        kind_name = ""
-        if k == "compute":
-            kind_name = "HW FLOPS"
-        elif k == "memory":
-            kind_name = "DRAM BW"
-        else:
-            kind_name = "Interconnect BW"
-        return kind_name
+    def get_kind_label(kind: str) -> str:
+        return {
+            "compute": "HW FLOPS",
+            "memory": "DRAM BW",
+            "interconnect": "Interconnect BW",
+        }.get(kind, "")
 
     # Create a rectangle used as background;
     rectangle = {

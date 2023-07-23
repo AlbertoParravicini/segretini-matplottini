@@ -41,8 +41,8 @@ def load_data() -> pd.DataFrame:
 
     # Compute relative execution time before and after transformations and remove outliers.
     # Also assign row/column identifiers to each benchmark for the ridgeplot;
-    data = remove_outliers_from_dataframe_ci(data, "exec_time_1_us", groupby="name", debug=True)
-    data = remove_outliers_from_dataframe_ci(data, "exec_time_2_us", groupby="name", debug=True)
+    data = remove_outliers_from_dataframe_ci(data, "exec_time_1_us", groupby=["name"], debug=True)
+    data = remove_outliers_from_dataframe_ci(data, "exec_time_2_us", groupby=["name"], debug=True)
 
     # Add relative execution time;
     data["rel_time_1"] = 1
@@ -60,7 +60,7 @@ def plot_1(data: pd.DataFrame) -> sns.FacetGrid:
         data,
         compact_layout=True,
         xlabel="Relative Execution Time",
-        legend_labels=["Before transformations", "After transformations"],
+        legend_labels=("Before transformations", "After transformations"),
         plot_confidence_intervals=False,
         xlimits=(0.7, 1.3),
     )
@@ -71,7 +71,7 @@ def plot_2(data: pd.DataFrame) -> sns.FacetGrid:
         data,
         compact_layout=False,
         xlabel="Relative Execution Time",
-        legend_labels=["Before transformations", "After transformations"],
+        legend_labels=("Before transformations", "After transformations"),
         xlimits=(0.7, 1.3),
     )
 
@@ -81,7 +81,6 @@ def plot_2(data: pd.DataFrame) -> sns.FacetGrid:
 ##############################
 
 if __name__ == "__main__":
-
     data = load_data()
     grid = plot_1(data)
     save_plot(PLOT_DIR, "ridgeplot_compact.{}")

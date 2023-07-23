@@ -6,6 +6,8 @@ import matplotlib.ticker as ticker
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 from matplotlib.patches import Patch, Rectangle
 
 from segretini_matplottini.utils.plot_utils import (
@@ -98,7 +100,8 @@ def ridgeplot(
     # Plot a vertical line corresponding to speedup = 1;
     g.map(plt.axvline, x=1, lw=0.75, clip_on=True, zorder=0, linestyle="--", ymax=plot_height)
     # Remove grid from every plot, if present
-    g.map(lambda label, color: plt.gca().grid(False))
+    ax: Axes = plt.gca()
+    g.map(lambda label, color: ax.grid(False))
 
     ##################
     # Add main plots #
@@ -138,7 +141,7 @@ def ridgeplot(
     if plot_confidence_intervals:
         # Plot a vertical line corresponding to the mean speedup of each benchmark.
         # Pass an unnecessary color argument as name is mapped to hue in the FacetGrid;
-        def plot_mean(x, label, color="#2f2f2f"):
+        def plot_mean(x: float, label: str, color: str = "#2f2f2f") -> None:
             for i, c in enumerate([column_1, column_2]):
                 mean_speedup = _data[_data[identifier_column] == label][c].mean()
                 plt.axvline(
@@ -154,8 +157,8 @@ def ridgeplot(
         g.map(plot_mean, identifier_column)
 
         # Plot confidence intervals;
-        def plot_ci(x, label, color="#2f2f2f"):
-            ax = plt.gca()
+        def plot_ci(x: float, label: str, color: str = "#2f2f2f") -> None:
+            ax: Axes = plt.gca()
             y_max = 0.25 * ax.get_ylim()[1]
             for i, c in enumerate([column_1, column_2]):
                 color = sns.set_hls_values(palette[i], l=0.3)
@@ -181,16 +184,17 @@ def ridgeplot(
     # Pass an unnecessary label and color arguments as required by FacetGrid.map,
     # as name is mapped to hue;
     if xlimits is not None:
+        x_left, x_right = xlimits
 
-        def set_x_width(label="", color="#2f2f2f"):
-            ax = plt.gca()
-            ax.set_xlim(left=xlimits[0], right=xlimits[1])
+        def set_x_width(label: str = "", color: str = "#2f2f2f") -> None:
+            ax: Axes = plt.gca()
+            ax.set_xlim(left=x_left, right=x_right)
 
         g.map(set_x_width)
 
     # Plot the name of each plot;
-    def label(x, label, color="#2f2f2f"):
-        ax = plt.gca()
+    def label(x: float, label: str, color: str = "#2f2f2f") -> None:
+        ax: Axes = plt.gca()
         ax.text(
             0 if compact_layout else 0.01,
             0.15,
@@ -205,7 +209,8 @@ def ridgeplot(
     g.map(label, identifier_column)
 
     # Fix the borders. This must be done here as the previous operations update the default values;
-    g.fig.subplots_adjust(
+    fig: Figure = g.fig
+    fig.subplots_adjust(
         top=0.98,
         bottom=0.21 if compact_layout else 0.1,
         right=0.98,
@@ -221,7 +226,7 @@ def ridgeplot(
 
     # Write the x-axis tick labels using percentages;
     @ticker.FuncFormatter
-    def major_formatter(x, pos):
+    def major_formatter(x: float, pos: str) -> str:
         return f"{int(100 * x)}%"
 
     # Disable y ticks and remove axis;
@@ -235,9 +240,10 @@ def ridgeplot(
     n_axes = int(n_rows * n_cols)
     n_full_axes = len(_data[identifier_column].unique())
     # Set ticks and labels on all axes;
-    for i, ax_i in enumerate(g.axes):
+    axes: list[list[Axes]] = g.axes
+    for i, ax_i in enumerate(axes):
         for k, ax_j in enumerate(ax_i):
-            if compact_layout and i < len(g.axes) - 1:
+            if compact_layout and i < len(axes) - 1:
                 ax_j.xaxis.set_ticklabels([])
             else:
                 ax_j.xaxis.set_major_formatter(major_formatter)
@@ -247,15 +253,15 @@ def ridgeplot(
                     tic.tick2line.set_visible(False)
     # Set labels on the last axis of each column (except the last, which could have fewer plots);
     if xlabel:
-        for ax in g.axes[-1][:-1]:
+        for ax in axes[-1][:-1]:
             ax.set_xlabel(xlabel, fontsize=18)
         # Set label on the last axis of the last column;
-        g.axes[-1 - (n_axes - n_full_axes)][-1].set_xlabel(xlabel, fontsize=18)
+        axes[-1 - (n_axes - n_full_axes)][-1].set_xlabel(xlabel, fontsize=18)
     # Hide labels and ticks on empty axes;
     if n_axes > n_full_axes:
-        for ax in g.axes[-(n_axes - n_full_axes) :]:
-            ax[-1].xaxis.set_ticklabels([])
-            for tic in ax[-1].xaxis.get_major_ticks():
+        for ax_i in axes[-(n_axes - n_full_axes) :]:
+            ax_i[-1].xaxis.set_ticklabels([])
+            for tic in ax_i[-1].xaxis.get_major_ticks():
                 tic.tick1line.set_visible(False)
 
     # Add custom legend;
@@ -263,7 +269,7 @@ def ridgeplot(
     leg, _ = add_legend_with_dark_shadow(
         fig=g.fig,
         handles=custom_lines,
-        labels=legend_labels,
+        labels=list(legend_labels),
         loc="lower center",
         bbox_to_anchor=(0.5, 0.0),
         fontsize=17,
@@ -274,7 +280,7 @@ def ridgeplot(
         line_width=1,
     )
     leg.set_title(None)
-    leg._legend_box.align = "left"
+    leg.set_alignment("left")
     leg.get_frame().set_facecolor("white")
 
     return g

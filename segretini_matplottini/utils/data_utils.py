@@ -1,14 +1,18 @@
 from functools import reduce
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Optional, TypeVar, Union
 
 import numpy as np
 import pandas as pd
 import scipy.stats
 import scipy.stats as st
+from jaxtyping import Float
 from scipy.stats.mstats import gmean
 
+N = TypeVar("N")
+M = TypeVar("M")
 
-def remove_outliers_ci(data: Union[pd.Series, list[float], np.ndarray], sigmas: float = 3):
+
+def remove_outliers_ci(data: Float[np.ndarray, N], sigmas: float = 3) -> Float[np.ndarray, M]:
     """
     Filter a sequence of data by keeping only values within "sigma" standard deviations from the mean.
     This is a simple way to filter outliers, it is more useful to clean data
@@ -21,7 +25,7 @@ def remove_outliers_ci(data: Union[pd.Series, list[float], np.ndarray], sigmas: 
     return data[np.abs(st.zscore(data)) < sigmas]
 
 
-def remove_outliers_iqr(data, quantile: float = 0.75):
+def remove_outliers_iqr(data: Float[np.ndarray, N], quantile: float = 0.75) -> Float[np.ndarray, M]:
     """
     Filter a sequence of data by removing outliers looking at the quantiles of the distribution.
     Find quantiles (by default, `Q1` and `Q3`), and interquantile range (by default, `Q3 - Q1`),
@@ -40,7 +44,9 @@ def remove_outliers_iqr(data, quantile: float = 0.75):
     return data[(data >= q1 - iqr * q1) & (data <= q3 + iqr * q3)]
 
 
-def find_outliers_right_quantile(data, quantile: float = 0.75, quantile_multiplier: float = 2):
+def find_outliers_right_quantile(
+    data: Float[np.ndarray, N], quantile: float = 0.75, quantile_multiplier: float = 2
+) -> Float[np.ndarray, M]:
     """
     Filter a sequence of data by removing outliers looking at the quantiles of the distribution.
     Since the distribution is not symmetrical, look just at the right quantile,
@@ -61,7 +67,7 @@ def find_outliers_right_quantile(data, quantile: float = 0.75, quantile_multipli
 def _remove_outliers_from_dataframe(
     data: pd.DataFrame,
     column: str,
-    remove_outliers_func: Callable,
+    remove_outliers_func: Callable[[pd.Series], pd.Series],
     groupby: Optional[list[str]] = None,
     reset_index: bool = True,
     drop_index: bool = True,
@@ -86,20 +92,20 @@ def _remove_outliers_from_dataframe(
     :return: Data without outliers.
     """
 
-    def _remove_outliers_df(data: pd.DataFrame, column, reset_index, drop_index, remove_outliers_func, **kwargs):
-        col = data[column]
-        res = data.loc[remove_outliers_func(col, **kwargs).index]
+    def _remove_outliers_df(curr_data: pd.DataFrame, **kwargs: Any) -> pd.DataFrame:
+        col = curr_data[column]
+        res = curr_data.loc[remove_outliers_func(col, **kwargs).index]
         if reset_index:
             res = res.reset_index(drop=drop_index)
         return res
 
     old_len = len(data)
     if groupby is None:
-        new_data = _remove_outliers_df(data, column, reset_index, drop_index, remove_outliers_func, **kwargs)
+        new_data = _remove_outliers_df(data, **kwargs)
     else:
         filtered = []
         for _, g in data.groupby(groupby, sort=False):
-            filtered += [_remove_outliers_df(g, column, reset_index, drop_index, remove_outliers_func, **kwargs)]
+            filtered += [_remove_outliers_df(g, **kwargs)]
         new_data = pd.concat(filtered, ignore_index=True)
     if debug and (len(new_data) < old_len):
         print(f"removed {old_len - len(new_data)} outliers")
@@ -210,7 +216,7 @@ def correct_speedup_df(
     baseline_filter_val: str,
     speedup_col_name: str = "speedup",
     speedup_col_name_reference: Optional[str] = None,
-):
+) -> pd.DataFrame:
     """
     Divide the speedups in `speedup_col_name` by the geomean of `speedup_col_name_reference`,
     grouping values by the columns in `groupby` and specifying a baseline column and value to use as reference.
@@ -244,15 +250,15 @@ def correct_speedup_df(
 def compute_speedup_df(
     data: pd.DataFrame,
     groupby: list[str],
-    baseline_filter_col: list[str],
-    baseline_filter_val: list[str],
+    baseline_filter_col: Union[str, list[str]],
+    baseline_filter_val: Union[str, list[str]],
     speedup_col_name: str = "speedup",
     time_column_name: str = "exec_time",
     baseline_col_name: str = "baseline_time",
     correction: bool = True,
-    aggregation: Callable = np.median,
+    aggregation: Callable[[pd.Series], float] = np.median,
     compute_relative_perf: bool = False,
-):
+) -> pd.DataFrame:
     """
     Compute speedups on a DataFrame by grouping values.
 
@@ -282,9 +288,9 @@ def compute_speedup_df(
     data[speedup_col_name] = 1
     data[baseline_col_name] = 0
 
-    if type(baseline_filter_col) is not list:
+    if isinstance(baseline_filter_col, str):
         baseline_filter_col = [baseline_filter_col]
-    if type(baseline_filter_val) is not list:
+    if isinstance(baseline_filter_val, str):
         baseline_filter_val = [baseline_filter_val]
 
     assert len(baseline_filter_col) == len(baseline_filter_val)
@@ -294,7 +300,8 @@ def compute_speedup_df(
         # Compute the median baseline computation time;
         indices = [group[group[i] == j].index for i, j in zip(baseline_filter_col, baseline_filter_val)]
         reduced_index = reduce(lambda x, y: x.intersection(y), indices)
-        mean_baseline = aggregation(data.loc[reduced_index, time_column_name])
+        group_to_aggregate = data.loc[reduced_index, time_column_name]
+        mean_baseline = aggregation(group_to_aggregate)
         # Compute the speedup for this group;
         group.loc[:, speedup_col_name] = (
             (group[time_column_name] / mean_baseline)

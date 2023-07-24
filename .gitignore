@@ -8,6 +8,7 @@
 !ruff.toml
 !mypy.ini
 !README.md
+!CHANGELOG.md
 !LICENSE
 !segretini_matplottini
 !segretini_matplottini/py.typed

@@ -32,11 +32,12 @@ pip install -e ".[dev]"
 [x] linting
 [x] reverse gitignore
 [] new code structure in readme, with tree
-[] modify plots structure not to have dates
-[] recreate sample plots
+[x] modify plots structure not to have dates
+[x] recreate sample plots
 [x] create imports for utils inside __init__, to hide private stuff
-[] changelog
+[x] changelog
 [] new barplot code
+[] ranz unused colors/palettes, add some new sample colors (e.g. green used in new plots)
 [] add util for arrow of metric
 [] add util for color palette
 [] add image with plot grid inside readme
@@ -49,9 +50,10 @@ pip install -e ".[dev]"
     [] protect master branch
     [] add automated tests check
     [] add automated linting check
-[] revisit save_plot? Take as input a path or a list of paths. And have another function to assemble the paths from root dir, plot name (not as format string), folder date (as format string, e.g Y_M_D) and suffix date (_Y_M_D_H_M_S), extensions
+[x] revisit save_plot. Take as input a path or a list of paths. And have another function to assemble the paths from root dir, plot name (not as format string), folder date (as format string, e.g Y_M_D) and suffix date (_Y_M_D_H_M_S), extensions
 [] revisit add_labels: create get_labels_for_barplot and add_labels_to_barplot that takes mandatory labels (and checks that num labels == num bars)
 [] create notebook to create good plot from scratch (some barplot)
+[] update changelog
 [] delete this list
 
 ## Repository Structure
@@ -95,47 +97,3 @@ black . --config pyproject.toml
 mypy . --config mypy.ini
 ruff . --fix --config ruff.toml
 ```
-
-## Update 2022-10-03
-
-Added a new **timeseries plot**, find it it `examples/plot_timeseries.py`. I also added a sleek `dark background` setting in `utils.plot_utils.reset_plot_style`.
-
-![Timeseries](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/2022-10-03/timeseries.png)
-
-## Update 2022-09-25
-
-I'm revamping the structure of the repository, to make it easier to integrate in other repositories and create pretty plots. I also added a new legend style, and squashed many bugs in `plot_utils.py`
-
-## Update 2021-08-28
-
-Update style of **Ridgeplot** to be readable in black & white. Added *large* layout to **Ridgeplot**
-
-![Ridgeplot](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/2022-09-25/ridgeplot_large.png)
-
-Updates to `plot_utils.py`: added option to directly provide vertical coordinates to `add_labels`. Added better outlier removal based on interquantile range (the same approach used to find outliers in box-plots)
-
-Added `examples/plot_performance_scaling.py`: this plot shows the relative performance increase of processors, memory and interconnection technologies from 1996 to 2021. 
-Shamefully copied from [AI and Memory Wall](https://medium.com/riselab/ai-and-memory-wall-2cb4265cb0b8) by Amir Gholami.
-This plot shows how to use dates for the x-axis, and do fairly complex visualization on log-scale axes (i.e. linear regressions on data with exponential increase).
-
-![Performance Scaling](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/2022-09-25/performance_scaling.png)
-
-## Update 2021-03-22
-
-Updated **Ridgeplot** to have confidence intervals and be more user-friendly (`examples/plot_ridgeplot.py`). Added some general tips about choosing colors.
-
-<!-- ![Ridgeplot Example](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/2022-09-25/ridgeplot.png) -->
-
-## Update 2021-03-20
-
-Added **Correlation Scatterplot**, find it in `examples/plot_correlation_scatterplot.py`.
-Minor updates to `plot_utils.py`: new palettes, improved robustness of `get_exp_label`, minor bugfixes.
-
-![Correlation Scatterplot](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/2022-09-25/correlation_scatterplot.png)
-
-## Update 2020-11-25
-
-Added **Roofline Plot**, find it in `examples/plot_roofline.py`.
-
-![Roofline](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/2022-09-25/roofline_double.png)
-

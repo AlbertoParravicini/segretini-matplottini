@@ -3,7 +3,7 @@
 A collection of Matplotlib and Seaborn recipes and utilities collected over years of colorful plot-making,
 to help researchers create publication-ready plots with ease.
 
-## Installation
+## 🚂 Installation
 
 Clone the repository and install `segretini-matplottini` with `pip`.
 
@@ -56,7 +56,7 @@ pip install -e ".[dev]"
 [] update changelog
 [] delete this list
 
-## Repository Structure
+## ✍️ Repository Structure
 
 * `segretini_matplottini/utils/plot_utils.py` contains many useful functions commonly used during plotting, to add labels above bars or writing nice labels with exponential notation.
 * `segretini_matplottini/utils/data_utils.py` contains functions useful for data preprocessing, such as removing outliers, computing and speedups.
@@ -65,16 +65,16 @@ pip install -e ".[dev]"
 * `data` contains files used for plots. For the most part, you can ignore it.
 * `plots` is where all the plots are stored. If you find something you like, the code to replicate it is in `examples`.
 
-## Tips and Tricks
+## 💡 Tips and Tricks
 
 An ever-growing collection of tips I've found or discovered along the way, together with some nice resources I like a lot.
 
-### Resources
+### 📚 Resources 
 
 * [Subtleties of Color](https://earthobservatory.nasa.gov/blogs/elegantfigures/2013/08/05/subtleties-of-color-part-1-of-6/): a six-parts guide on how to pick nice colors and create great palettes, from the Earth Observatory NASA blog.
 * [Adobe Color](https://color.adobe.com/create/color-wheel): a free web tool to create palettes of different types (shades, complementary, etc.). It also has accessibility tools to test for color blindness safety.
 
-### Colors
+### 🎨 Colors
 
 Picking the right colors is hard! I found the following tips to be very helpful.
 
@@ -88,7 +88,7 @@ If your plot is not explicitely comparing classes (for example, you want to show
 * **Add redundant information**: if you are plotting many different classes, and use one color per class, it can be difficult to distinguish among them. Instead, add some kind of redundant information.
 In scatterplots and lineplots you can use different markers (circles, diamonds, etc.), while in barplots you can use different hatches (//// or \\\\) or add labels to each class.
 
-## Development notes
+## 👨‍🔬 Development notes
 
 We use `black`, `mypy`, and `ruff` for formatting, type checking, linting, and sorting imports. Each commit must pass their checks. To run checks manually, run the following.
 

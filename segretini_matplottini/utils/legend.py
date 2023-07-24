@@ -1,4 +1,4 @@
-from typing import Any, Optional, TypeVar
+from typing import Any, Optional
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -9,9 +9,6 @@ from matplotlib.backend_bases import RendererBase
 from matplotlib.figure import Figure
 from matplotlib.legend import Legend
 from matplotlib.patches import Patch, Shadow
-
-N = TypeVar("N")
-M = TypeVar("M")
 
 
 class LegendWithDarkShadow(Legend):

@@ -1,14 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Jun 18 10:14:53 2020
-
-Example of Ridge plot, inspired by https://seaborn.pydata.org/examples/kde_ridgeplot.html
-
-@author: aparravi
-"""
-
-
 from pathlib import Path
 
 import numpy as np
@@ -16,15 +5,19 @@ import pandas as pd
 import seaborn as sns
 
 from segretini_matplottini.plot import ridgeplot
-from segretini_matplottini.utils import remove_outliers_from_dataframe_ci, save_plot
+from segretini_matplottini.utils import (
+    assemble_filenames_to_save_plot,
+    remove_outliers_from_dataframe_ci,
+    save_plot,
+)
 
 ##############################
 # Setup ######################
 ##############################
 
 
-PLOT_DIR = (Path(__file__).parent.parent / "plots").resolve()
-DATA_DIR = (Path(__file__).parent.parent / "data").resolve()
+PLOT_DIR = Path(__file__).parent.parent / "plots"
+DATA_DIR = Path(__file__).parent.parent / "data"
 
 
 ##############################
@@ -82,6 +75,20 @@ def plot_2(data: pd.DataFrame) -> sns.FacetGrid:
 if __name__ == "__main__":
     data = load_data()
     grid = plot_1(data)
-    save_plot(PLOT_DIR, "ridgeplot_compact.{}")
+    save_plot(
+        assemble_filenames_to_save_plot(
+            directory=PLOT_DIR,
+            plot_name="ridgeplot_compact",
+            add_timestamp_prefix_to_plot_name=False,
+            store_plot_into_timestamp_subfolder=False,
+        )
+    )
     grid = plot_2(data)
-    save_plot(PLOT_DIR, "ridgeplot_large.{}")
+    save_plot(
+        assemble_filenames_to_save_plot(
+            directory=PLOT_DIR,
+            plot_name="ridgeplot_large",
+            add_timestamp_prefix_to_plot_name=False,
+            store_plot_into_timestamp_subfolder=False,
+        )
+    )

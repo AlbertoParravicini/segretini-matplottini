@@ -12,7 +12,11 @@ from matplotlib.dates import MonthLocator, YearLocator, num2date
 from matplotlib.ticker import FuncFormatter
 from sklearn import linear_model
 
-from segretini_matplottini.utils import reset_plot_style, save_plot
+from segretini_matplottini.utils import (
+    assemble_filenames_to_save_plot,
+    reset_plot_style,
+    save_plot,
+)
 
 ##############################
 # Setup ######################
@@ -26,8 +30,8 @@ MARKERS = ["o", "D", "X"]
 X_LIMITS = (datetime(year=1996, month=1, day=1), datetime(year=2022, month=1, day=1))
 Y_LIMITS = (0.1, 5 * 1e6)
 
-PLOT_DIR = (Path(__file__).parent.parent / "plots").resolve()
-DATA_DIR = (Path(__file__).parent.parent / "data").resolve()
+PLOT_DIR = Path(__file__).parent.parent / "plots"
+DATA_DIR = Path(__file__).parent.parent / "data"
 
 ##############################
 # Plotting functions #########
@@ -271,7 +275,7 @@ def load_data() -> pd.DataFrame:
     # Load data;
     data = pd.read_csv(DATA_DIR / "performance_scaling_data.csv")
     # Convert date;
-    data["year"] = pd.to_datetime(data["year"], format="%Y-%m")
+    data["year"] = pd.to_datetime(data["year"], format="ISO8601")
     return data
 
 
@@ -286,4 +290,11 @@ def plot(data: pd.DataFrame) -> tuple[plt.Figure, plt.Axes]:
 if __name__ == "__main__":
     data = load_data()
     fig, ax = plot(data)
-    save_plot(PLOT_DIR, "performance_scaling.{}")
+    save_plot(
+        assemble_filenames_to_save_plot(
+            directory=PLOT_DIR,
+            plot_name="performance_scaling",
+            add_timestamp_prefix_to_plot_name=False,
+            store_plot_into_timestamp_subfolder=False,
+        )
+    )

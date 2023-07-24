@@ -1,9 +1,10 @@
-import os
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional, Union
 
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import seaborn as sns
 from matplotlib.axis import Axis
 from matplotlib.figure import Figure
@@ -147,7 +148,7 @@ def update_bars_width(ax: Axis, percentage_width: float = 1) -> None:
 
 def add_labels(
     ax: Axis,
-    labels: Optional[list[str]] = None,
+    labels: Optional[list[float]] = None,
     vertical_offsets: Optional[list[float]] = None,
     patch_num: Optional[list[int]] = None,
     fontsize: int = 14,
@@ -185,111 +186,145 @@ def add_labels(
     :param skip_nan_bars: If True, skip bars with NaN height when placing labels.
     :param max_height: If present, place labels at this maximum specified height (e.g. the y axis limit).
     """
-    ...
-    # if not vertical_offsets:
-    #     # 5% above each bar, by default;
-    #     vertical_offsets = [ax.get_ylim()[1] * 0.05] * len(ax.patches)
-    # if not labels:
-    #     labels = [p.get_height() for p in ax.patches]
-    #     if max_only:
-    #         argmax = np.argmax(labels)
-    # patches = []
-    # if not patch_num:
-    #     patches = ax.patches
-    # else:
-    #     patches = [p for i, p in enumerate(ax.patches) if i in patch_num]
-    # if skip_nan_bars:
-    #     labels = [l for l in labels if not pd.isna(l)]
-    #     patches = [p for p in patches if not pd.isna(p.get_height())]
+    if not vertical_offsets:
+        # 5% above each bar, by default;
+        vertical_offsets = [ax.get_ylim()[1] * 0.05] * len(ax.patches)
+    if not labels:
+        labels = [p.get_height() for p in ax.patches]
+        if max_only:
+            argmax = np.argmax(labels)
+    patches = []
+    if not patch_num:
+        patches = ax.patches
+    else:
+        patches = [p for i, p in enumerate(ax.patches) if i in patch_num]
+    if skip_nan_bars:
+        labels = [_l for _l in labels if not pd.isna(_l)]
+        patches = [p for p in patches if not pd.isna(p.get_height())]
 
-    # # Iterate through the list of axes' patches
-    # for i, p in enumerate(patches[skip_bars:max_bars]):
-    #     if (
-    #         labels[i]
-    #         and (i > 0 or not skip_zero)
-    #         and (not max_only or i == argmax)
-    #         and i < len(labels)
-    #         and i < len(vertical_offsets)
-    #     ):
-    #         if skip_value and np.abs(labels[i] - skip_value) < skip_threshold:
-    #             continue  # Skip labels equal to the specified value;
-    #         height = vertical_offsets[i] + p.get_height()
-    #         if max_height is not None and height > max_height:
-    #             height = max_height
-    #         ax.text(
-    #             p.get_x() + p.get_width() / 2,
-    #             height,
-    #             format_str.format(labels[i]),
-    #             fontsize=fontsize,
-    #             color=label_color,
-    #             ha="center",
-    #             va="bottom",
-    #             rotation=rotation,
-    #
+    # Iterate through the list of axes' patches
+    for i, p in enumerate(patches[skip_bars:max_bars]):
+        if (
+            labels[i]
+            and (i > 0 or not skip_zero)
+            and (not max_only or i == argmax)
+            and i < len(labels)
+            and i < len(vertical_offsets)
+        ):
+            if skip_value and np.abs(labels[i] - skip_value) < skip_threshold:
+                continue  # Skip labels equal to the specified value;
+            height = vertical_offsets[i] + p.get_height()
+            if max_height is not None and height > max_height:
+                height = max_height
+            ax.text(
+                p.get_x() + p.get_width() / 2,
+                height,
+                format_str.format(str(labels[i])),
+                fontsize=fontsize,
+                color=label_color,
+                ha="center",
+                va="bottom",
+                rotation=rotation,
+            )
 
 
-def assemble_output_directory_name(
-    directory: Union[str, Path], date: Optional[str] = None, create_date_dir: bool = True
-) -> str:
+def assemble_filenames_to_save_plot(
+    directory: Union[str, Path],
+    plot_name: str,
+    file_format: Union[str, list[str]] = ["pdf", "png"],
+    add_timestamp_prefix_to_plot_name: bool = True,
+    timestamp_prefix_for_plot_name: str = "%Y-%m-%d_%H-%M-%S_",
+    store_plot_into_timestamp_subfolder: bool = True,
+    timestamp_format_for_subfolder: str = "%Y-%m-%d",
+) -> list[Path]:
     """
-    Create the output directory where plots are saved.
-    Optionally, create a subfolder with todays' date formatted as `%Y-%m-%d`,
-    and save plots inside it. Parent folders of `directory` are assumed to exist.
+    Provide an easy interface to generate paths where plots are stored, using a consistent format
+    that allows to easily identify them, and storing them with multiple extensions.
+    A plot with name `plot_name` is stored in the `directory` folder.
+    Additionally, a timestamp prefix can be added to the plot name, and the plot can be stored in a subfolder.
+    The output is a list of paths, one for each extension.
+    This function does not create directories, that's responsibility of the caller.
 
-    :param directory: Path to the directory where plots are created.
-    :param date: If present, create a subfolder with this date inside `directory`.
-    :param create_date_dir: If True, and `date` is None, create the date subfolder as `%Y-%m-%d`.
-    :return: Path of the folder that has been created, as a string.
+    Examples of generated paths:
+    * `directory/plot_name.pdf`, `directory/plot_name.png`
+    * `directory/%Y-%m-%d_%H-%M-%S_plot_name.pdf`, `directory/%Y-%m-%d_%H-%M-%S_plot_name.png`
+    * `directory/%Y-%m-%d/plot_name.pdf`, `directory/%Y-%m-%d/plot_name.png`
+    * `directory/%Y-%m-%d/%Y-%m-%d_%H-%M-%S_plot_name.pdf`, `directory/%Y-%m-%d/%Y-%m-%d_%H-%M-%S_plot_name.png`
+
+    :param directory: Full path to the directory where the folders are stored.
+        The parent of this directory must exist, while the directory itself might not exist yet.
+    :param plot_name: Name of the plot, without extension.
+    :param file_format: List of extensions used to store the plot.
+    :param add_timestamp_prefix_to_plot_name: If True, add a timestamp prefix to the plot name.
+    :param timestamp_prefix_for_plot_name: Format of the timestamp prefix.
+        Used only if `add_timestamp_prefix_to_plot_name` is True.
+        The prefix can be a format string representing a timestamp.
+        If it's not a valid format string, the prefix is used as-it-is.
+    :param store_plot_into_timestamp_subfolder: If True, store the plot in a subfolder with the current date.
+    :param timestamp_format_for_subfolder: Format of the timestamp used for the subfolder.
+        Used only if `store_plot_into_timestamp_subfolder` is True.
+        The prefix can be a format string representing a timestamp.
+        If it's not a valid format string, the prefix is used as-it-is.
+    :raises ValueError: If the parent directory of `directory` does not exist.
+    :return: A list of paths where plots can be stored, one for each extension.
     """
-    p = Path(directory)
-    p.mkdir(parents=False, exist_ok=True)
-    if create_date_dir:
-        if date is None:
-            date = datetime.today().strftime("%Y-%m-%d")
-        p = Path(directory) / date
-    p.mkdir(parents=False, exist_ok=True)
-    return str(p)
+    if isinstance(directory, str):
+        directory = Path(directory)
+    if not directory.parent.exists():
+        raise ValueError(f"❌ the parent directory {directory.parent} of {directory} does not exist.")
+    # Obtain a single timestamp. Try formatting prefix and subfolder if necessary.
+    # If formatting fails (e.g. the format string is not valid), use the prefix as-it-is;
+    if add_timestamp_prefix_to_plot_name or store_plot_into_timestamp_subfolder:
+        timestamp = datetime.today()
+        if add_timestamp_prefix_to_plot_name:
+            formatted_prefix = timestamp.strftime(timestamp_prefix_for_plot_name)
+            plot_name = formatted_prefix + plot_name
+        if store_plot_into_timestamp_subfolder:
+            formatted_folder = timestamp.strftime(timestamp_format_for_subfolder)
+            directory = directory / formatted_folder
+    # Assemble the filenames;
+    return [directory / f"{plot_name}.{e}" for e in file_format]
 
 
 def save_plot(
-    directory: Union[str, Path],
-    filename: str,
+    file_name: Union[str, list[str], Path, list[Path]],
     figure: Optional[Figure] = None,
-    date: Optional[str] = None,
-    create_date_dir: bool = True,
-    extension: list = ["pdf", "png"],
     dpi: int = 300,
     remove_white_margin: bool = False,
+    verbose: bool = False,
     **kwargs: Any,
 ) -> None:
     """
-    :param directory: Where the plot is stored.
-    :param filename: Name of the plot. It should be of format 'myplot_{}.{}',
-        where the first placeholder is used for the date and the second for the extension,
-        or 'myplot.{}', or 'myplot.extension'.
+    :param file_name: One or more absolute file names where the plot is store.
+        It is possible to pass multiple paths since one might want to save the same plot with multiple
+        extensions, or in multiple locations.
     :param figure: A specific figure to save. If None, save the last plot that has been drawn.
-    :param date: Date that should appear in the plot filename.
-    :param create_date_dir: If True, create a sub-folder with the date. If `date` is None, use `%Y-%m-%d`.
-    :param extension: List of extension used to store the plot.
     :param dpi: DPI of the image, when saved as a raster image format such as PNG.
     :param remove_white_margin: If True, remove the white margin around the plot.
         Suitable to plot images without any border around them.
+    :param verbose: If True, print information about where the plots have been stored.
     :param kwargs: Other arguments passed to `plt.savefig`.
     """
-    output_folder = assemble_output_directory_name(directory, date, create_date_dir)
+    if isinstance(file_name, str):
+        file_name = [file_name]
+    elif isinstance(file_name, Path):
+        file_name = [file_name]
+    file_name = [Path(_f) for _f in file_name]
+    for _f in file_name:
+        if not _f.parent.exists():
+            _f.parent.mkdir(parents=True, exist_ok=True)
+            if verbose:
+                print(f"👉 created directory {_f.parent} to save plots")
 
     savefig_kwargs: dict[str, Any] = kwargs | {"dpi": dpi}
     if remove_white_margin:
         savefig_kwargs["bbox_inches"] = "tight"
         savefig_kwargs["pad_inches"] = 0
 
-    for e in extension:
-        # Format the filename
-        try:
-            output_filename = filename.format(e)
-        except (ValueError, IndexError):
-            output_filename = filename.format(date, e)
+    for _f in file_name:
         if figure is not None:
-            figure.savefig(os.path.join(output_folder, output_filename), **savefig_kwargs)
+            figure.savefig(_f, **savefig_kwargs)
         else:  # Save the current plot;
-            plt.savefig(os.path.join(output_folder, output_filename), **savefig_kwargs)
+            plt.savefig(_f, **savefig_kwargs)
+        if verbose:
+            print(f"💡 saved plot to {_f}")

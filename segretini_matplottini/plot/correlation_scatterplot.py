@@ -71,6 +71,7 @@ def correlation_scatterplot(
     ##############
     # Plot setup #
     ##############
+
     if reset_plot_style:
         _reset_plot_style(label_pad=5)
     if palette is None:

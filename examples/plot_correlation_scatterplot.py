@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from segretini_matplottini.plot import correlation_scatterplot
-from segretini_matplottini.utils import save_plot
+from segretini_matplottini.utils import assemble_filenames_to_save_plot, save_plot
 from segretini_matplottini.utils.colors import PALETTE_G
 
 ##############################
@@ -18,8 +18,8 @@ Y_LIMITS = (-0.1, 0.3)
 # Color palette used for plotting;
 PALETTE = [PALETTE_G[0], PALETTE_G[2]]
 
-PLOT_DIR = (Path(__file__).parent.parent / "plots").resolve()
-DATA_DIR = (Path(__file__).parent.parent / "data").resolve()
+PLOT_DIR = Path(__file__).parent.parent / "plots"
+DATA_DIR = Path(__file__).parent.parent / "data"
 
 ##############################
 # Load data and plot #########
@@ -56,4 +56,11 @@ def plot(data: pd.DataFrame) -> tuple[plt.Figure, plt.Axes]:
 if __name__ == "__main__":
     data = load_data()
     fig, ax = plot(data)
-    save_plot(PLOT_DIR, "correlation_scatterplot.{}")
+    save_plot(
+        assemble_filenames_to_save_plot(
+            directory=PLOT_DIR,
+            plot_name="correlation_scatterplot",
+            add_timestamp_prefix_to_plot_name=False,
+            store_plot_into_timestamp_subfolder=False,
+        )
+    )

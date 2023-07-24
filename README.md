@@ -34,7 +34,7 @@ pip install -e ".[dev]"
 [] new code structure in readme, with tree
 [] modify plots structure not to have dates
 [] recreate sample plots
-[] create imports for utils inside __init__, to hide private stuff
+[x] create imports for utils inside __init__, to hide private stuff
 [] changelog
 [] new barplot code
 [] add util for arrow of metric

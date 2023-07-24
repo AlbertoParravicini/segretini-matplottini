@@ -1,5 +1,5 @@
 from functools import reduce
-from typing import Any, Callable, Optional, TypeVar, Union
+from typing import Any, Callable, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -8,14 +8,11 @@ import scipy.stats as st
 from jaxtyping import Float
 from scipy.stats.mstats import gmean
 
-N = TypeVar("N")
-M = TypeVar("M")
-
 
 def get_ci_size(
-    x: Float[np.ndarray, N],
+    x: Float[np.ndarray, "#n"],
     ci: float = 0.95,
-    estimator_func: Callable[[Float[np.ndarray, N]], float] = np.mean,
+    estimator_func: Callable[[Float[np.ndarray, "#n"]], float] = np.mean,
     get_raw_location: bool = False,
 ) -> tuple[float, float, float]:
     """
@@ -38,7 +35,7 @@ def get_ci_size(
 
 
 def get_upper_ci_size(
-    x: Float[np.ndarray, N], ci: float = 0.95, estimator_func: Callable[[Float[np.ndarray, N]], float] = np.mean
+    x: Float[np.ndarray, "#n"], ci: float = 0.95, estimator_func: Callable[[Float[np.ndarray, "#n"]], float] = np.mean
 ) -> float:
     """
     Compute the size of the upper confidence interval,
@@ -53,7 +50,7 @@ def get_upper_ci_size(
     return get_ci_size(x, ci, estimator_func=estimator_func)[0]
 
 
-def remove_outliers_ci(data: Float[np.ndarray, N], sigmas: float = 3) -> Float[np.ndarray, M]:
+def remove_outliers_ci(data: Float[np.ndarray, "#n"], sigmas: float = 3) -> Float[np.ndarray, "#m"]:
     """
     Filter a sequence of data by keeping only values within "sigma" standard deviations from the mean.
     This is a simple way to filter outliers, it is more useful to clean data
@@ -66,7 +63,7 @@ def remove_outliers_ci(data: Float[np.ndarray, N], sigmas: float = 3) -> Float[n
     return data[np.abs(st.zscore(data)) < sigmas]
 
 
-def remove_outliers_iqr(data: Float[np.ndarray, N], quantile: float = 0.75) -> Float[np.ndarray, M]:
+def remove_outliers_iqr(data: Float[np.ndarray, "#n"], quantile: float = 0.75) -> Float[np.ndarray, "#m"]:
     """
     Filter a sequence of data by removing outliers looking at the quantiles of the distribution.
     Find quantiles (by default, `Q1` and `Q3`), and interquantile range (by default, `Q3 - Q1`),
@@ -86,8 +83,8 @@ def remove_outliers_iqr(data: Float[np.ndarray, N], quantile: float = 0.75) -> F
 
 
 def find_outliers_right_quantile(
-    data: Float[np.ndarray, N], quantile: float = 0.75, quantile_multiplier: float = 2
-) -> Float[np.ndarray, M]:
+    data: Float[np.ndarray, "#n"], quantile: float = 0.75, quantile_multiplier: float = 2
+) -> Float[np.ndarray, "#m"]:
     """
     Filter a sequence of data by removing outliers looking at the quantiles of the distribution.
     Since the distribution is not symmetrical, look just at the right quantile,

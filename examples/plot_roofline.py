@@ -5,14 +5,14 @@ import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 
 from segretini_matplottini.plot import roofline
-from segretini_matplottini.utils import save_plot
+from segretini_matplottini.utils import assemble_filenames_to_save_plot, save_plot
 from segretini_matplottini.utils.colors import BB4, BB5, G2, PEACH1
 
 ##############################
 # Setup ######################
 ##############################
 
-PLOT_DIR = (Path(__file__).parent.parent / "plots").resolve()
+PLOT_DIR = Path(__file__).parent.parent / "plots"
 MARKERS = ["o", "X", "D", "P"]
 PALETTE = [PEACH1, G2, BB4, BB5]
 
@@ -151,14 +151,34 @@ if __name__ == "__main__":
     # Create a single Roofline model;
     data_dict = load_data_1()
     fig, ax = plot_1(data_dict)
-    save_plot(PLOT_DIR, "roofline.{}")
+    save_plot(
+        assemble_filenames_to_save_plot(
+            directory=PLOT_DIR,
+            plot_name="roofline",
+            add_timestamp_prefix_to_plot_name=False,
+            store_plot_into_timestamp_subfolder=False,
+        )
+    )
 
     # Create a fancier Roofline model, with multiple lines and custom settings;
     data_dict = load_data_2()
     fig, ax = plot_2(data_dict)
-    save_plot(PLOT_DIR, "roofline_stacked.{}")
-
+    save_plot(
+        assemble_filenames_to_save_plot(
+            directory=PLOT_DIR,
+            plot_name="roofline_stacked",
+            add_timestamp_prefix_to_plot_name=False,
+            store_plot_into_timestamp_subfolder=False,
+        )
+    )
     # Create a single plot composed of 2 separate Rooflines;
     data_dict_1, data_dict_2 = load_data_3()
     fig, ax = plot_3(data_dict_1, data_dict_2)
-    save_plot(PLOT_DIR, "roofline_double.{}")
+    save_plot(
+        assemble_filenames_to_save_plot(
+            directory=PLOT_DIR,
+            plot_name="roofline_double",
+            add_timestamp_prefix_to_plot_name=False,
+            store_plot_into_timestamp_subfolder=False,
+        )
+    )

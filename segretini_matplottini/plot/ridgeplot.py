@@ -1,4 +1,5 @@
-from typing import Optional
+import warnings
+from typing import Any, Callable, Optional
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -34,6 +35,7 @@ def ridgeplot(
     Draw a ridgeplot that compares two distributions across different populations.
     For example, the performance of different benchmarks before and after some optimization.
     Or the height of different populations of trees before and after some natural event.
+    Inspired by https://seaborn.pydata.org/examples/kde_ridgeplot.html
 
     :param data: The data to plot. A DataFrame that contains numerical columns with names `column_1` and `column_2`.
     :param plot_confidence_intervals: If True, plot 95% confidence intervals centered
@@ -51,6 +53,16 @@ def ridgeplot(
     :param compact_layout : If True, draw distributions on the same column slightly overlapped, to take less space.
     :return: The Seaborn FacetGrid where the plot is contained.
     """
+
+    def grid_map(g: sns.FacetGrid, func: Callable, *args: Any, **kwargs: Any) -> sns.FacetGrid:
+        """
+        Wrap FacetGrid.map to suppress UserWarnings.
+        Since FacetGrid forces a tight layout, and we get warnings when axes are partially overlapped,
+        we suppress the warnings.
+        """
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=UserWarning)
+            return g.map(func, *args, **kwargs)
 
     ##############
     # Setup data #
@@ -85,23 +97,25 @@ def ridgeplot(
     # "sharex" is disabled as seaborn would use a single axis object preventing customizations on individual plots.
     # "hue=identifier_column" is necessary to create a mapping over the individual plots,
     # required to set benchmark labels on each axis;
-    g = sns.FacetGrid(
-        _data,
-        hue=identifier_column,
-        aspect=8,
-        height=plot_height,
-        palette=["#2f2f2f"],
-        sharex=False,
-        sharey=False,
-        row=row_identifier,
-        col=col_identifier,
-    )
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=UserWarning)
+        g = sns.FacetGrid(
+            _data,
+            hue=identifier_column,
+            aspect=8,
+            height=plot_height,
+            palette=["#2f2f2f"],
+            sharex=False,
+            sharey=False,
+            row=row_identifier,
+            col=col_identifier,
+        )
 
     # Plot a vertical line corresponding to speedup = 1;
-    g.map(plt.axvline, x=1, lw=0.75, clip_on=True, zorder=0, linestyle="--", ymax=plot_height)
+    grid_map(g, plt.axvline, x=1, lw=0.75, clip_on=True, zorder=0, linestyle="--", ymax=plot_height)
     # Remove grid from every plot, if present
     ax: Axes = plt.gca()
-    g.map(lambda label, color: ax.grid(False))
+    grid_map(g, lambda label, color: ax.grid(False))
 
     ##################
     # Add main plots #
@@ -109,7 +123,8 @@ def ridgeplot(
 
     # Plot the densities. Plot them twice as the second time we plot just the black contour.
     # "cut" removes values above the threshold; clip=xlimits avoids plotting values outside the margins;
-    g.map(
+    grid_map(
+        g,
         sns.kdeplot,
         column_1,
         clip_on=False,
@@ -122,7 +137,8 @@ def ridgeplot(
         zorder=2,
         cut=10,
     )
-    g.map(
+    grid_map(
+        g,
         sns.kdeplot,
         column_2,
         clip_on=False,
@@ -135,8 +151,12 @@ def ridgeplot(
         zorder=3,
         cut=10,
     )
-    g.map(sns.kdeplot, column_1, clip_on=False, clip=xlimits, color="#5f5f5f", lw=1, bw_adjust=1, zorder=2, cut=10)
-    g.map(sns.kdeplot, column_2, clip_on=False, clip=xlimits, color="#5f5f5f", lw=1, bw_adjust=1, zorder=3, cut=10)
+    grid_map(
+        g, sns.kdeplot, column_1, clip_on=False, clip=xlimits, color="#5f5f5f", lw=1, bw_adjust=1, zorder=2, cut=10
+    )
+    grid_map(
+        g, sns.kdeplot, column_2, clip_on=False, clip=xlimits, color="#5f5f5f", lw=1, bw_adjust=1, zorder=3, cut=10
+    )
 
     if plot_confidence_intervals:
         # Plot a vertical line corresponding to the mean speedup of each benchmark.
@@ -154,7 +174,7 @@ def ridgeplot(
                     color=sns.set_hls_values(palette[i], l=0.3),
                 )
 
-        g.map(plot_mean, identifier_column)
+        grid_map(g, plot_mean, identifier_column)
 
         # Plot confidence intervals;
         def plot_ci(x: float, label: str, color: str = "#2f2f2f") -> None:
@@ -171,14 +191,14 @@ def ridgeplot(
                 )
                 ax.add_patch(new_patch)
 
-        g.map(plot_ci, identifier_column)
+        grid_map(g, plot_ci, identifier_column)
 
     #####################
     # Style fine-tuning #
     #####################
 
     # Plot the horizontal line below the densities;
-    g.map(plt.axhline, y=0, lw=1.5, clip_on=False, zorder=4)
+    grid_map(g, plt.axhline, y=0, lw=1.5, clip_on=False, zorder=4)
 
     # Fix the horizontal axes so that they are in the specified range (xlimits).
     # Pass an unnecessary label and color arguments as required by FacetGrid.map,
@@ -190,7 +210,7 @@ def ridgeplot(
             ax: Axes = plt.gca()
             ax.set_xlim(left=x_left, right=x_right)
 
-        g.map(set_x_width)
+        grid_map(g, set_x_width)
 
     # Plot the name of each plot;
     def label(x: float, label: str, color: str = "#2f2f2f") -> None:
@@ -206,7 +226,7 @@ def ridgeplot(
             fontsize=18,
         )
 
-    g.map(label, identifier_column)
+    grid_map(g, label, identifier_column)
 
     # Fix the borders. This must be done here as the previous operations update the default values;
     fig: Figure = g.fig
@@ -230,6 +250,7 @@ def ridgeplot(
         return f"{int(100 * x)}%"
 
     # Disable y ticks and remove axis;
+    axes: list[list[Axes]] = g.axes
     g.set(yticks=[])
     g.despine(bottom=True, left=compact_layout)
 
@@ -239,18 +260,28 @@ def ridgeplot(
     n_cols = int(_data[col_identifier].max()) + 1
     n_axes = int(n_rows * n_cols)
     n_full_axes = len(_data[identifier_column].unique())
-    # Set ticks and labels on all axes;
-    axes: list[list[Axes]] = g.axes
-    for i, ax_i in enumerate(axes):
-        for k, ax_j in enumerate(ax_i):
-            if compact_layout and i < len(axes) - 1:
-                ax_j.xaxis.set_ticklabels([])
-            else:
+    # Hide all ticks and tick labels by default, in the compact layout, except on the last row;
+    if compact_layout:
+        for ax_i in axes[:-1]:
+            for ax_j in ax_i:
+                ax_j.set(xticks=[])
+                ax_j.set(xticklabels=[])
+        for ax_j in axes[-1]:
+            ax_j.xaxis.set_tick_params(grid_linewidth=0)  # Hide some white markers that are still present;
+            ax_j.xaxis.set_major_formatter(major_formatter)
+            ax_j.tick_params(axis="x", which="major", labelsize=14)
+            for tic in ax_j.xaxis.get_major_ticks():
+                tic.tick1line.set_visible(True)
+                tic.tick2line.set_visible(False)
+    else:
+        for ax_i in axes:
+            for ax_j in ax_i:
                 ax_j.xaxis.set_major_formatter(major_formatter)
                 ax_j.tick_params(axis="x", which="major", labelsize=14)
                 for tic in ax_j.xaxis.get_major_ticks():
                     tic.tick1line.set_visible(True)
                     tic.tick2line.set_visible(False)
+
     # Set labels on the last axis of each column (except the last, which could have fewer plots);
     if xlabel:
         for ax in axes[-1][:-1]:

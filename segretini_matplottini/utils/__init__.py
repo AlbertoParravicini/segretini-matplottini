@@ -20,7 +20,7 @@ from segretini_matplottini.utils.legend import (  # noqa: F401
 )
 from segretini_matplottini.utils.plot import (  # noqa: F401
     add_labels,
-    assemble_output_directory_name,
+    assemble_filenames_to_save_plot,
     fix_label_length,
     get_exp_label,
     reset_plot_style,

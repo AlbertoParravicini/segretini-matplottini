@@ -31,7 +31,7 @@ This plot shows how to use dates for the x-axis, and do fairly complex visualiza
 
 Updated **Ridgeplot** to have confidence intervals and be more user-friendly (`examples/plot_ridgeplot.py`). Added some general tips about choosing colors.
 
-![Ridgeplot Example](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/ridgeplot.png)
+![Ridgeplot Example](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/ridgeplot_compact.png)
 
 ## 2021-03-20
 

@@ -20,4 +20,6 @@
 !plots/
 !plots/*.png
 !plots/*.pdf
+!tests/
+!tests/e2e/
 !.vscode/

@@ -22,10 +22,10 @@ PALETTE = [PEACH1, G2, BB4, BB5]
 
 
 def roofline(
-    performance: list[float],
-    operational_intensity: list[float],
-    peak_performance: list[float],
-    peak_bandwidth: list[float],
+    performance: Union[float, list[float], int, list[int]],
+    operational_intensity: Union[float, list[float], int, list[int]],
+    peak_performance: Union[float, list[float], int, list[int]],
+    peak_bandwidth: Union[float, list[float], int, list[int]],
     xmin: Optional[float] = None,
     xmax: Optional[float] = None,
     ymin: Optional[float] = None,
@@ -114,6 +114,10 @@ def roofline(
         peak_performance = [peak_performance]
     if isinstance(peak_bandwidth, (int, float)):
         peak_bandwidth = [peak_bandwidth]
+    performance = [float(p) for p in performance]
+    operational_intensity = [float(o) for o in operational_intensity]
+    peak_performance = [float(p) for p in peak_performance]
+    peak_bandwidth = [float(p) for p in peak_bandwidth]
     num_rooflines = len(performance)
 
     assert num_rooflines == len(performance)

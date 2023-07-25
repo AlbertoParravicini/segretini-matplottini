@@ -27,9 +27,9 @@ pip install .
 [x] create imports for utils inside __init__, to hide private stuff
 [x] changelog
 [] new barplot code
-[] all plots must have fontsize base 10 (or 8?). And specify figsize and subplot adjust as params
-    [] for ridgeplot, no subplot adjust except horizontal, since it's specific to dataset size
-    [] split ridgeplot in ridgeplot and ridgeplot_compact
+[x] all plots must have fontsize base 10 (or 8?). And specify figsize and subplot adjust as params
+    [x] for ridgeplot, no subplot adjust except horizontal, since it's specific to dataset size
+    [x] split ridgeplot in ridgeplot and ridgeplot_compact
 [] ranz unused colors/palettes, add some new sample colors (e.g. green used in new plots)
 [] add util for arrow of metric
 [] add util for color palette

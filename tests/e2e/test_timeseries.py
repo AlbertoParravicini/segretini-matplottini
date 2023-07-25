@@ -1,5 +1,4 @@
 import datetime
-import inspect
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -7,23 +6,10 @@ import pandas as pd
 import pytest
 
 from segretini_matplottini.plot import timeseries
-from segretini_matplottini.utils import save_plot
+
+from .utils import reset_plot_style, save_tmp_plot  # noqa: F401
 
 DATA_DIR = Path(__file__).parent.parent.parent / "data"
-
-
-@pytest.fixture(autouse=True)
-def reset_plot_style() -> None:
-    # Reset plotting settings
-    plt.rcdefaults()
-    return
-
-
-def save_tmp_plot() -> None:
-    plot_dir = Path(__file__).parent.parent.parent / "plots" / "tests"
-    plot_dir.mkdir(parents=True, exist_ok=True)
-    caller_name = inspect.stack()[1][3]
-    save_plot(plot_dir / f"{Path(__file__).stem}_{caller_name}.png")
 
 
 @pytest.fixture
@@ -45,13 +31,14 @@ def data() -> pd.Series:
     return data
 
 
+@save_tmp_plot
 def test_default(data: pd.Series) -> None:
     timeseries(
         data,
     )
-    save_tmp_plot()
 
 
+@save_tmp_plot
 def test_custom_settings(data: pd.Series) -> None:
     timeseries(
         data,
@@ -62,13 +49,12 @@ def test_custom_settings(data: pd.Series) -> None:
         fill=True,
         dark_background=True,
     )
-    save_tmp_plot()
 
 
+@save_tmp_plot
 def test_existing_axis(data: pd.Series) -> None:
     _, ax = plt.subplots(1, 1, figsize=(6, 3))
     timeseries(
         data,
         ax=ax,
     )
-    save_tmp_plot()

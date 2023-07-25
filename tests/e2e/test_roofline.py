@@ -1,32 +1,16 @@
-import inspect
-from pathlib import Path
-
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
-import pytest
 
 from segretini_matplottini.plot import roofline
-from segretini_matplottini.utils import save_plot
 from segretini_matplottini.utils.colors import BB4, BB5, G2, PEACH1
+
+from .utils import reset_plot_style, save_tmp_plot  # noqa: F401
 
 MARKERS = ["o", "X", "D", "P"]
 PALETTE = [PEACH1, G2, BB4, BB5]
 
 
-def save_tmp_plot() -> None:
-    plot_dir = Path(__file__).parent.parent.parent / "plots" / "tests"
-    plot_dir.mkdir(parents=True, exist_ok=True)
-    caller_name = inspect.stack()[1][3]
-    save_plot(plot_dir / f"{Path(__file__).stem}_{caller_name}.png")
-
-
-@pytest.fixture(autouse=True)
-def reset_plot_style() -> None:
-    # Reset plotting settings
-    plt.rcdefaults()
-    return
-
-
+@save_tmp_plot
 def test_default() -> None:
     performance = 0.4 * 10**9
     peak_bandwidth = 140.8 * 10**9
@@ -38,9 +22,9 @@ def test_default() -> None:
         peak_performance,
         peak_bandwidth,
     )
-    save_tmp_plot()
 
 
+@save_tmp_plot
 def test_single_roofline() -> None:
     performance = 0.4 * 10**9
     peak_bandwidth = 140.8 * 10**9
@@ -54,9 +38,9 @@ def test_single_roofline() -> None:
         add_legend=True,
         legend_labels="CPU",
     )
-    save_tmp_plot()
 
 
+@save_tmp_plot
 def test_stacked_roofline() -> None:
     packet_size = 15
     bandwidth_single_core = 13.2 * 10**9
@@ -83,9 +67,9 @@ def test_stacked_roofline() -> None:
         add_legend=True,
         legend_labels=[f"{c} Cores" for c in num_cores],
     )
-    save_tmp_plot()
 
 
+@save_tmp_plot
 def test_double_roofline() -> None:
     packet_size = 15
     bandwidth_single_core = 13.2 * 10**9
@@ -142,4 +126,3 @@ def test_double_roofline() -> None:
         add_operational_intensity_label=False,
         reset_plot_style=False,
     )
-    save_tmp_plot()

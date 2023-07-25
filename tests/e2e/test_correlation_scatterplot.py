@@ -1,4 +1,3 @@
-import inspect
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -6,8 +5,9 @@ import pandas as pd
 import pytest
 
 from segretini_matplottini.plot import correlation_scatterplot
-from segretini_matplottini.utils import save_plot
 from segretini_matplottini.utils.colors import PALETTE_G
+
+from .utils import reset_plot_style, save_tmp_plot  # noqa: F401
 
 # Axes limits used in the plot, change them accordingy to your data;
 X_LIMITS = (-0.2, 0.6)
@@ -28,13 +28,6 @@ def load_data() -> pd.DataFrame:
     return data
 
 
-def save_tmp_plot() -> None:
-    plot_dir = Path(__file__).parent.parent.parent / "plots" / "tests"
-    plot_dir.mkdir(parents=True, exist_ok=True)
-    caller_name = inspect.stack()[1][3]
-    save_plot(plot_dir / f"{Path(__file__).stem}_{caller_name}.png")
-
-
 @pytest.fixture
 def data() -> pd.DataFrame:
     # Load data;
@@ -45,22 +38,16 @@ def data() -> pd.DataFrame:
     return data
 
 
-@pytest.fixture(autouse=True)
-def reset_plot_style() -> None:
-    # Reset plotting settings
-    plt.rcdefaults()
-    return
-
-
+@save_tmp_plot
 def test_default_settings(data: pd.DataFrame) -> None:
     correlation_scatterplot(
         data=data,
         x="estimate0",
         y="estimate1",
     )
-    save_tmp_plot()
 
 
+@save_tmp_plot
 def test_custom_settings(data: pd.DataFrame) -> None:
     data = load_data()
     correlation_scatterplot(
@@ -75,9 +62,9 @@ def test_custom_settings(data: pd.DataFrame) -> None:
         ylabel="Speedup estimate, method B (%)",
         highlight_negative_area=True,
     )
-    save_tmp_plot()
 
 
+@save_tmp_plot
 def test_no_regression(data: pd.DataFrame) -> None:
     data = load_data()
     correlation_scatterplot(
@@ -86,9 +73,9 @@ def test_no_regression(data: pd.DataFrame) -> None:
         y="estimate1",
         plot_regression=False,
     )
-    save_tmp_plot()
 
 
+@save_tmp_plot
 def test_no_kde(data: pd.DataFrame) -> None:
     correlation_scatterplot(
         data=data,
@@ -96,9 +83,9 @@ def test_no_kde(data: pd.DataFrame) -> None:
         y="estimate1",
         plot_kde=False,
     )
-    save_tmp_plot()
 
 
+@save_tmp_plot
 def test_existing_axis(data: pd.DataFrame) -> None:
     _, ax = plt.subplots(1, 1, figsize=(3, 3))
     correlation_scatterplot(
@@ -107,4 +94,3 @@ def test_existing_axis(data: pd.DataFrame) -> None:
         y="estimate1",
         ax=ax,
     )
-    save_tmp_plot()

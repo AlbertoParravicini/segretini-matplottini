@@ -1,7 +1,5 @@
-import inspect
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import pytest
@@ -9,8 +7,9 @@ import pytest
 from segretini_matplottini.plot import ridgeplot, ridgeplot_compact
 from segretini_matplottini.utils import (
     remove_outliers_from_dataframe_ci,
-    save_plot,
 )
+
+from .utils import reset_plot_style, save_tmp_plot  # noqa: F401
 
 DATA_DIR = Path(__file__).parent.parent.parent / "data"
 
@@ -38,27 +37,14 @@ def data() -> pd.DataFrame:
     return data
 
 
-def save_tmp_plot() -> None:
-    plot_dir = Path(__file__).parent.parent.parent / "plots" / "tests"
-    plot_dir.mkdir(parents=True, exist_ok=True)
-    caller_name = inspect.stack()[1][3]
-    save_plot(plot_dir / f"{Path(__file__).stem}_{caller_name}.png")
-
-
-@pytest.fixture(autouse=True)
-def reset_plot_style() -> None:
-    # Reset plotting settings
-    plt.rcdefaults()
-    return
-
-
+@save_tmp_plot
 def test_ridgeplot_default(data: pd.DataFrame) -> None:
     ridgeplot(
         data,
     )
-    save_tmp_plot()
 
 
+@save_tmp_plot
 def test_ridgeplot(data: pd.DataFrame) -> None:
     ridgeplot(
         data,
@@ -67,16 +53,16 @@ def test_ridgeplot(data: pd.DataFrame) -> None:
         plot_confidence_intervals=True,
         xlimits=(0.7, 1.3),
     )
-    save_tmp_plot()
 
 
+@save_tmp_plot
 def test_ridgeplot_compact_default(data: pd.DataFrame) -> None:
     ridgeplot_compact(
         data,
     )
-    save_tmp_plot()
 
 
+@save_tmp_plot
 def test_ridgeplot_compact(data: pd.DataFrame) -> None:
     ridgeplot_compact(
         data,
@@ -84,9 +70,9 @@ def test_ridgeplot_compact(data: pd.DataFrame) -> None:
         legend_labels=("Before transformations", "After transformations"),
         xlimits=(0.7, 1.3),
     )
-    save_tmp_plot()
 
 
+@save_tmp_plot
 def test_ridgeplot_one_col(data: pd.DataFrame) -> None:
     ridgeplot(
         data,
@@ -96,9 +82,9 @@ def test_ridgeplot_one_col(data: pd.DataFrame) -> None:
         xlimits=(0.7, 1.3),
         number_of_plot_columns=1,
     )
-    save_tmp_plot()
 
 
+@save_tmp_plot
 def test_ridgeplot_compact_one_col(data: pd.DataFrame) -> None:
     ridgeplot_compact(
         data,
@@ -107,9 +93,9 @@ def test_ridgeplot_compact_one_col(data: pd.DataFrame) -> None:
         xlimits=(0.7, 1.3),
         number_of_plot_columns=1,
     )
-    save_tmp_plot()
 
 
+@save_tmp_plot
 def test_ridgeplot_three_col(data: pd.DataFrame) -> None:
     ridgeplot(
         data,
@@ -119,9 +105,9 @@ def test_ridgeplot_three_col(data: pd.DataFrame) -> None:
         xlimits=(0.7, 1.3),
         number_of_plot_columns=3,
     )
-    save_tmp_plot()
 
 
+@save_tmp_plot
 def test_ridgeplot_compact_three_col(data: pd.DataFrame) -> None:
     ridgeplot_compact(
         data,
@@ -130,4 +116,3 @@ def test_ridgeplot_compact_three_col(data: pd.DataFrame) -> None:
         xlimits=(0.7, 1.3),
         number_of_plot_columns=3,
     )
-    save_tmp_plot()

@@ -19,6 +19,7 @@ from segretini_matplottini.utils.legend import (  # noqa: F401
     transpose_legend_labels,
 )
 from segretini_matplottini.utils.plot import (  # noqa: F401
+    activate_dark_background,
     add_labels,
     assemble_filenames_to_save_plot,
     fix_label_length,

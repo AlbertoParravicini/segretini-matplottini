@@ -3,12 +3,14 @@ from typing import Optional
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib.axis import Axis
+from matplotlib.axes import Axes
 from matplotlib.dates import DateFormatter, HourLocator, MinuteLocator, SecondLocator
 from matplotlib.figure import Figure
 from matplotlib.ticker import LinearLocator
 
-from segretini_matplottini.utils import reset_plot_style
+from segretini_matplottini.utils import activate_dark_background
+from segretini_matplottini.utils import reset_plot_style as _reset_plot_style
+from segretini_matplottini.utils.constants import DEFAULT_DPI, DEFAULT_FONT_SIZE
 
 
 def timeseries(
@@ -18,16 +20,22 @@ def timeseries(
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
     ylimits: Optional[tuple[float, float]] = None,
-    aspect_ratio: float = 3,
     date_format: Optional[str] = None,
     seconds_interval: Optional[int] = None,
     minutes_interval: Optional[int] = None,
     hours_interval: Optional[int] = None,
-    font_size: int = 10,
     draw_style: str = "default",
     fill: bool = False,
     dark_background: bool = False,
-) -> tuple[Figure, Axis]:
+    ax: Optional[Axes] = None,
+    figure_size: tuple[float, float] = (9, 3),
+    font_size: int = DEFAULT_FONT_SIZE,
+    left_padding: float = 0.07,
+    right_padding: float = 0.98,
+    bottom_padding: float = 0.23,
+    top_padding: float = 0.95,
+    reset_plot_style: bool = True,
+) -> tuple[Figure, Axes]:
     """
     Plot an array of numerical data, representing a time-series of some kind.
 
@@ -37,20 +45,35 @@ def timeseries(
     :param xlabel: Label of the x-axis.
     :param ylabel: Label of the y-axis.
     :param ylimits: Limits of the y-axis. If none, use `[min(x), max(x)]`.
-    :param aspect_ratio: Aspect ratio of the plot. The size is computed as `[aspect_ration * 3, 3]`.
     :param date_format: If not None, try formatting x-axis tick labels with the specified time format.
     :param seconds_interval: If not None and `date_format` is present, locate ticks with distance equal to this amount of seconds.
         If `minutes_interval` or `hours_interval` are also present, use the smallest interval possible.
         If none of them is present, locate ticks every 1 minute.
     :param minutes_interval: If not None and `date_format` is present, locate ticks with distance equal to this amount of minutes.
     :param hours_interval: If not None and `date_format` is present, locate ticks with distance equal to this amount of hours.
-    :param font_size: Default font size used in the plot.
     :param draw_style: Style of the line, as in Matplotlib's `draw_style`. For `default`, the points are connected with straight lines.
         Alternatively, connect points with steps.
         `steps-pre`: The step is at the beginning of the line segment, i.e. the line will be at the y-value of point to the right.
         `steps-mid`: The step is halfway between the points.
         `steps-post`: The step is at the end of the line segment, i.e. the line will be at the y-value of the point to the left.
     :param dark_background: If True, plot on a dark background.
+    :param ax: Existing axis where to plot, useful for example when adding a subplot.
+    :param figure_size: Width and height of the figure, in inches.
+    :param font_size: Base font size used in the plot. Font size of titles and tick labels is computed from this value.
+    :param left_padding: Padding on the left of the plot, as a fraction of the figure width,
+        provided to `plt.subplots_adjust`. A value of 0 means no left padding.
+        A value of 0 means no left padding. Applied only if `ax` is None.
+    :param right_padding: Padding on the right of the plot, as a fraction of the figure width,
+        provided to `plt.subplots_adjust`. Must be >= `left_padding`.
+        A value of 1 means no right padding. Applied only if `ax` is None.
+    :param bottom_padding: Padding on the bottom of the plot, as a fraction of the figure height,
+        provided to `plt.subplots_adjust`. A value of 0 means no bottom padding. Applied only if `ax` is None.
+    :param top_padding: Padding on the top of the plot, as a fraction of the figure height,
+        provided to `plt.subplots_adjust`. Must be >= `bottom_padding`.
+        A value of 1 means no top padding. Applied only if `ax` is None.
+    :param reset_plot_style: If True, reset the style of the plot before plotting.
+        Disabling it can be useful when plotting on an existing axis rather than creating a new one,
+        and the existing axis has a custom style.
     :return: Matplotlib figure and axis containing the plot.
     """
 
@@ -68,9 +91,15 @@ def timeseries(
     # Setup plot #
     ##############
 
-    reset_plot_style(label_pad=4, xtick_major_pad=3, ytick_major_pad=3, dark_background=dark_background)
-    fig, ax = plt.subplots(figsize=(aspect_ratio * 3, 3), dpi=600)
-    plt.subplots_adjust(top=0.95, bottom=0.25, left=0.08, right=0.98)
+    if reset_plot_style:
+        _reset_plot_style(label_pad=4, xtick_major_pad=3, ytick_major_pad=3)
+    if dark_background:
+        activate_dark_background()
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figure_size, dpi=DEFAULT_DPI)
+        plt.subplots_adjust(top=top_padding, bottom=bottom_padding, left=left_padding, right=right_padding)
+    else:
+        fig = ax.get_figure()
 
     ##################
     # Add main plots #

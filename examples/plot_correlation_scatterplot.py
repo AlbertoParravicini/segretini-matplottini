@@ -46,6 +46,7 @@ def plot(data: pd.DataFrame) -> tuple[plt.Figure, plt.Axes]:
         palette=PALETTE,
         xlabel="Speedup estimate, method A (%)",
         ylabel="Speedup estimate, method B (%)",
+        highlight_negative_area=True,
     )
 
 
@@ -62,5 +63,6 @@ if __name__ == "__main__":
             plot_name="correlation_scatterplot",
             add_timestamp_prefix_to_plot_name=False,
             store_plot_into_timestamp_subfolder=False,
-        )
+        ),
+        verbose=True,
     )

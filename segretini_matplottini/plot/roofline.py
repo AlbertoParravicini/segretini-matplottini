@@ -1,11 +1,11 @@
 from typing import Optional, Union
 
-import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.axis import Axis
+from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.lines import Line2D
+from matplotlib.ticker import LogLocator
 
 from segretini_matplottini.utils import (
     add_legend_with_dark_shadow,
@@ -15,6 +15,7 @@ from segretini_matplottini.utils import (
     reset_plot_style as _reset_plot_style,
 )
 from segretini_matplottini.utils.colors import BB4, BB5, G2, PEACH1
+from segretini_matplottini.utils.constants import DEFAULT_DPI, DEFAULT_FONT_SIZE
 
 MARKERS = ["o", "X", "D", "P"]
 PALETTE = [PEACH1, G2, BB4, BB5]
@@ -25,14 +26,12 @@ def roofline(
     operational_intensity: list[float],
     peak_performance: list[float],
     peak_bandwidth: list[float],
-    ax: Optional[Axis] = None,
     xmin: Optional[float] = None,
     xmax: Optional[float] = None,
     ymin: Optional[float] = None,
     ymax: Optional[float] = None,
     palette: Optional[Union[list[str], str]] = None,
     markers: Optional[Union[list[str], str]] = None,
-    base_font_size: float = 6,
     scatter_size: float = 14,
     xlabel: str = "Operational Intensity [{}/B]",
     ylabel: str = "Performance [{}/s]",
@@ -43,8 +42,15 @@ def roofline(
     operational_intensity_label: str = "OI={:.2f}",
     add_legend: bool = False,
     legend_labels: Optional[Union[str, list[str]]] = None,
+    ax: Optional[Axes] = None,
+    figure_size: tuple[float, float] = (2.8, 2.5),
+    font_size: int = DEFAULT_FONT_SIZE,
+    left_padding: float = 0.2,
+    right_padding: float = 0.89,
+    bottom_padding: float = 0.2,
+    top_padding: float = 0.95,
     reset_plot_style: bool = True,
-) -> tuple[Figure, Axis]:
+) -> tuple[Figure, Axes]:
     """
     Plot a Roofline model with the specified performance data.
     All input values must be specified with the base measurement unit (e.g. Byte/sec instead of GB/sec).
@@ -53,7 +59,6 @@ def roofline(
     :param operational_intensity: List of operational intensity values.
     :param peak_performance: List of peak performance levels.
     :param peak_bandwidth: List of peak bandwidth values.
-    :param ax: Existing axis where to plot, useful for example when adding a subplot.
     :param xmin: Minimum value on the x-axis. If not present it is inferred from the data.
     :param xmax: Maximum value on the x-axis. If not present it is inferred from the data.
     :param ymin: Minimum value on the y-axis. If not present it is inferred from the data.
@@ -71,7 +76,23 @@ def roofline(
     :param operational_intensity_label: Label used for Operational Intensity labels.
     :param add_legend: If True, add a legend.
     :param legend_labels: List of legend labels. If missing, use ??? as placeholder.
+    :param ax: Existing axis where to plot, useful for example when adding a subplot.
+    :param figure_size: Width and height of the figure, in inches.
+    :param font_size: Base font size used in the plot. Font size of titles and tick labels is computed from this value.
+    :param left_padding: Padding on the left of the plot, as a fraction of the figure width,
+        provided to `plt.subplots_adjust`. A value of 0 means no left padding.
+        A value of 0 means no left padding. Applied only if `ax` is None.
+    :param right_padding: Padding on the right of the plot, as a fraction of the figure width,
+        provided to `plt.subplots_adjust`. Must be >= `left_padding`.
+        A value of 1 means no right padding. Applied only if `ax` is None.
+    :param bottom_padding: Padding on the bottom of the plot, as a fraction of the figure height,
+        provided to `plt.subplots_adjust`. A value of 0 means no bottom padding. Applied only if `ax` is None.
+    :param top_padding: Padding on the top of the plot, as a fraction of the figure height,
+        provided to `plt.subplots_adjust`. Must be >= `bottom_padding`.
+        A value of 1 means no top padding. Applied only if `ax` is None.
     :param reset_plot_style: If True, reset the style of the plot before plotting.
+        Disabling it can be useful when plotting on an existing axis rather than creating a new one,
+        and the existing axis has a custom style.
     :return: Matplotlib figure and axis containing the plot
     """
 
@@ -115,19 +136,19 @@ def roofline(
     # Setup plot #
     ##############
 
+    # Create a figure for the plot, and adjust margins;
     if reset_plot_style:
-        _reset_plot_style(
-            grid_linewidth=0.5, title_pad=40, label_pad=2, title_size=22, label_size=14, xtick_major_pad=5
-        )
-
-    # Create a plot if no axis is provided;
+        _reset_plot_style(label_pad=2)
     if ax is None:
-        fig = plt.figure(figsize=(2.2, 1.9))
-        gs = gridspec.GridSpec(1, 1)
-        plt.subplots_adjust(top=0.95, bottom=0.2, left=0.2, right=0.89, hspace=0, wspace=0.5)
-        ax = fig.add_subplot(gs[0, 0])
+        fig, ax = plt.subplots(figsize=figure_size, dpi=DEFAULT_DPI)
+        plt.subplots_adjust(
+            top=top_padding,
+            bottom=bottom_padding,
+            left=left_padding,
+            right=right_padding,
+        )
     else:
-        fig = plt.gcf()
+        fig = ax.get_figure()
 
     # Always set log-axes;
     plt.yscale("log")
@@ -200,7 +221,7 @@ def roofline(
             trans_angle = ax.transData.transform_angles([angle], np.array([0, 0]).reshape((1, 2)))[0]
             ax.annotate(
                 label,
-                fontsize=base_font_size * 0.75,
+                fontsize=font_size * 0.75,
                 xy=(x_loc, peak_bandwidth[i] * x_loc * 1.1),
                 ha="left",
                 rotation_mode="anchor",
@@ -211,7 +232,7 @@ def roofline(
         if add_operational_intensity_label:
             label = operational_intensity_label.format(operational_intensity[i])
             ax.annotate(
-                label, fontsize=base_font_size, xy=(operational_intensity[i] * 1.1, ax.get_ylim()[0] * 2), ha="left"
+                label, fontsize=font_size, xy=(operational_intensity[i] * 1.1, ax.get_ylim()[0] * 2), ha="left"
             )
 
     #####################
@@ -219,8 +240,8 @@ def roofline(
     #####################
 
     # Set tick number and parameters on x and y axes;
-    ax.xaxis.set_major_locator(plt.LogLocator(base=10, numticks=15))
-    ax.yaxis.set_major_locator(plt.LogLocator(base=10, numticks=15))
+    ax.xaxis.set_major_locator(LogLocator(base=10, numticks=15))
+    ax.yaxis.set_major_locator(LogLocator(base=10, numticks=15))
     ax.tick_params(axis="x", direction="out", which="both", bottom=True, top=False)
     # Set grid on y axis;
     ax.xaxis.grid(False)
@@ -234,13 +255,13 @@ def roofline(
         tic.tick2line.set_visible(False)
     # Set exponential labels on the y axis;
     ax.yaxis.set_major_formatter(lambda x, pos: get_exp_label(x))
-    ax.tick_params(axis="y", labelsize=base_font_size)
+    ax.tick_params(axis="y", labelsize=font_size)
     # Fix ticks on the x axis, ensuring that all minor ticks appear;
-    ax.tick_params(labelcolor="black", labelsize=base_font_size, pad=1)
+    ax.tick_params(labelcolor="black", labelsize=font_size, pad=1)
     ax.minorticks_on()
     # Set x and y axes labels;
-    ax.set_xlabel(xlabel.format(performance_unit) if performance_unit else xlabel, fontsize=base_font_size + 1)
-    ax.set_ylabel(ylabel.format(performance_unit) if performance_unit else ylabel, fontsize=base_font_size + 1)
+    ax.set_xlabel(xlabel.format(performance_unit) if performance_unit else xlabel, fontsize=font_size * 1.125)
+    ax.set_ylabel(ylabel.format(performance_unit) if performance_unit else ylabel, fontsize=font_size * 1.125)
 
     # Add legend;
     if add_legend:
@@ -269,7 +290,7 @@ def roofline(
             labels=legend_labels,
             handles=custom_lines,
             bbox_to_anchor=(0.9, 0),
-            fontsize=base_font_size,
+            fontsize=font_size,
             ncol=1,
             loc="lower center",
             handletextpad=0.3,

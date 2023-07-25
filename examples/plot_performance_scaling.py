@@ -296,5 +296,6 @@ if __name__ == "__main__":
             plot_name="performance_scaling",
             add_timestamp_prefix_to_plot_name=False,
             store_plot_into_timestamp_subfolder=False,
-        )
+        ),
+        verbose=True,
     )

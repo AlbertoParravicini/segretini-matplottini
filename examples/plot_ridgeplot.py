@@ -2,9 +2,8 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import seaborn as sns
 
-from segretini_matplottini.plot import ridgeplot
+from segretini_matplottini.plot import ridgeplot, ridgeplot_compact
 from segretini_matplottini.utils import (
     assemble_filenames_to_save_plot,
     remove_outliers_from_dataframe_ci,
@@ -47,48 +46,40 @@ def load_data() -> pd.DataFrame:
     return data
 
 
-def plot_1(data: pd.DataFrame) -> sns.FacetGrid:
-    return ridgeplot(
-        data,
-        compact_layout=True,
-        xlabel="Relative Execution Time",
-        legend_labels=("Before transformations", "After transformations"),
-        plot_confidence_intervals=False,
-        xlimits=(0.7, 1.3),
-    )
-
-
-def plot_2(data: pd.DataFrame) -> sns.FacetGrid:
-    return ridgeplot(
-        data,
-        compact_layout=False,
-        xlabel="Relative Execution Time",
-        legend_labels=("Before transformations", "After transformations"),
-        xlimits=(0.7, 1.3),
-    )
-
-
 ##############################
 # Main #######################
 ##############################
 
 if __name__ == "__main__":
     data = load_data()
-    grid = plot_1(data)
-    save_plot(
-        assemble_filenames_to_save_plot(
-            directory=PLOT_DIR,
-            plot_name="ridgeplot_compact",
-            add_timestamp_prefix_to_plot_name=False,
-            store_plot_into_timestamp_subfolder=False,
-        )
+    ridgeplot(
+        data,
+        xlabel="Relative Execution Time",
+        legend_labels=("Before transformations", "After transformations"),
+        plot_confidence_intervals=True,
+        xlimits=(0.7, 1.3),
     )
-    grid = plot_2(data)
     save_plot(
         assemble_filenames_to_save_plot(
             directory=PLOT_DIR,
             plot_name="ridgeplot_large",
             add_timestamp_prefix_to_plot_name=False,
             store_plot_into_timestamp_subfolder=False,
-        )
+        ),
+        verbose=True,
+    )
+    ridgeplot_compact(
+        data,
+        xlabel="Relative Execution Time",
+        legend_labels=("Before transformations", "After transformations"),
+        xlimits=(0.7, 1.3),
+    )
+    save_plot(
+        assemble_filenames_to_save_plot(
+            directory=PLOT_DIR,
+            plot_name="ridgeplot_compact",
+            add_timestamp_prefix_to_plot_name=False,
+            store_plot_into_timestamp_subfolder=False,
+        ),
+        verbose=True,
     )

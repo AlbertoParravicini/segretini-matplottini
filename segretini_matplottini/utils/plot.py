@@ -12,6 +12,18 @@ from matplotlib.figure import Figure
 from segretini_matplottini.utils.colors import BACKGROUND_BLACK
 
 
+def activate_dark_background(background_color: str = BACKGROUND_BLACK) -> None:
+    """
+    Modify the current plot style to use a dark background,
+    and to save figures with the dark background.
+
+    :param background_color: Hexadecimal color used for the background.
+    """
+    plt.style.use("dark_background")
+    plt.rcParams["axes.facecolor"] = background_color
+    plt.rcParams["savefig.facecolor"] = background_color
+
+
 def reset_plot_style(
     label_pad: float = 0,
     xtick_major_pad: float = 1,
@@ -46,8 +58,6 @@ def reset_plot_style(
         style_dict["axes.grid.axis"] = "y"
         style_dict["grid_linewidth"] = grid_linewidth
     sns.set_style("white", style_dict)
-    if dark_background:
-        plt.style.use("dark_background")
     # Other parameters
     plt.rcParams["axes.labelpad"] = label_pad
     plt.rcParams["xtick.major.pad"] = xtick_major_pad
@@ -61,8 +71,7 @@ def reset_plot_style(
         plt.rcParams["axes.labelsize"] = label_size
     # Background color
     if dark_background:
-        plt.rcParams["axes.facecolor"] = BACKGROUND_BLACK
-        plt.rcParams["savefig.facecolor"] = BACKGROUND_BLACK
+        activate_dark_background()
 
 
 def get_exp_label(

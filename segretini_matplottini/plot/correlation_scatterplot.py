@@ -1,11 +1,12 @@
 from typing import Any, Callable, Optional
 
-import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from matplotlib.axes import Axes
 from matplotlib.patches import Patch, Rectangle
+from matplotlib.ticker import LinearLocator
 from scipy import stats
 
 from segretini_matplottini.utils import (
@@ -14,6 +15,7 @@ from segretini_matplottini.utils import (
 )
 from segretini_matplottini.utils import reset_plot_style as _reset_plot_style
 from segretini_matplottini.utils.colors import PALETTE_G, PALETTE_O
+from segretini_matplottini.utils.constants import DEFAULT_DPI, DEFAULT_FONT_SIZE
 
 
 def correlation_scatterplot(
@@ -27,18 +29,23 @@ def correlation_scatterplot(
     ylabel: Optional[str] = None,
     plot_kde: bool = True,
     plot_regression: bool = True,
-    highlight_negative_area: bool = True,
+    highlight_negative_area: bool = False,
     xlimits: Optional[tuple[float, float]] = None,
     ylimits: Optional[tuple[float, float]] = None,
     x_ticks_formatter: Callable[[Any, int], str] = lambda x, pos: f"{x * 100:.0f}%",
     y_ticks_formatter: Callable[[Any, int], str] = lambda x, pos: f"{x * 100:.0f}%",
-    reset_plot_style: bool = True,
     vertical_legend: bool = False,
     legend_position: str = "best",
     label_color: str = "#2f2f2f",
-    font_size: int = 8,
+    ax: Optional[Axes] = None,
     figure_size: tuple[float, float] = (3.4, 3.1),
-) -> tuple[plt.Figure, plt.Axes]:
+    font_size: int = DEFAULT_FONT_SIZE,
+    left_padding: float = 0.19,
+    right_padding: float = 0.93,
+    bottom_padding: float = 0.15,
+    top_padding: float = 0.95,
+    reset_plot_style: bool = True,
+) -> tuple[plt.Figure, Axes]:
     """
     Plot a detailed correlation analysis between two variables.
     Combine a bivariate density plot, a regression plot and a scatterplot.
@@ -56,35 +63,58 @@ def correlation_scatterplot(
     :param ylabel: Label added to the y-axis.
     :param plot_kde: If True, add a seaborn KDE plot with the bivariate density.
     :param plot_regression: If True, add a Seaborn linear regression plot.
+    :param highlight_negative_area: If True, highlight the negative part of the plot.
     :param xlimits: If specified, truncate the x-axis to this interval.
     :param ylimits: If specified, truncate the y-axis to this interval.
     :param x_ticks_formatter: Callable function used to format x-axis tick labels.
     :param y_ticks_formatter: Callable function used to format y-axis tick labels.
-    :param reset_plot_style: If True, reset the style of the plot before plotting.
     :param vertical_legend: If True, draw a vertical legend instead of an horizontal one.
     :param legend_position: Position of the legend.
     :param label_color: Color of the linear regression label.
-    :param font_size: Base font size used for annotations and titles.
+        :param ax: Existing axis where to plot, useful for example when adding a subplot.
+    :param figure_size: Width and height of the figure, in inches.
+    :param font_size: Base font size used in the plot. Font size of titles and tick labels is computed from this value.
+    :param left_padding: Padding on the left of the plot, as a fraction of the figure width,
+        provided to `plt.subplots_adjust`. A value of 0 means no left padding.
+        A value of 0 means no left padding. Applied only if `ax` is None.
+    :param right_padding: Padding on the right of the plot, as a fraction of the figure width,
+        provided to `plt.subplots_adjust`. Must be >= `left_padding`.
+        A value of 1 means no right padding. Applied only if `ax` is None.
+    :param bottom_padding: Padding on the bottom of the plot, as a fraction of the figure height,
+        provided to `plt.subplots_adjust`. A value of 0 means no bottom padding. Applied only if `ax` is None.
+    :param top_padding: Padding on the top of the plot, as a fraction of the figure height,
+        provided to `plt.subplots_adjust`. Must be >= `bottom_padding`.
+        A value of 1 means no top padding. Applied only if `ax` is None.
+    :param reset_plot_style: If True, reset the style of the plot before plotting.
+        Disabling it can be useful when plotting on an existing axis rather than creating a new one,
+        and the existing axis has a custom style.
     :return: Matplotlib figure and axis containing the plot
     """
 
     ##############
-    # Plot setup #
+    # Setup plot #
     ##############
 
+    # Create a figure for the plot, and adjust margins;
     if reset_plot_style:
         _reset_plot_style(label_pad=5)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figure_size, dpi=DEFAULT_DPI)
+        plt.subplots_adjust(
+            top=top_padding,
+            bottom=bottom_padding,
+            left=left_padding,
+            right=right_padding,
+        )
+    else:
+        fig = ax.get_figure()
+
+    # Create default color palette;
     if palette is None:
         if hue is None:
             palette = sns.color_palette("rocket").as_hex()
         else:
             palette = sns.color_palette("rocket", len(data[hue].unique())).as_hex()
-
-    # Create a figure for the plot, and adjust margins;
-    fig = plt.figure(figsize=figure_size)
-    gs = gridspec.GridSpec(1, 1)
-    plt.subplots_adjust(top=0.95, bottom=0.15, left=0.19, right=0.93)
-    ax = fig.add_subplot(gs[0, 0])
 
     # Set axes limits;
     if xlimits is not None:
@@ -165,8 +195,9 @@ def correlation_scatterplot(
             ax.annotate(
                 row[label], xy=(row[x], row[y]), fontsize=font_size - 2, color="#2f2f2f", ha="left", zorder=100
             )
-    if ax.legend_ is not None:
-        ax.legend_.remove()  # Hack to remove legend;
+    # Remove the existing legend from the axis, if present
+    if ax.get_legend():
+        ax.get_legend().remove()
 
     #####################
     # Style fine-tuning #
@@ -180,10 +211,7 @@ def correlation_scatterplot(
         # Transform angle to adapt to axes with different scale;
         trans_angle = ax.transData.transform_angles([angle], np.array([0, 0]).reshape((1, 2)))[0]
         # Add label with Latex Math font, at the right angle;
-        if xlimits is None:
-            x_coord = (data[x].max() - data[x].min()) * 0.2 + data[x].min()
-        else:
-            x_coord = (xlimits[1] - xlimits[0]) * 0.2 + xlimits[0]
+        x_coord = (ax.get_xlim()[1] - ax.get_xlim()[0]) * 0.8 + ax.get_xlim()[0]
         y_coord = x_coord * 1.05 * slope + intercept
         ax.annotate(
             r"$\mathdefault{R^2=" + f"{r_value:.2f}}}$",
@@ -201,10 +229,10 @@ def correlation_scatterplot(
     ax.xaxis.grid(True, linewidth=0.5)
 
     # Ticks and tick labels;
-    ax.xaxis.set_major_locator(plt.LinearLocator(9))
+    ax.xaxis.set_major_locator(LinearLocator(9))
     ax.xaxis.set_major_formatter(x_ticks_formatter)
     ax.tick_params(axis="x", labelsize=font_size - 2)
-    ax.yaxis.set_major_locator(plt.LinearLocator(9))
+    ax.yaxis.set_major_locator(LinearLocator(9))
     ax.yaxis.set_major_formatter(y_ticks_formatter)
     ax.tick_params(axis="y", labelsize=font_size - 2)
 

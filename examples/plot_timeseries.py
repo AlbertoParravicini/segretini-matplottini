@@ -45,7 +45,6 @@ def plot(data: np.ndarray) -> tuple[Figure, Axis]:
         xlabel="Time [min]",
         ylabel="Intensity",
         date_format="%H:%M:%S",
-        line_width=0.6,
         minutes_interval=2,
         fill=True,
         dark_background=True,
@@ -65,5 +64,6 @@ if __name__ == "__main__":
             plot_name="timeseries",
             add_timestamp_prefix_to_plot_name=False,
             store_plot_into_timestamp_subfolder=False,
-        )
+        ),
+        verbose=True,
     )

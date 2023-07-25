@@ -102,9 +102,8 @@ def load_data_3() -> tuple[dict[str, Any], dict[str, Any]]:
 def plot_3(data_dict_1: dict[str, Any], data_dict_2: dict[str, Any]) -> tuple[plt.Figure, plt.Axes]:
     num_col = 2
     num_row = 1
-    fig = plt.figure(figsize=(2.2 * num_col, 1.9 * num_row))
-    gs = gridspec.GridSpec(num_row, num_col)
-    plt.subplots_adjust(top=0.95, bottom=0.2, left=0.1, right=0.92, hspace=0, wspace=0.4)
+    fig = plt.figure(figsize=(2.7 * num_col, 2.4 * num_row))
+    gs = gridspec.GridSpec(num_row, num_col, top=0.95, bottom=0.2, left=0.1, right=0.92, hspace=0, wspace=0.4)
     # First roofline
     ax = fig.add_subplot(gs[0, 0])
     ax = roofline(
@@ -139,6 +138,7 @@ def plot_3(data_dict_1: dict[str, Any], data_dict_2: dict[str, Any]) -> tuple[pl
         legend_labels=["CPU", "GPU", "FPGA"],
         add_bandwidth_label=False,
         add_operational_intensity_label=False,
+        reset_plot_style=False,
     )
     return fig, ax
 
@@ -157,7 +157,8 @@ if __name__ == "__main__":
             plot_name="roofline",
             add_timestamp_prefix_to_plot_name=False,
             store_plot_into_timestamp_subfolder=False,
-        )
+        ),
+        verbose=True,
     )
 
     # Create a fancier Roofline model, with multiple lines and custom settings;
@@ -169,7 +170,8 @@ if __name__ == "__main__":
             plot_name="roofline_stacked",
             add_timestamp_prefix_to_plot_name=False,
             store_plot_into_timestamp_subfolder=False,
-        )
+        ),
+        verbose=True,
     )
     # Create a single plot composed of 2 separate Rooflines;
     data_dict_1, data_dict_2 = load_data_3()
@@ -180,5 +182,6 @@ if __name__ == "__main__":
             plot_name="roofline_double",
             add_timestamp_prefix_to_plot_name=False,
             store_plot_into_timestamp_subfolder=False,
-        )
+        ),
+        verbose=True,
     )

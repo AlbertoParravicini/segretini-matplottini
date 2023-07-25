@@ -26,7 +26,10 @@ pip install .
 [x] recreate sample plots
 [x] create imports for utils inside __init__, to hide private stuff
 [x] changelog
+[] timeseries plot for video frames
 [] new barplot code
+    [] e2e test
+[] plot for tp/tn/f1/etc. Have setting that says which should be plotten, and setting for nrows/ncols (default=plot all, nrows/cols is sqrt (e.g. 4 -> 2,2))
     [] e2e test
 [x] all plots must have fontsize base 10 (or 8?). And specify figsize and subplot adjust as params
     [x] for ridgeplot, no subplot adjust except horizontal, since it's specific to dataset size

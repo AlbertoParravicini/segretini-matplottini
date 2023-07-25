@@ -5,9 +5,13 @@ Here you can find a list of the latest updates to `matplotlib`, such as new reci
 
 ## 2022-10-03
 
-Added a new **timeseries plot**, find it it `examples/plot_timeseries.py`. Also added a sleek `dark background` setting in `utils.plot_utils.reset_plot_style`.
+Added a new **timeseries plot**, find it it `examples/plot_timeseries.py`. It also supports a sleek `dark background` that you can enable in `segretini_matplottini.utils.reset_style`
 
 ![Timeseries](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/timeseries.png)
+
+It can also be used as a stem plot, by setting `stem=True` in `plot_timeseries`.
+
+![Stem](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/stem.png)
 
 ## 2022-09-25
 

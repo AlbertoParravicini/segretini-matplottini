@@ -58,3 +58,24 @@ def test_existing_axis(data: pd.Series) -> None:
         data,
         ax=ax,
     )
+
+
+@save_tmp_plot
+def test_stem_default(data: pd.Series) -> None:
+    timeseries(
+        data,
+        draw_style="stem",
+    )
+
+
+@save_tmp_plot
+def test_stem_custom_settings(data: pd.Series) -> None:
+    timeseries(
+        data,
+        xlabel="Time [min]",
+        ylabel="Intensity",
+        date_format="%H:%M:%S",
+        minutes_interval=2,
+        dark_background=True,
+        draw_style="stem",
+    )

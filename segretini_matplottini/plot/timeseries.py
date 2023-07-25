@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Literal, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -24,7 +24,7 @@ def timeseries(
     seconds_interval: Optional[int] = None,
     minutes_interval: Optional[int] = None,
     hours_interval: Optional[int] = None,
-    draw_style: str = "default",
+    draw_style: Literal["default", "steps-pre", "steps-mid", "steps-post", "stem"] = "default",
     fill: bool = False,
     dark_background: bool = False,
     ax: Optional[Axes] = None,
@@ -52,10 +52,12 @@ def timeseries(
     :param minutes_interval: If not None and `date_format` is present, locate ticks with distance equal to this amount of minutes.
     :param hours_interval: If not None and `date_format` is present, locate ticks with distance equal to this amount of hours.
     :param draw_style: Style of the line, as in Matplotlib's `draw_style`. For `default`, the points are connected with straight lines.
-        Alternatively, connect points with steps.
+        Alternatively, connect points with steps, or plot a stem plot.
         `steps-pre`: The step is at the beginning of the line segment, i.e. the line will be at the y-value of point to the right.
         `steps-mid`: The step is halfway between the points.
         `steps-post`: The step is at the end of the line segment, i.e. the line will be at the y-value of the point to the left.
+        `stem`: Plot a stem plot, i.e. a vertical line at each x location from the baseline to y.
+    :param fill: If True, fill the area under the line. Ignored if `draw_style` is `stem`.
     :param dark_background: If True, plot on a dark background.
     :param ax: Existing axis where to plot, useful for example when adding a subplot.
     :param figure_size: Width and height of the figure, in inches.
@@ -105,10 +107,14 @@ def timeseries(
     # Add main plots #
     ##################
 
-    ax.plot(x, y, lw=line_width, color=line_color, drawstyle=draw_style)
-    if fill:
-        step = None if "steps" not in draw_style else draw_style.replace("steps-", "")
-        plt.fill_between(x, y, alpha=0.5, color=line_color, step=step)
+    if draw_style == "stem":
+        stems = ax.stem(x, y, linefmt=line_color, markerfmt=" ", basefmt=" ", use_line_collection=True)
+        plt.setp(stems, "linewidth", line_width)  # Set stem line width
+    else:
+        ax.plot(x, y, lw=line_width, color=line_color, drawstyle=draw_style)
+        if fill:
+            step = None if "steps" not in draw_style else draw_style.replace("steps-", "")
+            plt.fill_between(x, y, alpha=0.5, color=line_color, step=step)
 
     #####################
     # Style fine-tuning #

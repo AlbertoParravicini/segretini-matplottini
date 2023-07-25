@@ -1,4 +1,5 @@
 import functools
+import inspect
 from pathlib import Path
 from typing import Any, Callable
 
@@ -23,7 +24,10 @@ def save_tmp_plot(func: Callable[..., Any]) -> Callable[..., Any]:
         plot_dir = Path(__file__).parent.parent.parent / "plots" / "tests"
         plot_dir.mkdir(parents=True, exist_ok=True)
         caller_name = func.__name__
-        save_plot(plot_dir / f"{Path(__file__).stem}_{caller_name}.png")
+        module = inspect.getmodule(func)
+        assert module is not None
+        module_name = module.__name__.split(".")[-1]
+        save_plot(plot_dir / f"{module_name}_{caller_name}.png")
         return result
 
     return wrapper

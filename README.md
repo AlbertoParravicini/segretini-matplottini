@@ -27,6 +27,7 @@ pip install .
 [x] create imports for utils inside __init__, to hide private stuff
 [x] changelog
 [] new barplot code
+    [] e2e test
 [x] all plots must have fontsize base 10 (or 8?). And specify figsize and subplot adjust as params
     [x] for ridgeplot, no subplot adjust except horizontal, since it's specific to dataset size
     [x] split ridgeplot in ridgeplot and ridgeplot_compact
@@ -38,7 +39,7 @@ pip install .
 [] compute_speedup should not mention speedup, and clean API. Maybe ranz correct_speedup, and add test
 [] tests
     [] unit tests
-    [] e2e tests for examples, check if they don't crash
+    [x] e2e tests for examples, check if they don't crash
 [] github
     [] protect master branch
     [] add automated tests check

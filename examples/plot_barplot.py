@@ -7,6 +7,7 @@ from segretini_matplottini.utils import (
     add_arrow_to_barplot,
     add_labels_to_bars,
     assemble_filenames_to_save_plot,
+    get_labels_for_bars,
     save_plot,
 )
 from segretini_matplottini.utils.constants import DEFAULT_FONT_SIZE
@@ -50,7 +51,7 @@ if __name__ == "__main__":
             "model_4": "D",
         },
     )
-    ax = add_labels_to_bars(axes=[ax], font_size=DEFAULT_FONT_SIZE - 4)[0]
+    ax = add_labels_to_bars(ax=ax, labels=get_labels_for_bars(ax), font_size=DEFAULT_FONT_SIZE - 4, location="below")
     ax = add_arrow_to_barplot(ax=ax, higher_is_better=True)
     save_plot(
         assemble_filenames_to_save_plot(

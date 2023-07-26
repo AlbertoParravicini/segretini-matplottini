@@ -27,6 +27,7 @@ from segretini_matplottini.utils.plot import (  # noqa: F401
     assemble_filenames_to_save_plot,
     fix_label_length,
     get_exp_label,
+    get_labels_for_bars,
     reset_plot_style,
     save_plot,
     update_bars_width,

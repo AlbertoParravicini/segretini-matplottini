@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Literal, Optional, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -278,25 +278,116 @@ def add_labels(
             )
 
 
-def add_labels_to_bars(
-    axes: list[Axes],
-    font_size: float = DEFAULT_FONT_SIZE,
+def get_labels_for_bars(
+    ax: Axes,
+    skip_zeros: bool = True,
+    skip_nan: bool = True,
+    skip_value: Optional[float] = None,
+    skip_threshold: float = 1e-6,
+    max_only: bool = False,
     label_format_str: Callable[[Union[float, str]], str] = lambda x: f"{x:.2f}",
-) -> list[Axes]:
-    # Add the value on top of each bar;
-    for ax in axes:
-        for p in ax.patches:
-            if isinstance(p, Rectangle):
-                height = p.get_height()
-                if height > 0 and p.get_width() > 0:
-                    ax.text(
-                        p.get_x() + p.get_width() / 2.0,
-                        height - 0.07,
-                        label_format_str(height),
-                        ha="center",
-                        fontsize=font_size,
-                    )
-    return axes
+) -> list[str]:
+    """
+    Given a barplot (or a plot containing bars), obtain a list of labels representing the value of each bar.
+
+    :param ax: Axis containing the barplot. Patches that are not rectangles are ignored.
+    :param skip_zeros: If True, skip bars with height equal to zero.
+    :param skip_nan: If True, skip bars with NaN height.
+    :param skip_value: If not None, skip bars with height equal to this value.
+    :param skip_threshold: Threshold used to determine if a label's value
+        is close enough to `skip_value` and `skip_zero`.
+    :param max_only: If True, return only the label of the bar with highest value.
+    :param label_format_str: Format of each label, by default use two decimal digits (e.g. 2.10).
+    :return: A list of labels, one for each bar. Bars that have been skipped have an empty string as label.
+    """
+    labels: list[str] = []
+    rectangles = [p for p in ax.patches if isinstance(p, Rectangle)]
+    if max_only:
+        # Simpy obtain the height of the highest bar, and set everything else to empty string;
+        argmax = np.argmax([p.get_height() for p in rectangles])
+        labels = ["" for _ in rectangles]
+        labels[argmax] = label_format_str(rectangles[argmax].get_height())
+        return labels
+    else:
+        # Get the height of each bar, and format it as a label.
+        # Skip it if necessary, adding an empty label.
+        for bar in rectangles:
+            height = bar.get_height()
+            if skip_zeros and np.abs(height) < skip_threshold:
+                labels.append("")
+            elif skip_nan and pd.isna(height):
+                labels.append("")
+            elif skip_value is not None and np.abs(height - skip_value) < skip_threshold:
+                labels.append("")
+            else:
+                labels.append(label_format_str(height))
+    return labels
+
+
+def add_labels_to_bars(
+    ax: Axes,
+    labels: list[str],
+    font_size: float = DEFAULT_FONT_SIZE,
+    rotation: float = 0,
+    label_color: str = "#2f2f2f",
+    location: Literal["above", "below"] = "above",
+    vertical_padding: float = 0.005,
+    do_not_exceed_ylim: bool = True,
+    tolerance_for_ylim: float = 0.05,
+) -> Axes:
+    """
+    Add labels to the top of each bar in a barplot.
+
+    :param ax: Axis containing the barplot. Patches that are not rectangles are ignored.
+    :param labels: List of labels to add. The number of labels must match the number of bars.
+    :param font_size: Font size of the labels
+    :param rotation: Rotation of the labels (e.g. `90` for 90°).
+    :param label_color: Hexadecimal color used for labels.
+    :param location: If "above", add labels above the top of each bar.
+        If "below", add labels below the top of each bar.
+    :param vertical_padding: Vertical padding, as a percentage of the vertical size of the plot.
+    :param do_not_exceed_ylim: If True, labels that would exceed the y-axis limits are added at the limit.
+    :param tolerance_for_ylim: Tolerance used to determine if a label's value is close enough to the y-axis limit,
+        and should be added at the limit. The tolerance is a percentage of the vertical size of the plot.
+        The tolerance is used since values close to the top/bottom would overlap with the border of the plot.
+    :return: The axis containing the barplot, with the labels added.
+    """
+    # Keep only rectangles;
+    rectangles = [p for p in ax.patches if isinstance(p, Rectangle)]
+    # The number of labels and rectangles must match;
+    assert len(rectangles) == len(
+        labels
+    ), f"❌ the number of labels ({len(labels)}) and rectangles ({len(rectangles)}) must match."
+    # Compute the vertical padding using the vertical size of the plot;
+    _vertical_padding = vertical_padding * (ax.get_ylim()[1] - ax.get_ylim()[0])
+    if location == "below":
+        # Invert the padding, and add a bit of extra space to avoid overlapping with the bar;
+        _vertical_padding = -_vertical_padding - 0.01
+    # Get the tolerance for the y-axis limits.
+    # We need a tolerance since values close to the top/bottom would overlap with the border of the plot;
+    _tolerance_for_ylim = tolerance_for_ylim * (ax.get_ylim()[1] - ax.get_ylim()[0])
+    # Add labels
+    for label, bar in zip(labels, rectangles):
+        height = bar.get_height()
+        if do_not_exceed_ylim:
+            y_min, y_max = ax.get_ylim()
+            if height + _tolerance_for_ylim > y_max:
+                height = y_max
+            # Only if the location is below, since if it's above it does not get clipped;
+            elif height - _tolerance_for_ylim < y_min and location == "below":
+                height = y_min
+        ax.text(
+            bar.get_x() + bar.get_width() / 2.0,
+            height + _vertical_padding,
+            label,
+            ha="center",
+            fontsize=font_size,
+            color=label_color,
+            rotation=rotation,
+            va="bottom" if location == "above" else "top",
+            clip_on=False,
+        )
+    return ax
 
 
 def assemble_filenames_to_save_plot(

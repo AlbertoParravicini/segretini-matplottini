@@ -7,6 +7,7 @@ from segretini_matplottini.plot import barplot_for_multiple_categories
 from segretini_matplottini.utils import (
     add_arrow_to_barplot,
     add_labels_to_bars,
+    get_labels_for_bars,
 )
 from segretini_matplottini.utils.constants import DEFAULT_FONT_SIZE
 
@@ -127,7 +128,7 @@ def test_custom_parameters_and_arrow_and_labels(data: pd.DataFrame) -> None:
             "model_4": "D",
         },
     )
-    ax = add_labels_to_bars(axes=[ax], font_size=DEFAULT_FONT_SIZE - 4)[0]
+    ax = add_labels_to_bars(ax=ax, labels=get_labels_for_bars(ax), font_size=DEFAULT_FONT_SIZE - 4)
     ax = add_arrow_to_barplot(ax=ax, higher_is_better=True)
 
 
@@ -153,5 +154,5 @@ def test_custom_parameters_and_arrow_and_labels_no_hue(data: pd.DataFrame) -> No
             "model_4": "D",
         },
     )
-    ax = add_labels_to_bars(axes=[ax], font_size=DEFAULT_FONT_SIZE - 4)[0]
+    ax = add_labels_to_bars(ax=ax, labels=get_labels_for_bars(ax), font_size=DEFAULT_FONT_SIZE - 4)
     ax = add_arrow_to_barplot(ax=ax, higher_is_better=True)

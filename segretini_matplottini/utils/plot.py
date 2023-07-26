@@ -1,15 +1,17 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Callable, Optional, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from matplotlib.axis import Axis
+from matplotlib.axes import Axes
 from matplotlib.figure import Figure
+from matplotlib.patches import Rectangle
 
 from segretini_matplottini.utils.colors import BACKGROUND_BLACK
+from segretini_matplottini.utils.constants import DEFAULT_FONT_SIZE
 
 
 def activate_dark_background(background_color: str = BACKGROUND_BLACK) -> None:
@@ -72,6 +74,45 @@ def reset_plot_style(
     # Background color
     if dark_background:
         activate_dark_background()
+
+
+def add_arrow_to_barplot(
+    ax: Axes,
+    higher_is_better: bool = True,
+    line_width: float = 0.5,
+    left_margin_to_add: float = 0.6,
+    arrow_color: str = "#2f2f2f",
+) -> Axes:
+    """
+    Add a arrow before the first bar in the barplot, to indicate that higher is better,
+    or that lower is better. Add a bit of space to the left, to make space for the arrow.
+
+    :param: ax: The axis containing the barplot.
+    :param: higher_is_better: If True, add an arrow that points up, to indicate that higher is better.
+        If False, add an arrow that points down, to indicate that lower is better.
+    :param line_width: Width of the arrow line.
+    :param left_margin_to_add: Amount of space, in inches, to add to the left of the first bar,
+        to make space for the arrow.
+    :param arrow_color: Color of the arrow, as hexadecimal string.
+    :return: The axis containing the barplot, with the arrow added.
+    """
+    # Add a bit of whitespace before the first bar;
+    ax.set_xlim(ax.get_xlim()[0] - left_margin_to_add, ax.get_xlim()[1])
+    rectangles = [p for p in ax.patches if isinstance(p, Rectangle)]
+    assert len(rectangles) > 0, "❌ no bars found in the plot, make sure to draw a barplot first!"
+    x_coord = rectangles[0].get_x() - (rectangles[0].get_x() - ax.get_xlim()[0]) / 2
+    ax.annotate(
+        "",
+        xy=(x_coord, ax.get_ylim()[1] - 0.02 * (ax.get_ylim()[1] - ax.get_ylim()[0])),
+        xytext=(x_coord, ax.get_ylim()[0] + 0.01 * (ax.get_ylim()[1] - ax.get_ylim()[0])),
+        arrowprops=dict(
+            arrowstyle="->" if higher_is_better else "<-",
+            color=arrow_color,
+            linewidth=line_width,
+        ),
+        annotation_clip=False,
+    )
+    return ax
 
 
 def get_exp_label(
@@ -138,7 +179,7 @@ def fix_label_length(labels: list[str], max_length: int = 20) -> list[str]:
     return fixed_labels
 
 
-def update_bars_width(ax: Axis, percentage_width: float = 1) -> None:
+def update_bars_width(ax: Axes, percentage_width: float = 1) -> None:
     """
     Given an axis with a barplot, scale the width of each bar to the provided percentage,
       and align them to their center.
@@ -146,7 +187,7 @@ def update_bars_width(ax: Axis, percentage_width: float = 1) -> None:
     :param ax: Axis where bars are located.
     :param percentage_width: Percentage width to which bars are rescaled. By default, do not change their size.
     """
-    for patch in ax.patches:
+    for patch in [p for p in ax.patches if isinstance(p, Rectangle)]:
         current_width = patch.get_width()
         diff = current_width - percentage_width
         # Change the bar width
@@ -156,7 +197,7 @@ def update_bars_width(ax: Axis, percentage_width: float = 1) -> None:
 
 
 def add_labels(
-    ax: Axis,
+    ax: Axes,
     labels: Optional[list[float]] = None,
     vertical_offsets: Optional[list[float]] = None,
     patch_num: Optional[list[int]] = None,
@@ -235,6 +276,27 @@ def add_labels(
                 va="bottom",
                 rotation=rotation,
             )
+
+
+def add_labels_to_bars(
+    axes: list[Axes],
+    font_size: float = DEFAULT_FONT_SIZE,
+    label_format_str: Callable[[Union[float, str]], str] = lambda x: f"{x:.2f}",
+) -> list[Axes]:
+    # Add the value on top of each bar;
+    for ax in axes:
+        for p in ax.patches:
+            if isinstance(p, Rectangle):
+                height = p.get_height()
+                if height > 0 and p.get_width() > 0:
+                    ax.text(
+                        p.get_x() + p.get_width() / 2.0,
+                        height - 0.07,
+                        label_format_str(height),
+                        ha="center",
+                        fontsize=font_size,
+                    )
+    return axes
 
 
 def assemble_filenames_to_save_plot(

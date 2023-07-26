@@ -26,7 +26,8 @@ pip install .
 [x] recreate sample plots
 [x] create imports for utils inside __init__, to hide private stuff
 [x] changelog
-[] timeseries plot for video frames
+[x] timeseries plot for video frames
+[] minor tick locator for timeseries (same as major, but check that interval is < than major.<- automatic, not necessaty)
 [] new barplot code
     [] e2e test
 [] plot for tp/tn/f1/etc. Have setting that says which should be plotten, and setting for nrows/ncols (default=plot all, nrows/cols is sqrt (e.g. 4 -> 2,2))
@@ -34,7 +35,7 @@ pip install .
 [x] all plots must have fontsize base 10 (or 8?). And specify figsize and subplot adjust as params
     [x] for ridgeplot, no subplot adjust except horizontal, since it's specific to dataset size
     [x] split ridgeplot in ridgeplot and ridgeplot_compact
-[] ranz unused colors/palettes, add some new sample colors (e.g. green used in new plots)
+[] ranz unused colors/palettes, add some new sample colors (e.g. green used in new plots, pink used in timeseries)
 [] add util for arrow of metric
 [] add util for color palette
 [] add image with plot grid inside readme
@@ -50,6 +51,7 @@ pip install .
 [x] revisit save_plot. Take as input a path or a list of paths. And have another function to assemble the paths from root dir, plot name (not as format string), folder date (as format string, e.g Y_M_D) and suffix date (_Y_M_D_H_M_S), extensions
 [] revisit add_labels: create get_labels_for_barplot and add_labels_to_barplot that takes mandatory labels (and checks that num labels == num bars)
 [] create notebook to create good plot from scratch (some barplot)
+[] can we create auto documentation?
 [] update changelog
 [] delete this list
 

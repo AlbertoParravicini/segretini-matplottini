@@ -1,5 +1,6 @@
 from typing import Union
 
+import seaborn as sns
 from matplotlib.colors import hsv_to_rgb, rgb_to_hsv, to_hex, to_rgb
 
 # Define some colors for later use.
@@ -59,8 +60,10 @@ PALETTE_G3 = ["#E7F7DF", "#B5E8B5", "#71BD8A", "#469C7F", "#257A7A"]
 # Palette of orange/yellow/brown tones;
 PALETTE_O = ["#FDCE7C", "#EBB25E", "#E6A37C", "#FAB187", "#E3896F", "#E37E62", "#FD867C"]
 # Palette with orange baseline + green tones;
-PALETTE_OG = ["#E8CFB5", "#81C798", "#55A68B", "#358787"]
-
+PALETTE_ORANGE_GREEN = ["#E8CFB5", "#81C798", "#55A68B", "#358787"]
+# Two teal tones to use as extremes of a palette;
+TWO_TEAL_TONES = ["#B1DEBD", "#4BA3A2"]
+TWO_PINK_TONES = ["#FFA1C3", "#E8487D"]
 # Used for plots with a dark background;
 BACKGROUND_BLACK = "#0E1117"
 
@@ -87,3 +90,22 @@ def hex_color_to_grayscale(rgb: Union[str, tuple[int, int, int]]) -> str:
     hsv = rgb_to_hsv(to_rgb(rgb))
     hsv[1] = 0  # Set saturation to 0;
     return str(to_hex(hsv_to_rgb(hsv)))
+
+
+def create_hex_palette(start_hex: str, end_hex: str, number_of_colors: int) -> list[str]:
+    """
+    Given two colors expressed as hex, create a palette of colors that goes from the first to the second,
+    with the specified number of colors in between.
+
+    :param start_hex: First color in the palette, as hex string (e.g. "#FF0000")
+    :param end_hex: Second color in the palette, as hex string (e.g. "#00FF00")
+    :param number_of_colors: Number of colors in the palette, including the two extremes. Must be >= 2.
+    :return: A list of colors, as hex strings.
+    """
+    assert number_of_colors > 2, f"❌ the number of colors in the palette must be >= 2, not {number_of_colors}"
+    return [
+        str(c)
+        for c in sns.color_palette(
+            sns.color_palette(f"blend:{start_hex},{end_hex}", n_colors=number_of_colors, as_cmap=False)
+        ).as_hex()
+    ]

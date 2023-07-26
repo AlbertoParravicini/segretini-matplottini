@@ -19,15 +19,6 @@ PALETTE = [PALETTE_G[0], PALETTE_G[2]]
 DATA_DIR = Path(__file__).parent.parent.parent / "data"
 
 
-def load_data() -> pd.DataFrame:
-    # Load data;
-    data = pd.read_csv(DATA_DIR / "correlation_scatterplot_data.csv")
-    # Remove outliers present in the dataset;
-    data = data[data["estimate0"] < 1]
-    data = data[data["estimate1"] < 1]
-    return data
-
-
 @pytest.fixture
 def data() -> pd.DataFrame:
     # Load data;
@@ -49,7 +40,6 @@ def test_default_settings(data: pd.DataFrame) -> None:
 
 @save_tmp_plot
 def test_custom_settings(data: pd.DataFrame) -> None:
-    data = load_data()
     correlation_scatterplot(
         data=data,
         x="estimate0",
@@ -66,7 +56,6 @@ def test_custom_settings(data: pd.DataFrame) -> None:
 
 @save_tmp_plot
 def test_no_regression(data: pd.DataFrame) -> None:
-    data = load_data()
     correlation_scatterplot(
         data=data,
         x="estimate0",

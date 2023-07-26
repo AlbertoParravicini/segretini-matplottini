@@ -9,7 +9,7 @@ Added a new **timeseries plot**, find it it `examples/plot_timeseries.py`. It al
 
 ![Timeseries](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/timeseries.png)
 
-It can also be used as a stem plot, by setting `stem=True` in `plot_timeseries`.
+It can also be used to draw stem plots, by setting `stem=True` in `plot_timeseries`.
 
 ![Stem](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/stem.png)
 

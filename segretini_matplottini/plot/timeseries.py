@@ -21,9 +21,12 @@ def timeseries(
     ylabel: Optional[str] = None,
     ylimits: Optional[tuple[float, float]] = None,
     date_format: Optional[str] = None,
-    seconds_interval: Optional[int] = None,
-    minutes_interval: Optional[int] = None,
-    hours_interval: Optional[int] = None,
+    seconds_interval_major_ticks: Optional[int] = None,
+    minutes_interval_major_ticks: Optional[int] = None,
+    hours_interval_major_ticks: Optional[int] = None,
+    seconds_interval_minor_ticks: Optional[int] = None,
+    minutes_interval_minor_ticks: Optional[int] = None,
+    hours_interval_minor_ticks: Optional[int] = None,
     draw_style: Literal["default", "steps-pre", "steps-mid", "steps-post", "stem"] = "default",
     fill: bool = False,
     dark_background: bool = False,
@@ -46,11 +49,22 @@ def timeseries(
     :param ylabel: Label of the y-axis.
     :param ylimits: Limits of the y-axis. If none, use `[min(x), max(x)]`.
     :param date_format: If not None, try formatting x-axis tick labels with the specified time format.
-    :param seconds_interval: If not None and `date_format` is present, locate ticks with distance equal to this amount of seconds.
+    :param seconds_interval_major_ticks: If not None and `date_format` is present,
+        locate ticks on the major axis with distance equal to this amount of seconds.
         If `minutes_interval` or `hours_interval` are also present, use the smallest interval possible.
         If none of them is present, locate ticks every 1 minute.
-    :param minutes_interval: If not None and `date_format` is present, locate ticks with distance equal to this amount of minutes.
-    :param hours_interval: If not None and `date_format` is present, locate ticks with distance equal to this amount of hours.
+    :param minutes_interval_major_ticks: If not None and `date_format` is present,
+        locate ticks on the major axis with distance equal to this amount of minutes.
+    :param hours_interval_major_ticks: If not None and `date_format` is present,
+        locate ticks on the major axis with distance equal to this amount of hours.
+    :param seconds_interval_minor_ticks: If not None and `date_format` is present,
+        locate ticks on the minor axis with distance equal to this amount of seconds.
+        If `minutes_interval` or `hours_interval` are also present, use the smallest interval possible.
+        If none of them is present, locate ticks every 1 minute.
+    :param minutes_interval_minor_ticks: If not None and `date_format` is present,
+        locate ticks on the minor axis with distance equal to this amount of minutes.
+    :param hours_interval_minor_ticks: If not None and `date_format` is present,
+        locate ticks on the minor axis with distance equal to this amount of hours.
     :param draw_style: Style of the line, as in Matplotlib's `draw_style`. For `default`, the points are connected with straight lines.
         Alternatively, connect points with steps, or plot a stem plot.
         `steps-pre`: The step is at the beginning of the line segment, i.e. the line will be at the y-value of point to the right.
@@ -133,15 +147,23 @@ def timeseries(
 
     # Format x-axis tick labels as a date
     if date_format is not None:
-        if seconds_interval is not None:
-            ax.xaxis.set_major_locator(SecondLocator(interval=seconds_interval))
-        elif minutes_interval is not None:
-            ax.xaxis.set_major_locator(MinuteLocator(interval=minutes_interval))
-        elif hours_interval is not None:
-            ax.xaxis.set_major_locator(HourLocator(interval=hours_interval))
+        # Major ticks
+        if seconds_interval_major_ticks is not None:
+            ax.xaxis.set_major_locator(SecondLocator(interval=seconds_interval_major_ticks))
+        elif minutes_interval_major_ticks is not None:
+            ax.xaxis.set_major_locator(MinuteLocator(interval=minutes_interval_major_ticks))
+        elif hours_interval_major_ticks is not None:
+            ax.xaxis.set_major_locator(HourLocator(interval=hours_interval_major_ticks))
         else:
             ax.xaxis.set_major_locator(MinuteLocator(interval=1))
         ax.xaxis.set_major_formatter(DateFormatter(date_format))
+        # Minor ticks
+        if seconds_interval_minor_ticks is not None:
+            ax.xaxis.set_minor_locator(SecondLocator(interval=seconds_interval_minor_ticks))
+        elif minutes_interval_minor_ticks is not None:
+            ax.xaxis.set_minor_locator(MinuteLocator(interval=minutes_interval_minor_ticks))
+        elif hours_interval_minor_ticks is not None:
+            ax.xaxis.set_minor_locator(HourLocator(interval=hours_interval_minor_ticks))
         ax.tick_params(axis="x", which="major", labelsize=font_size - 2, rotation=45)
         plt.xticks(ha="right", rotation_mode="anchor")
     else:

@@ -3,8 +3,6 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from matplotlib.axis import Axis
-from matplotlib.figure import Figure
 from scipy.signal import argrelextrema
 
 from segretini_matplottini.plot import timeseries
@@ -52,20 +50,6 @@ def load_data_2() -> pd.Series:
     return z
 
 
-def plot(data: np.ndarray) -> tuple[Figure, Axis]:
-    return timeseries(
-        data,
-        xlabel="Time [min]",
-        ylabel="Intensity",
-        date_format="%H:%M:%S",
-        minutes_interval=2,
-        fill=True,
-        dark_background=True,
-        draw_style="stem",
-        line_width=1,
-    )
-
-
 ##############################
 # Main #######################
 ##############################
@@ -77,7 +61,8 @@ if __name__ == "__main__":
         xlabel="Time [min]",
         ylabel="Intensity",
         date_format="%H:%M:%S",
-        minutes_interval=2,
+        minutes_interval_major_ticks=2,
+        minutes_interval_minor_ticks=1,
         fill=True,
         dark_background=True,
     )
@@ -96,7 +81,8 @@ if __name__ == "__main__":
         xlabel="Time [min]",
         ylabel="Intensity",
         date_format="%H:%M:%S",
-        minutes_interval=2,
+        minutes_interval_major_ticks=2,
+        minutes_interval_minor_ticks=1,
         dark_background=True,
         draw_style="stem",
     )

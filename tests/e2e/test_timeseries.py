@@ -45,7 +45,7 @@ def test_custom_settings(data: pd.Series) -> None:
         xlabel="Time [min]",
         ylabel="Intensity",
         date_format="%H:%M:%S",
-        minutes_interval=2,
+        minutes_interval_major_ticks=2,
         fill=True,
         dark_background=True,
     )
@@ -75,7 +75,8 @@ def test_stem_custom_settings(data: pd.Series) -> None:
         xlabel="Time [min]",
         ylabel="Intensity",
         date_format="%H:%M:%S",
-        minutes_interval=2,
+        minutes_interval_major_ticks=2,
+        seconds_interval_minor_ticks=30,
         dark_background=True,
         draw_style="stem",
     )

@@ -80,7 +80,7 @@ def add_arrow_to_barplot(
     ax: Axes,
     higher_is_better: bool = True,
     line_width: float = 0.5,
-    left_margin_to_add: float = 0.6,
+    left_margin_to_add: float = 0.1,
     arrow_color: str = "#2f2f2f",
 ) -> Axes:
     """

@@ -3,6 +3,22 @@
 
 Here you can find a list of the latest updates to `matplotlib`, such as new recipes for plots.
 
+## 2023-07-26
+
+### Barplots 
+
+Added new `barplot` functions. Creating a barplot is easy, creating a pretty one is not!
+* `matplotlib.plot.barplot_for_multiple_categories` wraps Seaborn to plot multiple categories in a single barplot.
+* `matplotlib.plot.barplot` simplifies plotting a grid of barplots, with independent axes and shared legend.
+
+![Barplot for multiple categories](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/barplot_for_multiple_categories.png)
+
+### Many new utilty functions
+
+New utilities in `matplotlib.utils`:
+* `add_arrow_to_barplot` adds an up or down arrow to a barplot, to highlight that a higher value or a lower value is better.
+* `create_hex_palette` creates a linear palette starting from a starting and ending color, with the requested number of colors. Just a wrapper around `sns.color_palette`, but easier to use.
+
 ## 2022-10-03
 
 Added a new **timeseries plot**, find it it `examples/plot_timeseries.py`. It also supports a sleek `dark background` that you can enable in `segretini_matplottini.utils.reset_style`

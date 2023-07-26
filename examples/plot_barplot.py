@@ -55,7 +55,7 @@ if __name__ == "__main__":
     save_plot(
         assemble_filenames_to_save_plot(
             directory=PLOT_DIR,
-            plot_name="barplot",
+            plot_name="barplot_for_multiple_categories",
             add_timestamp_prefix_to_plot_name=False,
             store_plot_into_timestamp_subfolder=False,
         ),

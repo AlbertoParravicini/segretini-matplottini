@@ -105,7 +105,5 @@ def create_hex_palette(start_hex: str, end_hex: str, number_of_colors: int) -> l
     assert number_of_colors > 2, f"❌ the number of colors in the palette must be >= 2, not {number_of_colors}"
     return [
         str(c)
-        for c in sns.color_palette(
-            sns.color_palette(f"blend:{start_hex},{end_hex}", n_colors=number_of_colors, as_cmap=False)
-        ).as_hex()
+        for c in sns.color_palette(f"blend:{start_hex},{end_hex}", n_colors=number_of_colors, as_cmap=False).as_hex()
     ]

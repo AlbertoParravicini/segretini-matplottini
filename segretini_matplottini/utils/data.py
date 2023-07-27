@@ -56,50 +56,53 @@ def remove_outliers_ci(data: Float[np.ndarray, "#n"], sigmas: float = 3) -> Floa
     This is a simple way to filter outliers, it is more useful to clean data
     for visualizations than for sound statistical analyses.
 
-    :param data: A 1D sequence of numerical data, iterable.
+    :param data: A 1D array of numerical data.
     :param sigmas: Number of standard deviations outside which a value is consider to be an outlier.
-    :return: Data without outliera.
+    :return: The array without outliers.
     """
     return data[np.abs(st.zscore(data)) < sigmas]
 
 
-def remove_outliers_iqr(data: Float[np.ndarray, "#n"], quantile: float = 0.75) -> Float[np.ndarray, "#m"]:
+def remove_outliers_iqr(
+    data: Float[np.ndarray, "#n"], quantile: float = 0.75, iqr_extension: float = 1.5
+) -> Float[np.ndarray, "#m"]:
     """
     Filter a sequence of data by removing outliers looking at the quantiles of the distribution.
     Find quantiles (by default, `Q1` and `Q3`), and interquantile range (by default, `Q3 - Q1`),
     and keep values in `[Q1 - iqr_extension * IQR, Q3 + iqr_extension * IQR]`.
     This is the same range used to identify whiskers in a boxplot (e.g. in Pandas and Seaborn).
 
-    :param data: A sequence of numerical data, iterable.
+    :param data: A 1D array of numerical data.
     :param quantile: Upper quantile value used as filtering threshold.
         Also use `(1 - quantile)` as lower threshold. Should be in `[0.5, 1]`.
-    :return: Data without outliers.
+    :param iqr_extension: multiplier used to filter out outliers.
+    :return: The array without outliers.
     """
     assert quantile >= 0.5 and quantile <= 1
     q1 = np.quantile(data, 1 - quantile)
     q3 = np.quantile(data, quantile)
     iqr = scipy.stats.iqr(data, rng=(100 - 100 * quantile, 100 * quantile))
-    return data[(data >= q1 - iqr * q1) & (data <= q3 + iqr * q3)]
+    return data[(data >= q1 - iqr * iqr_extension) & (data <= q3 + iqr * iqr_extension)]
 
 
 def find_outliers_right_quantile(
-    data: Float[np.ndarray, "#n"], quantile: float = 0.75, quantile_multiplier: float = 2
+    data: Float[np.ndarray, "#n"], quantile: float = 0.75, iqr_extension: float = 1.5
 ) -> Float[np.ndarray, "#m"]:
     """
     Filter a sequence of data by removing outliers looking at the quantiles of the distribution.
     Since the distribution is not symmetrical, look just at the right quantile,
     and remove values above the specified quantile multiplier.
-    In other words, flag as outliers values such that `data > quantile(data) * quantile_multiplier`.
+    In other words, flag as outliers values such that `data > quantile(data) * iqr_extension`.
 
-    :param data: A sequence of numerical data, iterable.
+    :param data: A 1D array of numerical data.
     :param quantile: Upper quantile value used as filtering threshold.
        Must be in `[0.5, 1]`.
-    :param quantile_multiplier: multiplier used to filter out outliers.
+    :param iqr_extension: multiplier used to filter out outliers.
     :return: Boolean array that says which values are outliers
     """
     assert quantile <= 1
     q = np.quantile(data, quantile)
-    return data > q * quantile_multiplier
+    return data > q * iqr_extension
 
 
 def _remove_outliers_from_dataframe(
@@ -195,6 +198,7 @@ def remove_outliers_from_dataframe_iqr(
     column: str,
     groupby: Optional[list[str]] = None,
     quantile: float = 0.75,
+    iqr_extension: float = 1.5,
     reset_index: bool = True,
     drop_index: bool = True,
     debug: bool = False,
@@ -213,6 +217,7 @@ def remove_outliers_from_dataframe_iqr(
         by the specified set of columns.
     :param quantile: Upper quantile value used as filtering threshold.
         Also use `(1 - quantile)` as lower threshold. Should be in `[0.5, 1]`.
+    :param iqr_extension: multiplier used to filter out outliers.
     :param reset_index: If True, reset the index after filtering.
     :param drop_index: If True, drop the original index column after reset.
     :param debug: If True, print how many outliers have been removed.

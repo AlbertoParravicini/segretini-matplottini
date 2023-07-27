@@ -211,6 +211,8 @@ def barplots(
     x: str,
     y: str,
     category: str,
+    add_bars_for_averages: bool = False,
+    aggregation_function_for_average: Callable[[pd.Series], float] = np.mean,
     number_of_rows: Optional[int] = None,
     number_of_columns: Optional[int] = None,
     ylimits: Optional[tuple[float, float]] = None,
@@ -244,6 +246,10 @@ def barplots(
     :param x: Name of the column in `data` that contains the categories to plot on the x-axis.
     :param y: Name of the column in `data` that contains the values to plot on the y-axis.
     :param category: Name of the column in `data` that contains the categories to plot as different barplots.
+    :param add_bars_for_averages: If True, add a group of bars at the start of the plot,
+        that represents the average across all categories.
+    :param aggregation_function_for_average: Function to use to aggregate the values of `y` across all categories,
+        to compute the average. By default, use the mean.
     :param number_of_rows: Number of rows of the grid of plots. If None, infer it from the number of categories.
     :param number_of_columns: Number of columns of the grid of plots. If None, infer it from the number of categories.
     :param ylimits: Limits of the y-axis. If none, they are inferred by Matplotlib.
@@ -292,6 +298,14 @@ def barplots(
         x_to_legend_label_map = {}
     if category_to_y_label_map is None:
         category_to_y_label_map = {}
+
+    if add_bars_for_averages:
+        # Compute the mean;
+        averages = _data.groupby(x, sort=False)[y].agg(aggregation_function_for_average).reset_index()
+        averages[category] = "Average"
+        categories = ["Average"] + categories
+        # Create a copy of the input data, prepend the averages at the start;
+        _data = pd.concat([averages, _data], ignore_index=True)
 
     ##############
     # Setup plot #

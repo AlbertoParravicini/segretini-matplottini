@@ -30,8 +30,8 @@ pip install .
 [x] minor tick locator for timeseries (same as major, but check that interval is < than major.<- automatic, not necessaty)
 [x] new barplot code
     [x] e2e test
-[] other barplot
-    [] e2e test
+[x] other barplot
+    [x] e2e test
 [] plot for tp/tn/f1/etc. Have setting that says which should be plotten, and setting for nrows/ncols (default=plot all, nrows/cols is sqrt (e.g. 4 -> 2,2))
     [] e2e test
 [x] all plots must have fontsize base 10 (or 8?). And specify figsize and subplot adjust as params
@@ -40,7 +40,8 @@ pip install .
 [] ranz unused colors/palettes, add some new sample colors (e.g. green used in new plots, pink used in timeseries)
 [x] add util for arrow of metric
 [x] add util for color palette
-[] add labels below barplots
+[] add baseline below barplots
+[] add labels below barplot (bottom of bars)
 [] support for relative performace in barplot (in examples, no need to change API of batplot)
 [] add image with plot grid inside readme
 [] add list of examples to readme, add images for the pretties ones

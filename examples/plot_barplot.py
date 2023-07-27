@@ -3,8 +3,6 @@ from pathlib import Path
 import pandas as pd
 
 from segretini_matplottini.plot import (
-    barplot,
-    barplot_for_multiple_categories,
     barplots,
 )
 from segretini_matplottini.utils import (
@@ -39,24 +37,25 @@ def load_data_2() -> pd.DataFrame:
 if __name__ == "__main__":
     # Plot a single barplot
     data = load_data_1()
-    _, ax = barplot(data, x="model", y="value", add_legend=True, ylabel="Metric A", xlabel="Model")
-    ax = add_labels_to_bars(ax=ax, labels=get_labels_for_bars(ax), font_size=DEFAULT_FONT_SIZE - 4, location="below")
-    ax = add_arrow_to_barplot(ax=ax, higher_is_better=True, left_margin_to_add=0.2)
-    save_plot(
-        assemble_filenames_to_save_plot(
-            directory=PLOT_DIR,
-            plot_name="barplot",
-            add_timestamp_prefix_to_plot_name=False,
-            store_plot_into_timestamp_subfolder=False,
-        ),
-        verbose=True,
-    )
-    # Plot a grid of barplots
+    # _, ax = barplot(data, x="model", y="value", add_legend=True, ylabel="Metric A", xlabel="Model")
+    # ax = add_labels_to_bars(ax=ax, labels=get_labels_for_bars(ax), font_size=DEFAULT_FONT_SIZE - 4, location="below")
+    # ax = add_arrow_to_barplot(ax=ax, higher_is_better=True, left_margin_to_add=0.2)
+    # save_plot(
+    #     assemble_filenames_to_save_plot(
+    #         directory=PLOT_DIR,
+    #         plot_name="barplot",
+    #         add_timestamp_prefix_to_plot_name=False,
+    #         store_plot_into_timestamp_subfolder=False,
+    #     ),
+    #     verbose=True,
+    # )
+    # # Plot a grid of barplots
     _, axes = barplots(
         data,
         x="model",
         y="value",
         category="metric",
+        add_bars_for_averages=True,
         x_to_legend_label_map={"A": "Model A", "B": "Model B", "C": "Model C"},
         category_to_y_label_map={
             "metric_10": "Metric 1",
@@ -81,37 +80,37 @@ if __name__ == "__main__":
         ),
         verbose=True,
     )
-    # Plot multiple barplots on the same row, grouped by different categories
-    data = load_data_2()
-    _, ax = barplot_for_multiple_categories(
-        data,
-        x="experiment",
-        y="value",
-        hue="model",
-        ylimits=(0, 1),
-        xlabel="Model",
-        ylabel="Value",
-        add_bars_for_averages=True,
-        hue_category_to_x_tick_label_map={
-            "experiment_1": "Experiment 1",
-            "experiment_2": "Experiment 2",
-            "experiment_3": "Experiment 3",
-        },
-        x_to_legend_label_map={
-            "model_10": "A",
-            "model_2": "B",
-            "model_12": "C",
-            "model_4": "D",
-        },
-    )
-    ax = add_labels_to_bars(ax=ax, labels=get_labels_for_bars(ax), font_size=DEFAULT_FONT_SIZE - 4, location="below")
-    ax = add_arrow_to_barplot(ax=ax, higher_is_better=True, left_margin_to_add=0.1)
-    save_plot(
-        assemble_filenames_to_save_plot(
-            directory=PLOT_DIR,
-            plot_name="barplot_for_multiple_categories",
-            add_timestamp_prefix_to_plot_name=False,
-            store_plot_into_timestamp_subfolder=False,
-        ),
-        verbose=True,
-    )
+    # # Plot multiple barplots on the same row, grouped by different categories
+    # data = load_data_2()
+    # _, ax = barplot_for_multiple_categories(
+    #     data,
+    #     x="experiment",
+    #     y="value",
+    #     hue="model",
+    #     ylimits=(0, 1),
+    #     xlabel="Model",
+    #     ylabel="Value",
+    #     add_bars_for_averages=True,
+    #     hue_category_to_x_tick_label_map={
+    #         "experiment_1": "Experiment 1",
+    #         "experiment_2": "Experiment 2",
+    #         "experiment_3": "Experiment 3",
+    #     },
+    #     x_to_legend_label_map={
+    #         "model_10": "A",
+    #         "model_2": "B",
+    #         "model_12": "C",
+    #         "model_4": "D",
+    #     },
+    # )
+    # ax = add_labels_to_bars(ax=ax, labels=get_labels_for_bars(ax), font_size=DEFAULT_FONT_SIZE - 4, location="below")
+    # ax = add_arrow_to_barplot(ax=ax, higher_is_better=True, left_margin_to_add=0.1)
+    # save_plot(
+    #     assemble_filenames_to_save_plot(
+    #         directory=PLOT_DIR,
+    #         plot_name="barplot_for_multiple_categories",
+    #         add_timestamp_prefix_to_plot_name=False,
+    #         store_plot_into_timestamp_subfolder=False,
+    #     ),
+    #     verbose=True,
+    # )

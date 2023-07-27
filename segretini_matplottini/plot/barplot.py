@@ -369,7 +369,15 @@ def barplots(
     _add_legend(axes.flat[0], x_to_legend_label_map, bar_categories)
     # Convert the axes array to a 2D list.
     # Remove deleted axes, by checking if they no longer have a figure reference
-    axes_list: list[list[Axes]] = axes.tolist() if len(axes.shape) == 2 else [axes.tolist()]
+    axes_list: list[list[Axes]]
+    if len(axes.shape) == 2:
+        axes_list = axes.tolist()
+    elif len(axes.shape) == 1 and _number_of_rows == 1:
+        axes_list = [axes.tolist()]
+    elif len(axes.shape) == 1 and _number_of_columns == 1:
+        axes_list = [[ax] for ax in axes.tolist()]
+    else:
+        raise ValueError(f"❌ unexpected shape of axes: {axes.shape}")
     non_stale_axes_list: list[list[Axes]] = [[ax_j for ax_j in ax_i if ax_j.figure is not None] for ax_i in axes_list]
     return fig, non_stale_axes_list
 

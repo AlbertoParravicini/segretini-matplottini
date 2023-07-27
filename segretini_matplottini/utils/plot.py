@@ -80,7 +80,7 @@ def add_arrow_to_barplot(
     ax: Axes,
     higher_is_better: bool = True,
     line_width: float = 0.5,
-    left_margin_to_add: float = 0.1,
+    left_margin_to_add: float = 0.3,
     arrow_color: str = "#2f2f2f",
 ) -> Axes:
     """
@@ -371,7 +371,12 @@ def add_labels_to_bars(
         height = bar.get_height()
         if do_not_exceed_ylim:
             y_min, y_max = ax.get_ylim()
-            if height + _tolerance_for_ylim > y_max:
+            # Handle cases where bars exceed (or almost exceed) the y-axis limits;
+            if height > y_max:
+                height = y_max
+            # Only if the location is above, otherwise a label that's fully contained
+            # in a bar almost at the top would be moved up and get clipped;
+            elif height + _tolerance_for_ylim > y_max and location == "above":
                 height = y_max
             # Only if the location is below, since if it's above it does not get clipped;
             elif height - _tolerance_for_ylim < y_min and location == "below":

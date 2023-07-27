@@ -3,7 +3,11 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from segretini_matplottini.plot import barplot_for_multiple_categories
+from segretini_matplottini.plot import (
+    barplot,
+    barplot_for_multiple_categories,
+    barplots,
+)
 from segretini_matplottini.utils import (
     add_arrow_to_barplot,
     add_labels_to_bars,
@@ -17,14 +21,171 @@ DATA_DIR = Path(__file__).parent.parent.parent / "data"
 
 
 @pytest.fixture
-def data() -> pd.DataFrame:
+def data_1() -> pd.DataFrame:
     return pd.read_csv(DATA_DIR / "barplot_data.csv")
 
 
+@pytest.fixture
+def data_2() -> pd.DataFrame:
+    return pd.read_csv(DATA_DIR / "barplot_for_multiple_categories_data.csv")
+
+
 @save_tmp_plot
-def test_default(data: pd.DataFrame) -> None:
+def test_default(data_1: pd.DataFrame) -> None:
+    barplot(
+        data_1,
+        x="model",
+        y="value",
+    )
+
+
+@save_tmp_plot
+def test_custom_parameters(data_1: pd.DataFrame) -> None:
+    barplot(
+        data_1,
+        x="model",
+        y="value",
+        ylimits=(0, 1),
+        xlabel="Model",
+        ylabel="Value",
+        add_legend=True,
+        x_to_legend_label_map={
+            "model_10": "A",
+            "model_2": "B",
+            "model_12": "C",
+            "model_4": "D",
+        },
+    )
+
+
+@save_tmp_plot
+def test_custom_parameters_and_arrow_and_labels(data_1: pd.DataFrame) -> None:
+    _, ax = barplot(
+        data_1,
+        x="model",
+        y="value",
+        ylimits=(0, 1),
+        xlabel="Model",
+        ylabel="Value",
+        add_legend=True,
+        x_to_legend_label_map={
+            "model_10": "A",
+            "model_2": "B",
+            "model_12": "C",
+            "model_4": "D",
+        },
+    )
+    ax = add_labels_to_bars(ax=ax, labels=get_labels_for_bars(ax), font_size=DEFAULT_FONT_SIZE - 4)
+    ax = add_arrow_to_barplot(ax=ax, higher_is_better=True)
+
+
+@save_tmp_plot
+def test_default_barplots(data_1: pd.DataFrame) -> None:
+    barplots(
+        data_1,
+        x="model",
+        y="value",
+        category="metric",
+    )
+
+
+@save_tmp_plot
+def test_default_barplots_one_row(data_1: pd.DataFrame) -> None:
+    barplots(
+        data_1,
+        x="model",
+        y="value",
+        category="metric",
+        number_of_rows=1,
+    )
+
+
+@save_tmp_plot
+def test_default_barplots_one_col(data_1: pd.DataFrame) -> None:
+    barplots(
+        data_1,
+        x="model",
+        y="value",
+        category="metric",
+        number_of_columns=1,
+    )
+
+
+@save_tmp_plot
+def test_default_barplots_two_col(data_1: pd.DataFrame) -> None:
+    barplots(
+        data_1,
+        x="model",
+        y="value",
+        category="metric",
+        number_of_columns=2,
+    )
+
+
+@save_tmp_plot
+def test_custom_parameters_barplots(data_1: pd.DataFrame) -> None:
+    barplots(
+        data_1,
+        x="model",
+        y="value",
+        category="metric",
+        ylimits=(0, 1),
+        x_to_legend_label_map={"A": "Model A", "B": "Model B", "C": "Model C"},
+        category_to_y_label_map={
+            "metric_10": "Metric 1",
+            "metric_2": "Metric 2",
+            "metric_4": "Metric 3",
+            "metric_1": "Metric 4",
+            "metric_3": "Metric 5",
+        },
+    )
+
+
+@save_tmp_plot
+def test_single_plot_barplots(data_1: pd.DataFrame) -> None:
+    data_1 = data_1.groupby(["model"]).mean(numeric_only=True).reset_index()
+    data_1["metric"] = "metric_1"
+    barplots(
+        data_1,
+        x="model",
+        y="value",
+        category="metric",
+        ylimits=(0, 1),
+        x_to_legend_label_map={"A": "Model A", "B": "Model B", "C": "Model C"},
+        category_to_y_label_map={
+            "metric_1": "Metric 4",
+        },
+    )
+
+
+@save_tmp_plot
+def test_custom_parameters_and_arrow_and_labels_barplots(data_1: pd.DataFrame) -> None:
+    _, axes = barplots(
+        data_1,
+        x="model",
+        y="value",
+        category="metric",
+        x_to_legend_label_map={"A": "Model A", "B": "Model B", "C": "Model C"},
+        category_to_y_label_map={
+            "metric_10": "Metric 1",
+            "metric_2": "Metric 2",
+            "metric_4": "Metric 3",
+            "metric_1": "Metric 4",
+            "metric_3": "Metric 5",
+        },
+    )
+    for ax_i in axes:
+        for ax_j in ax_i:
+            ax_j = add_labels_to_bars(
+                ax=ax_j, labels=get_labels_for_bars(ax_j), font_size=DEFAULT_FONT_SIZE - 4, location="below"
+            )
+            ax_j = add_arrow_to_barplot(ax=ax_j, higher_is_better=True, left_margin_to_add=0.4)
+
+
+@save_tmp_plot
+def test_default_for_multiple_categories(data_2: pd.DataFrame) -> None:
     barplot_for_multiple_categories(
-        data,
+        data_2,
         x="experiment",
         y="value",
         hue="model",
@@ -32,9 +193,9 @@ def test_default(data: pd.DataFrame) -> None:
 
 
 @save_tmp_plot
-def test_custom_parameters(data: pd.DataFrame) -> None:
+def test_custom_parameters_for_multiple_categories(data_2: pd.DataFrame) -> None:
     barplot_for_multiple_categories(
-        data,
+        data_2,
         x="experiment",
         y="value",
         hue="model",
@@ -57,9 +218,9 @@ def test_custom_parameters(data: pd.DataFrame) -> None:
 
 
 @save_tmp_plot
-def test_custom_parameters_no_averages(data: pd.DataFrame) -> None:
+def test_custom_parameters_no_averages_for_multiple_categories(data_2: pd.DataFrame) -> None:
     barplot_for_multiple_categories(
-        data,
+        data_2,
         x="experiment",
         y="value",
         hue="model",
@@ -82,9 +243,9 @@ def test_custom_parameters_no_averages(data: pd.DataFrame) -> None:
 
 
 @save_tmp_plot
-def test_no_hue(data: pd.DataFrame) -> None:
+def test_no_hue_for_multiple_categories(data_2: pd.DataFrame) -> None:
     barplot_for_multiple_categories(
-        data,
+        data_2,
         x="experiment",
         y="value",
         ylimits=(0, 1),
@@ -106,9 +267,9 @@ def test_no_hue(data: pd.DataFrame) -> None:
 
 
 @save_tmp_plot
-def test_custom_parameters_and_arrow_and_labels(data: pd.DataFrame) -> None:
+def test_custom_parameters_and_arrow_and_labels_for_multiple_categories(data_2: pd.DataFrame) -> None:
     _, ax = barplot_for_multiple_categories(
-        data,
+        data_2,
         x="experiment",
         y="value",
         hue="model",
@@ -133,9 +294,9 @@ def test_custom_parameters_and_arrow_and_labels(data: pd.DataFrame) -> None:
 
 
 @save_tmp_plot
-def test_custom_parameters_and_arrow_and_labels_no_hue(data: pd.DataFrame) -> None:
+def test_custom_parameters_and_arrow_and_labels_no_hue_for_multiple_categories(data_2: pd.DataFrame) -> None:
     _, ax = barplot_for_multiple_categories(
-        data,
+        data_2,
         x="experiment",
         y="value",
         ylimits=(0, 1),

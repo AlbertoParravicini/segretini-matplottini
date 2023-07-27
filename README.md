@@ -40,6 +40,8 @@ pip install .
 [] ranz unused colors/palettes, add some new sample colors (e.g. green used in new plots, pink used in timeseries)
 [x] add util for arrow of metric
 [x] add util for color palette
+[] add labels below barplots
+[] support for relative performace in barplot (in examples, no need to change API of batplot)
 [] add image with plot grid inside readme
 [] add list of examples to readme, add images for the pretties ones
 [] compute_speedup should not mention speedup, and clean API. Maybe ranz correct_speedup, and add test

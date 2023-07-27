@@ -9,8 +9,10 @@ Here you can find a list of the latest updates to `matplotlib`, such as new reci
 
 Added new `barplot` functions. Creating a barplot is easy, creating a pretty one is not!
 * `matplotlib.plot.barplot_for_multiple_categories` wraps Seaborn to plot multiple categories in a single barplot.
-* `matplotlib.plot.barplot` simplifies plotting a grid of barplots, with independent axes and shared legend.
+* `matplotlib.plot.barplot` plots a single barplot, with the same aesthetic of the other plots.
+* `matplotlib.plot.barplots` uses `barplot` to create a grid of barplots, iterating over a list of categories.
 
+![Barplots](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/barplots.png)
 ![Barplot for multiple categories](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/barplot_for_multiple_categories.png)
 
 ### Many new utilty functions

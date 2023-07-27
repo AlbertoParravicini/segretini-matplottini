@@ -1,0 +1,13 @@
+experiment,model,value
+experiment_1,model_10,0.47
+experiment_1,model_2,0.67
+experiment_1,model_12,0.72
+experiment_1,model_4,0.73
+experiment_2,model_10,0.41
+experiment_2,model_2,0.46
+experiment_2,model_12,0.50
+experiment_2,model_4,0.53
+experiment_3,model_10,0.39
+experiment_3,model_2,0.47
+experiment_3,model_12,0.49
+experiment_3,model_4,0.65

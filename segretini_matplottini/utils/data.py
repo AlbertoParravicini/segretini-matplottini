@@ -236,58 +236,58 @@ def remove_outliers_from_dataframe_iqr(
     )
 
 
-def compute_speedup(data: pd.DataFrame, col_slow: str, col_fast: str, col_speedup: str) -> pd.DataFrame:
-    """
-    Add a column to a dataframe that represents a speedup,
-    and "col_slow", "col_fast" are execution times (e.g. CPU and GPU execution time).
-    Speedup is computed as `data[col_slow] / data[col_fast]`
+# def compute_speedup(data: pd.DataFrame, col_slow: str, col_fast: str, col_speedup: str) -> pd.DataFrame:
+#     """
+#     Add a column to a dataframe that represents a speedup,
+#     and "col_slow", "col_fast" are execution times (e.g. CPU and GPU execution time).
+#     Speedup is computed as `data[col_slow] / data[col_fast]`
 
-    :param data: A Pandas DataFrame where the speedup is computed.
-    :param col_slow: The baseline column used for the speedup.
-    :param col_fast: The other colum used for the speedup.
-    :param col_speedup: Name of the column where the speedup is stored.
-    :return: The DataFrame.
-    """
-    data[col_speedup] = data[col_slow] / data[col_fast]
-    return data
+#     :param data: A Pandas DataFrame where the speedup is computed.
+#     :param col_slow: The baseline column used for the speedup.
+#     :param col_fast: The other colum used for the speedup.
+#     :param col_speedup: Name of the column where the speedup is stored.
+#     :return: The DataFrame.
+#     """
+#     data[col_speedup] = data[col_slow] / data[col_fast]
+#     return data
 
 
-def correct_speedup_df(
-    data: pd.DataFrame,
-    groupby: list[str],
-    baseline_filter_col: str,
-    baseline_filter_val: str,
-    speedup_col_name: str = "speedup",
-    speedup_col_name_reference: Optional[str] = None,
-) -> pd.DataFrame:
-    """
-    Divide the speedups in `speedup_col_name` by the geomean of `speedup_col_name_reference`,
-    grouping values by the columns in `groupby` and specifying a baseline column and value to use as reference.
-    In most cases, `speedup_col_name` and `speedup_col_name_reference` are the same value.
-    Useful to ensure that the geomean baseline speedup is 1, and that the other speedups are corrected to reflect that.
+# def correct_speedup_df(
+#     data: pd.DataFrame,
+#     groupby: list[str],
+#     baseline_filter_col: str,
+#     baseline_filter_val: str,
+#     speedup_col_name: str = "speedup",
+#     speedup_col_name_reference: Optional[str] = None,
+# ) -> pd.DataFrame:
+#     """
+#     Divide the speedups in `speedup_col_name` by the geomean of `speedup_col_name_reference`,
+#     grouping values by the columns in `groupby` and specifying a baseline column and value to use as reference.
+#     In most cases, `speedup_col_name` and `speedup_col_name_reference` are the same value.
+#     Useful to ensure that the geomean baseline speedup is 1, and that the other speedups are corrected to reflect that.
 
-    1. Divide the data in groups denoted by `groupby`
-    2. For each group, select rows where `data[baseline_filter_col] == baseline_filter_val`
-    3. Compute the geometric mean of the column `speedup_col_name_reference` for the rows selected at (2)
-    4. Divide the values in `speedup_col_name_reference` for the current group selected at (1)
-       by the geometric mean computed at (3)
+#     1. Divide the data in groups denoted by `groupby`
+#     2. For each group, select rows where `data[baseline_filter_col] == baseline_filter_val`
+#     3. Compute the geometric mean of the column `speedup_col_name_reference` for the rows selected at (2)
+#     4. Divide the values in `speedup_col_name_reference` for the current group selected at (1)
+#        by the geometric mean computed at (3)
 
-    :param data: Input DataFrame.
-    :param groupby: List of columns on which the grouping is performed, e.g. `["benchmark_name", "implementation"]`.
-    :param baseline_filter_col: One or more columns used to recognize the baseline, e.g. `["hardware"]`.
-    :param baseline_filter_val : One or more values in `baseline_filter_col` used
-        to recognize the baseline, e.g. `["cpu"]`.
-    :param speedup_col_name: Name of the speedup column to adjust. The default is `"speedup"`.
-    :param speedup_col_name_reference: Name of the reference speedup column,
-        by default it is the same as `"speedup_col_name"`.
-    :return: The updated DataFrame.
-    """
-    if not speedup_col_name_reference:
-        speedup_col_name_reference = speedup_col_name
-    for _, g in data.groupby(groupby):
-        gmean_speedup = gmean(g.loc[g[baseline_filter_col] == baseline_filter_val, speedup_col_name_reference])
-        data.loc[g.index, speedup_col_name] /= gmean_speedup
-    return data
+#     :param data: Input DataFrame.
+#     :param groupby: List of columns on which the grouping is performed, e.g. `["benchmark_name", "implementation"]`.
+#     :param baseline_filter_col: One or more columns used to recognize the baseline, e.g. `["hardware"]`.
+#     :param baseline_filter_val : One or more values in `baseline_filter_col` used
+#         to recognize the baseline, e.g. `["cpu"]`.
+#     :param speedup_col_name: Name of the speedup column to adjust. The default is `"speedup"`.
+#     :param speedup_col_name_reference: Name of the reference speedup column,
+#         by default it is the same as `"speedup_col_name"`.
+#     :return: The updated DataFrame.
+#     """
+#     if not speedup_col_name_reference:
+#         speedup_col_name_reference = speedup_col_name
+#     for _, g in data.groupby(groupby):
+#         gmean_speedup = gmean(g.loc[g[baseline_filter_col] == baseline_filter_val, speedup_col_name_reference])
+#         data.loc[g.index, speedup_col_name] /= gmean_speedup
+#     return data
 
 
 def compute_speedup_df(
@@ -359,3 +359,115 @@ def compute_speedup_df(
             gmean_speedup = gmean(data.loc[reduced_index, speedup_col_name])
             group.loc[:, speedup_col_name] /= gmean_speedup
             data.loc[group.index, :] = group
+
+
+def compute_relative_performance(
+    data: pd.DataFrame,
+    category: str,
+    value: str,
+    baseline_category: str,
+    groupby: Optional[list[str]] = None,
+    aggregation_function: Callable[[pd.Series], float] = np.mean,
+    relative_performance_format_string: Callable[[str], str] = lambda x: f"{x}_relative_performance",
+    lower_is_better: bool = False,
+    add_baseline_value_to_result: bool = False,
+    baseline_value_format_string: Callable[[str], str] = lambda x: f"{x}_baseline_value",
+) -> pd.DataFrame:
+    """
+    Compute the relative performance of categories in a DataFrame when compared to the performance
+    of a baseline category.
+    The input DataFrame must have a string/categorical column whose name is the value of `category`,
+    and a numerical column whose name is the value of `value`.
+    Optionally, group data by the columns whose names are the values of `group_by`.
+    The baseline category must be one of the values in `category`.
+
+    For example, given the following DataFrame,
+    where `category` is `cat`, `value` is `val` and `group_by` is `[groupy_by_1]`:
+
+    ```
+    +----------+-----------+-------+
+    | cat      | group_by_1| val   |
+    +----------+-----------+-------+
+    | baseline | A         | 0.1   |
+    | model_1  | A         | 0.3   |
+    | model_2  | A         | 0.6   |
+    | baseline | B         | 2     |
+    | model_1  | B         | 4     |
+    | model_2  | B         | 6     |
+    +----------+-----------+-------+
+    ```
+
+    The result will be:
+
+    ```
+    +----------+-----------+--------------------------+
+    | cat      | group_by_1| val_relative_performance |
+    +----------+-----------+--------------------------+
+    | baseline | A         | 1                        |
+    | model_1  | A         | 3                        |
+    | model_2  | A         | 6                        |
+    | baseline | B         | 1                        |
+    | model_1  | B         | 2                        |
+    | model_2  | B         | 3                        |
+    +----------+-----------+--------------------------+
+    ```
+
+    :param data: A DataFrame with the data for which to compute the relative performance.
+    :param category: Name of the column that contains the categories. Values must be strings or Categorical.
+    :param value: Name of the column that contains the values. Values must be numerical.
+    :param baseline_category: Name of the category that is used as baseline.
+        It must be a value that appear in `data[category]`.
+    :param groupby: If not None, group data by the columns whose names are the values of `group_by`.
+    :param aggregation_function: Function used to aggregate values.
+    :param relative_performance_format_string: Function used to format the name of the column
+        where the relative performance is stored.
+    :param lower_is_better: If True, invert the relative performance in case a metric is better for lower values.
+        For example, for execution time we would obtain the speedup.
+    :param add_baseline_value_to_result: If True, add a column to the result DataFrame
+        where the baseline value is stored.
+    :param baseline_value_format_string: Function used to format the name of the column
+        where the baseline value is stored.
+    :return: A DataFrame with the relative performance.
+    """
+
+    # Create a new DataFrame with the relative performance column.
+    # Initialize it with the raw values;
+    relative_performance_column_name = relative_performance_format_string(value)
+    _data = data.rename(columns={value: relative_performance_column_name})
+    # Create a column where to store the average baseline value, if requested;
+    if add_baseline_value_to_result:
+        _data[baseline_value_format_string(value)] = np.nan
+    # If not groupby is required, simply obtain the baseline performance, and divide values by it;
+    if groupby is None or len(groupby) == 0:
+        assert baseline_category in _data[category].values, (
+            f"❌ baseline category {baseline_category} not found in data, "
+            f"available categories are {set(_data[category].values)}"
+        )
+        baseline_value = _data.loc[_data[category] == baseline_category, relative_performance_column_name].agg(
+            aggregation_function
+        )
+        _data[relative_performance_column_name] /= baseline_value
+        if add_baseline_value_to_result:
+            _data[baseline_value_format_string(value)] = baseline_value
+    else:
+        # Obtain each group, then compute relative performance within each group;
+        for _, group in _data.groupby(groupby, sort=False, as_index=False):
+            assert baseline_category in group[category].values, (
+                f"❌ baseline category {baseline_category} not found in data, "
+                f"available categories are {set(group[category].values)}"
+            )
+            # Compute the aggregated baseline value for the group;
+            baseline_value = group.loc[group[category] == baseline_category, relative_performance_column_name].agg(
+                aggregation_function
+            )
+            # Compute the relative performance for this group;
+            group.loc[:, relative_performance_column_name] /= baseline_value
+            if add_baseline_value_to_result:
+                group.loc[:, baseline_value_format_string(value)] = baseline_value
+            _data.loc[group.index, :] = group
+
+    # If lower is better, invert the relative performance.
+    # For example, for execution time we would obtain the speedup;
+    if lower_is_better:
+        _data[relative_performance_column_name] = 1 / _data[relative_performance_column_name]
+    return _data

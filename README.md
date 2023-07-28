@@ -13,53 +13,6 @@ cd segretini-matplottini
 pip install .
 ```
 
-# TODO
-
-[x] rename files in `data` to end with `data.csv`
-[x] delete scratchbook
-[x] add ruff and isort
-[x] add pre-commit hooks
-[x] linting
-[x] reverse gitignore
-[x] new code structure in readme, with tree
-[x] modify plots structure not to have dates
-[x] recreate sample plots
-[x] create imports for utils inside __init__, to hide private stuff
-[x] changelog
-[x] timeseries plot for video frames
-[x] minor tick locator for timeseries (same as major, but check that interval is < than major.<- automatic, not necessaty)
-[x] new barplot code
-    [x] e2e test
-[x] other barplot
-    [x] e2e test
-[] plot for tp/tn/f1/etc. Have setting that says which should be plotten, and setting for nrows/ncols (default=plot all, nrows/cols is sqrt (e.g. 4 -> 2,2))
-    [] e2e test
-[x] all plots must have fontsize base 10 (or 8?). And specify figsize and subplot adjust as params
-    [x] for ridgeplot, no subplot adjust except horizontal, since it's specific to dataset size
-    [x] split ridgeplot in ridgeplot and ridgeplot_compact
-[] ranz unused colors/palettes, add some new sample colors (e.g. green used in new plots, pink used in timeseries)
-[x] add util for arrow of metric
-[x] add util for color palette
-[] add baseline below barplots
-[] add labels below barplot (bottom of bars)
-[] support for relative performace in barplot (in examples, no need to change API of batplot)
-[] add image with plot grid inside readme
-[] add list of examples to readme, add images for the pretties ones
-[] compute_speedup should not mention speedup, and clean API. Maybe ranz correct_speedup, and add test
-[] tests
-    [] unit tests
-    [x] e2e tests for examples, check if they don't crash
-[] github
-    [] protect master branch
-    [] add automated tests check
-    [] add automated linting check
-[x] revisit save_plot. Take as input a path or a list of paths. And have another function to assemble the paths from root dir, plot name (not as format string), folder date (as format string, e.g Y_M_D) and suffix date (_Y_M_D_H_M_S), extensions
-[x] revisit add_labels: create get_labels_for_barplot and add_labels_to_barplot that takes mandatory labels (and checks that num labels == num bars)
-[] create notebook to create good plot from scratch (some barplot)
-[] can we create auto documentation?
-[] update changelog
-[] delete this list
-
 ## ✍️ Repository Structure
 
 These are the most important folders of `segretini-matplottini`, so you won't get lost when exploring the code.

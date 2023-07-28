@@ -4,9 +4,10 @@ from segretini_matplottini.utils.colors import (  # noqa: F401
     hex_color_to_grayscale,
 )
 from segretini_matplottini.utils.data import (  # noqa: F401
-    compute_speedup,
+    # correct_speedup_df,
+    compute_relative_performance,
+    # compute_speedup,
     compute_speedup_df,
-    correct_speedup_df,
     find_outliers_right_quantile,
     get_ci_size,
     get_upper_ci_size,

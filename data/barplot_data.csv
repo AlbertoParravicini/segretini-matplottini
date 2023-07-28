@@ -5,12 +5,12 @@ A,metric_4,0.30
 A,metric_1,0.45
 A,metric_3,0.31
 B,metric_10,0.35
-B,metric_2,0.47
+B,metric_2,1.47
 B,metric_4,0.63
 B,metric_1,0.72
 B,metric_3,0.75
 C,metric_10,0.54
-C,metric_2,0.25
+C,metric_2,1.52
 C,metric_4,0.72
 C,metric_1,0.85
 C,metric_3,0.90

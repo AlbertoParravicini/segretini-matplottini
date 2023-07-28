@@ -22,4 +22,5 @@
 !plots/*.pdf
 !tests/
 !tests/e2e/
+!tests/utils/
 !.vscode/

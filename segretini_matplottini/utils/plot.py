@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from matplotlib.axes import Axes
+from matplotlib.container import BarContainer
 from matplotlib.figure import Figure
 from matplotlib.patches import Rectangle
 
@@ -286,6 +287,7 @@ def get_labels_for_bars(
     skip_threshold: float = 1e-6,
     max_only: bool = False,
     label_format_str: Callable[[Union[float, str]], str] = lambda x: f"{x:.2f}",
+    normalize_wrt_minimum: bool = False,
 ) -> list[str]:
     """
     Given a barplot (or a plot containing bars), obtain a list of labels representing the value of each bar.
@@ -298,30 +300,50 @@ def get_labels_for_bars(
         is close enough to `skip_value` and `skip_zero`.
     :param max_only: If True, return only the label of the bar with highest value.
     :param label_format_str: Format of each label, by default use two decimal digits (e.g. 2.10).
+    :param normalize_wrt_minimum: If True, normalize the label numeric values w.r.t. the label with smallest value,
+        to obtain a relative performance.
     :return: A list of labels, one for each bar. Bars that have been skipped have an empty string as label.
     """
-    labels: list[str] = []
-    rectangles = [p for p in ax.patches if isinstance(p, Rectangle)]
-    if max_only:
-        # Simpy obtain the height of the highest bar, and set everything else to empty string;
-        argmax = np.argmax([p.get_height() for p in rectangles])
-        labels = ["" for _ in rectangles]
-        labels[argmax] = label_format_str(rectangles[argmax].get_height())
-        return labels
-    else:
-        # Get the height of each bar, and format it as a label.
-        # Skip it if necessary, adding an empty label.
-        for bar in rectangles:
-            height = bar.get_height()
-            if skip_zeros and np.abs(height) < skip_threshold:
-                labels.append("")
-            elif skip_nan and pd.isna(height):
-                labels.append("")
-            elif skip_value is not None and np.abs(height - skip_value) < skip_threshold:
-                labels.append("")
-            else:
-                labels.append(label_format_str(height))
-    return labels
+    assert hasattr(ax, "containers"), f"❌ the axis {ax} does not have any container, are you sure it's a barplot?"
+    containers: list[BarContainer] = ax.containers
+    labels_for_each_category: list[list[str]] = []
+
+    # If plotting bars grouped by a category, they will appear in separate BarContainers.
+    # The problem is that the bars of a category are not in the same BarContainer,
+    # but bars of the i-th category are in the i-th position of each BarContainer;
+    heights_for_each_category: list[list[float]] = []
+    # Do not transpose if only one container is present, since all bars are already within that single container;
+    transposed_bars: np.ndarray = np.array(containers).T if len(containers) > 1 else np.array(containers)
+    for bar_container in transposed_bars:
+        rectangles = [p for p in bar_container if isinstance(p, Rectangle)]
+        heights = [p.get_height() for p in rectangles]
+        if normalize_wrt_minimum:
+            min_height = min([h for h in heights if h != 0 and not pd.isna(h)])
+            heights = [h / min_height for h in heights]
+        heights_for_each_category += [heights]
+    # Obtain the labels for each category;
+    for heights in heights_for_each_category:
+        _labels_for_each_category: list[str] = []
+        if max_only:
+            # Simpy obtain the height of the highest bar, and set everything else to empty string;
+            argmax = np.argmax(heights)
+            _labels_for_each_category = ["" for _ in heights]
+            _labels_for_each_category[argmax] = label_format_str(heights[argmax])
+        else:
+            # Get the height of each bar, and format it as a label.
+            # Skip it if necessary, adding an empty label;
+            for height in heights:
+                if skip_zeros and np.abs(height) < skip_threshold:
+                    _labels_for_each_category.append("")
+                elif skip_nan and pd.isna(height):
+                    _labels_for_each_category.append("")
+                elif skip_value is not None and np.abs(height - skip_value) < skip_threshold:
+                    _labels_for_each_category.append("")
+                else:
+                    _labels_for_each_category.append(label_format_str(height))
+        labels_for_each_category += [_labels_for_each_category]
+    # Transpose the labels for each category, so the i-th label correspond to the i-th bar in the original plot;
+    return [str(x) for x in np.array(labels_for_each_category).T.reshape(-1).tolist()]
 
 
 def add_labels_to_bars(

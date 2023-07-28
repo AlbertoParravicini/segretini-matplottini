@@ -1,12 +1,10 @@
-from functools import reduce
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Optional
 
 import numpy as np
 import pandas as pd
 import scipy.stats
 import scipy.stats as st
 from jaxtyping import Float
-from scipy.stats.mstats import gmean
 
 
 def get_ci_size(
@@ -233,132 +231,8 @@ def remove_outliers_from_dataframe_iqr(
         drop_index=drop_index,
         debug=debug,
         quantile=quantile,
+        iqr_extension=iqr_extension,
     )
-
-
-# def compute_speedup(data: pd.DataFrame, col_slow: str, col_fast: str, col_speedup: str) -> pd.DataFrame:
-#     """
-#     Add a column to a dataframe that represents a speedup,
-#     and "col_slow", "col_fast" are execution times (e.g. CPU and GPU execution time).
-#     Speedup is computed as `data[col_slow] / data[col_fast]`
-
-#     :param data: A Pandas DataFrame where the speedup is computed.
-#     :param col_slow: The baseline column used for the speedup.
-#     :param col_fast: The other colum used for the speedup.
-#     :param col_speedup: Name of the column where the speedup is stored.
-#     :return: The DataFrame.
-#     """
-#     data[col_speedup] = data[col_slow] / data[col_fast]
-#     return data
-
-
-# def correct_speedup_df(
-#     data: pd.DataFrame,
-#     groupby: list[str],
-#     baseline_filter_col: str,
-#     baseline_filter_val: str,
-#     speedup_col_name: str = "speedup",
-#     speedup_col_name_reference: Optional[str] = None,
-# ) -> pd.DataFrame:
-#     """
-#     Divide the speedups in `speedup_col_name` by the geomean of `speedup_col_name_reference`,
-#     grouping values by the columns in `groupby` and specifying a baseline column and value to use as reference.
-#     In most cases, `speedup_col_name` and `speedup_col_name_reference` are the same value.
-#     Useful to ensure that the geomean baseline speedup is 1, and that the other speedups are corrected to reflect that.
-
-#     1. Divide the data in groups denoted by `groupby`
-#     2. For each group, select rows where `data[baseline_filter_col] == baseline_filter_val`
-#     3. Compute the geometric mean of the column `speedup_col_name_reference` for the rows selected at (2)
-#     4. Divide the values in `speedup_col_name_reference` for the current group selected at (1)
-#        by the geometric mean computed at (3)
-
-#     :param data: Input DataFrame.
-#     :param groupby: List of columns on which the grouping is performed, e.g. `["benchmark_name", "implementation"]`.
-#     :param baseline_filter_col: One or more columns used to recognize the baseline, e.g. `["hardware"]`.
-#     :param baseline_filter_val : One or more values in `baseline_filter_col` used
-#         to recognize the baseline, e.g. `["cpu"]`.
-#     :param speedup_col_name: Name of the speedup column to adjust. The default is `"speedup"`.
-#     :param speedup_col_name_reference: Name of the reference speedup column,
-#         by default it is the same as `"speedup_col_name"`.
-#     :return: The updated DataFrame.
-#     """
-#     if not speedup_col_name_reference:
-#         speedup_col_name_reference = speedup_col_name
-#     for _, g in data.groupby(groupby):
-#         gmean_speedup = gmean(g.loc[g[baseline_filter_col] == baseline_filter_val, speedup_col_name_reference])
-#         data.loc[g.index, speedup_col_name] /= gmean_speedup
-#     return data
-
-
-def compute_speedup_df(
-    data: pd.DataFrame,
-    groupby: list[str],
-    baseline_filter_col: Union[str, list[str]],
-    baseline_filter_val: Union[str, list[str]],
-    speedup_col_name: str = "speedup",
-    time_column_name: str = "exec_time",
-    baseline_col_name: str = "baseline_time",
-    correction: bool = True,
-    aggregation: Callable[[pd.Series], float] = np.median,
-    compute_relative_perf: bool = False,
-) -> pd.DataFrame:
-    """
-    Compute speedups on a DataFrame by grouping values.
-
-    1. Divide the data in groups denoted by `groupby`
-    2. For each group, select rows where `data[baseline_filter_col] == baseline_filter_val`
-    3. Compute the mean of the column `speedup_col_name_reference` for the rows selected at (2)
-    4. Divide the values in `speedup_col_name_reference` for the current group selected at (1)
-       by the mean computed at (3)
-
-    :param data: Input DataFrame.
-    :param groupby: List of columns on which the grouping is performed, e.g. `["benchmark_name", "implementation"]`.
-    :param baseline_filter_col: One or more columns used to recognize the baseline, e.g. `["hardware"]`.
-    :param baseline_filter_val : One or more values in `baseline_filter_col` used
-        to recognize the baseline, e.g. `["cpu"]`.
-    :param speedup_col_name: Name of the speedup column to adjust. The default is `"speedup"`.
-    :param time_column_name: Name of the execution time column. The default is `"exec_time"`. This is the column
-        where the mean performance is computed, and speedup is obtained as a relative execution time.
-    :param baseline_col_name: Add a new column where we add the execution time of the baseline used to compute the
-        speedup in each group. The default is `"baseline_time"`.
-    :param correction : If `True`, ensure that the median of the baseline is 1. The default is `True`.
-    :param aggregation: Function used to aggregate values. The default is `np.median`.
-    :param compute_relative_perf: If `True`, compute relative performance instead of speedup (i.e. `1 / speedup`);
-    :return: The updated DataFrame.
-    """
-
-    # Initialize speedup values;
-    data[speedup_col_name] = 1
-    data[baseline_col_name] = 0
-
-    if isinstance(baseline_filter_col, str):
-        baseline_filter_col = [baseline_filter_col]
-    if isinstance(baseline_filter_val, str):
-        baseline_filter_val = [baseline_filter_val]
-
-    assert len(baseline_filter_col) == len(baseline_filter_val)
-
-    grouped_data = data.groupby(groupby, as_index=False)
-    for _, group in grouped_data:
-        # Compute the median baseline computation time;
-        indices = [group[group[i] == j].index for i, j in zip(baseline_filter_col, baseline_filter_val)]
-        reduced_index = reduce(lambda x, y: x.intersection(y), indices)
-        group_to_aggregate = data.loc[reduced_index, time_column_name]
-        mean_baseline = aggregation(group_to_aggregate)
-        # Compute the speedup for this group;
-        group.loc[:, speedup_col_name] = (
-            (group[time_column_name] / mean_baseline)
-            if compute_relative_perf
-            else (mean_baseline / group[time_column_name])
-        )
-        group.loc[:, baseline_col_name] = mean_baseline
-        data.loc[group.index, :] = group
-
-        # Guarantee that the geometric mean of speedup referred to the baseline is 1, and adjust speedups accordingly;
-        if correction:
-            gmean_speedup = gmean(data.loc[reduced_index, speedup_col_name])
-            group.loc[:, speedup_col_name] /= gmean_speedup
-            data.loc[group.index, :] = group
 
 
 def compute_relative_performance(

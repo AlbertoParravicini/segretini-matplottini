@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Any, Callable, Optional
 
 import numpy as np
@@ -345,3 +346,60 @@ def compute_relative_performance(
     if lower_is_better:
         _data[relative_performance_column_name] = 1 / _data[relative_performance_column_name]
     return _data
+
+
+def true_positives(
+    logits: Float[np.ndarray, "#n"], targets: Float[np.ndarray, "#n"], classification_threshold: float
+) -> int:
+    p = (logits >= classification_threshold).astype(bool)
+    t = targets.astype(bool)
+    return int((p & t).sum())
+
+
+def true_negatives(
+    logits: Float[np.ndarray, "#n"], targets: Float[np.ndarray, "#n"], classification_threshold: float
+) -> int:
+    p = (logits >= classification_threshold).astype(bool)
+    t = targets.astype(bool)
+    return int((~p & ~t).sum())
+
+
+def false_positives(
+    logits: Float[np.ndarray, "#n"], targets: Float[np.ndarray, "#n"], classification_threshold: float
+) -> int:
+    p = (logits >= classification_threshold).astype(bool)
+    t = targets.astype(bool)
+    return int((p & ~t).sum())
+
+
+def false_negatives(
+    logits: Float[np.ndarray, "#n"], targets: Float[np.ndarray, "#n"], classification_threshold: float
+) -> int:
+    p = (logits >= classification_threshold).astype(bool)
+    t = targets.astype(bool)
+    return int((~p & t).sum())
+
+
+@dataclass(frozen=True)
+class ConfusionMatrix:
+    tp: int
+    fp: int
+    fn: int
+    tn: int
+
+
+def confusion_matrix(
+    logits: Float[np.ndarray, "#n"], targets: Float[np.ndarray, "#n"], classification_threshold: float
+) -> ConfusionMatrix:
+    p = (logits >= classification_threshold).astype(bool)
+    t = targets.astype(bool)
+    tp = (p & t).sum()
+    tn = (~p & ~t).sum()
+    fp = (p & ~t).sum()
+    fn = (~p & t).sum()
+    return ConfusionMatrix(
+        tp=tp,
+        fp=fp,
+        fn=fn,
+        tn=tn,
+    )

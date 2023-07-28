@@ -10,12 +10,13 @@ from matplotlib.ticker import LinearLocator
 
 from segretini_matplottini.utils import activate_dark_background
 from segretini_matplottini.utils import reset_plot_style as _reset_plot_style
+from segretini_matplottini.utils.colors import MEGA_PINK
 from segretini_matplottini.utils.constants import DEFAULT_DPI, DEFAULT_FONT_SIZE
 
 
 def timeseries(
     x: pd.Series,
-    line_color: str = "#FF6494",
+    line_color: str = MEGA_PINK,
     line_width: float = 0.5,
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,

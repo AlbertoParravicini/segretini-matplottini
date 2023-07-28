@@ -4,7 +4,11 @@ from segretini_matplottini.utils.colors import (  # noqa: F401
     hex_color_to_grayscale,
 )
 from segretini_matplottini.utils.data import (  # noqa: F401
+    ConfusionMatrix,
     compute_relative_performance,
+    confusion_matrix,
+    false_negatives,
+    false_positives,
     find_outliers_right_quantile,
     get_ci_size,
     get_upper_ci_size,
@@ -12,6 +16,8 @@ from segretini_matplottini.utils.data import (  # noqa: F401
     remove_outliers_from_dataframe_ci,
     remove_outliers_from_dataframe_iqr,
     remove_outliers_iqr,
+    true_negatives,
+    true_positives,
 )
 from segretini_matplottini.utils.legend import (  # noqa: F401
     add_legend_with_dark_shadow,

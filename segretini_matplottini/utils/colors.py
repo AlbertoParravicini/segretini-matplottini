@@ -48,7 +48,8 @@ G2 = "#A5E6C6"
 
 BT1 = "#55819E"
 BT2 = "#538F6F"
-BLUE_KLEIN = "#002fa7"
+BLUE_KLEIN = "#002fA7"
+MEGA_PINK = "#FF6494"
 
 # Pastel-tint palette from dark blue to red;
 PALETTE_1 = ["#4C9389", "#60b1b0", "#8fd4d4", "#9BD198", "#EFE8AC", "#f9af85", "#f59191"]

@@ -30,7 +30,7 @@ jobs:
           mypy . --config mypy.ini
       - name: Ruff
         run: |
-          ruff . --fix --config ruff.toml
+          ruff . --config ruff.toml
       - name: Test with pytest
         run: |
           pytest

@@ -10,7 +10,7 @@ repos:
     hooks:
       - id: mypy
         exclude: build|dist
-        args: [--config=mypy.ini]
+        args: [ --version]
   # ruff - sorting imports and quality checking
   # https://beta.ruff.rs/docs/usage/#pre-commit
   - repo: https://github.com/astral-sh/ruff-pre-commit

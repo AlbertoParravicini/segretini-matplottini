@@ -1,23 +1,29 @@
 
 # Changelog
 
-Here you can find a list of the latest updates to `matplotlib`, such as new recipes for plots.
+Here you can find a list of the latest updates to `segretini_matplottini`, such as new recipes for plots.
 
 ## 2023-07-26
 
 ### Barplots 
 
 Added new `barplot` functions. Creating a barplot is easy, creating a pretty one is not!
-* `matplotlib.plot.barplot_for_multiple_categories` wraps Seaborn to plot multiple categories in a single barplot.
-* `matplotlib.plot.barplot` plots a single barplot, with the same aesthetic of the other plots.
-* `matplotlib.plot.barplots` uses `barplot` to create a grid of barplots, iterating over a list of categories.
+* `segretini_matplottini.plot.barplot_for_multiple_categories` wraps Seaborn to plot multiple categories in a single barplot.
+* `segretini_matplottini.plot.barplot` plots a single barplot, with the same aesthetic of the other plots.
+* `segretini_matplottini.plot.barplots` uses `barplot` to create a grid of barplots, iterating over a list of categories.
 
 ![Barplots](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/barplots.png)
 ![Barplot for multiple categories](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/barplot_for_multiple_categories.png)
 
+### Binary classification plots
+
+When evaluating a binary classification model it is common to evaluate its performance using a variety of metrics and classification thresholds. We added axis-level functions to plot the Confusion Matrix, Precision, Recall, F1, ROC, and Precision-Recall curves, and a figure-level `segretini_matplottini.plot.binary_classification` function to plot all of them at once.
+
+![Binary classification](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/binary_classification.png)
+
 ### Many new utilty functions
 
-New utilities in `matplotlib.utils`:
+New utilities in `segretini_matplottini.utils`:
 * `add_arrow_to_barplot` adds an up or down arrow to a barplot, to highlight that a higher value or a lower value is better.
 * `create_hex_palette` creates a linear palette starting from a starting and ending color, with the requested number of colors. Just a wrapper around `sns.color_palette`, but easier to use.
 * `get_labels_for_bars` obtains the labels to add on top of the bars in a barplot, representing the height of each bar.

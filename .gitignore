@@ -21,6 +21,6 @@
 !plots/*.png
 !plots/*.pdf
 !tests/
-!tests/e2e/
+!tests/plot/
 !tests/utils/
 !.vscode/

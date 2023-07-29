@@ -5,6 +5,9 @@
 !pyproject.toml
 !.gitignore
 !.pre-commit-config.yaml
+!.github/
+!.github/workflows/
+!.github/workflows/pull_request.yaml
 !ruff.toml
 !mypy.ini
 !README.md

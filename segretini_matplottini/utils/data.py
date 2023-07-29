@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import scipy.stats
 import scipy.stats as st
-from jaxtyping import Float
+from jaxtyping import Bool, Float
 
 
 def get_ci_size(
@@ -59,7 +59,7 @@ def remove_outliers_ci(data: Float[np.ndarray, "#n"], sigmas: float = 3) -> Floa
     :param sigmas: Number of standard deviations outside which a value is consider to be an outlier.
     :return: The array without outliers.
     """
-    return data[np.abs(st.zscore(data)) < sigmas]
+    return data[np.abs(st.zscore(data)) < sigmas]  # type: ignore
 
 
 def remove_outliers_iqr(
@@ -81,12 +81,12 @@ def remove_outliers_iqr(
     q1 = np.quantile(data, 1 - quantile)
     q3 = np.quantile(data, quantile)
     iqr = scipy.stats.iqr(data, rng=(100 - 100 * quantile, 100 * quantile))
-    return data[(data >= q1 - iqr * iqr_extension) & (data <= q3 + iqr * iqr_extension)]
+    return data[(data >= q1 - iqr * iqr_extension) & (data <= q3 + iqr * iqr_extension)]  # type: ignore
 
 
 def find_outliers_right_quantile(
     data: Float[np.ndarray, "#n"], quantile: float = 0.75, iqr_extension: float = 1.5
-) -> Float[np.ndarray, "#m"]:
+) -> Bool[np.ndarray, "#m"]:
     """
     Filter a sequence of data by removing outliers looking at the quantiles of the distribution.
     Since the distribution is not symmetrical, look just at the right quantile,
@@ -101,7 +101,7 @@ def find_outliers_right_quantile(
     """
     assert quantile <= 1
     q = np.quantile(data, quantile)
-    return data > q * iqr_extension
+    return data > q * iqr_extension  # type: ignore
 
 
 def _remove_outliers_from_dataframe(

@@ -247,7 +247,7 @@ def true_positives(
     :return: Matplotlib figure and axis containing the plot.
     """
     thresholds = np.linspace(0, 1, num_thresholds)
-    scores = [_true_positives(logits, targets, t) for t in thresholds]
+    scores = np.array([_true_positives(logits, targets, t) for t in thresholds], dtype=float)
     return _plot_binary_classification_curve(
         x=thresholds,
         y=scores,
@@ -325,7 +325,7 @@ def true_negatives(
     :return: Matplotlib figure and axis containing the plot.
     """
     thresholds = np.linspace(0, 1, num_thresholds)
-    scores = [_true_negatives(logits, targets, t) for t in thresholds]
+    scores = np.array([_true_negatives(logits, targets, t) for t in thresholds], dtype=float)
     return _plot_binary_classification_curve(
         x=thresholds,
         y=scores,
@@ -403,7 +403,7 @@ def false_positives(
     :return: Matplotlib figure and axis containing the plot.
     """
     thresholds = np.linspace(0, 1, num_thresholds)
-    scores = [_false_positives(logits, targets, t) for t in thresholds]
+    scores = np.array([_false_positives(logits, targets, t) for t in thresholds], dtype=float)
     return _plot_binary_classification_curve(
         x=thresholds,
         y=scores,
@@ -481,7 +481,7 @@ def false_negatives(
     :return: Matplotlib figure and axis containing the plot.
     """
     thresholds = np.linspace(0, 1, num_thresholds)
-    scores = [_false_negatives(logits, targets, t) for t in thresholds]
+    scores = np.array([_false_negatives(logits, targets, t) for t in thresholds], dtype=float)
     return _plot_binary_classification_curve(
         x=thresholds,
         y=scores,
@@ -564,7 +564,7 @@ def precision(
     :return: Matplotlib figure and axis containing the plot.
     """
     thresholds = np.linspace(0, 1, num_thresholds)
-    scores = [precision_score(y_pred=logits >= t, y_true=targets, zero_division=0) for t in thresholds]
+    scores = np.array([precision_score(y_pred=logits >= t, y_true=targets, zero_division=0) for t in thresholds])
     return _plot_binary_classification_curve(
         x=thresholds,
         y=scores,
@@ -648,7 +648,7 @@ def recall(
     :return: Matplotlib figure and axis containing the plot.
     """
     thresholds = np.linspace(0, 1, num_thresholds)
-    scores = [recall_score(y_pred=logits >= t, y_true=targets, zero_division=1) for t in thresholds]
+    scores = np.array([recall_score(y_pred=logits >= t, y_true=targets, zero_division=1) for t in thresholds])
     return _plot_binary_classification_curve(
         x=thresholds,
         y=scores,
@@ -733,7 +733,7 @@ def f1(
     :return: Matplotlib figure and axis containing the plot.
     """
     thresholds = np.linspace(0, 1, num_thresholds)
-    scores = [f1_score(y_pred=logits >= t, y_true=targets, zero_division=0) for t in thresholds]
+    scores = np.array([f1_score(y_pred=logits >= t, y_true=targets, zero_division=0) for t in thresholds])
     return _plot_binary_classification_curve(
         x=thresholds,
         y=scores,
@@ -828,8 +828,8 @@ def roc(
         tpr += [tp / (tp + fn)]
         fpr += [fp / (fp + tn)]
     return _plot_binary_classification_curve(
-        x=fpr[::-1],
-        y=tpr[::-1],
+        x=np.array(fpr[::-1]),
+        y=np.array(tpr[::-1]),
         xlabel=xlabel,
         ylabel=ylabel,
         xlimits=xlimits,
@@ -911,8 +911,8 @@ def precision_recall(
     # Reverse the points, and remove the last one since was added by sklearn
     # to have the plot end at (0, 0), but that's something we enforce anyway.
     return _plot_binary_classification_curve(
-        x=recalls[:-1][::-1],
-        y=precisions[:-1][::-1],
+        x=np.array(recalls[:-1][::-1]),
+        y=np.array(precisions[:-1][::-1]),
         xlabel=xlabel,
         ylabel=ylabel,
         xlimits=xlimits,

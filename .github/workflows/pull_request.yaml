@@ -24,7 +24,7 @@ jobs:
           python -m pip install ".[dev]" --upgrade pip
       - name: Black
         run: |
-          black . --config pyproject.toml
+          black . --config pyproject.toml --check
       - name: Mypy
         run: |
           mypy . --config mypy.ini

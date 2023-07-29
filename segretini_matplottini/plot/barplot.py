@@ -11,6 +11,7 @@ from matplotlib.ticker import LinearLocator
 
 from segretini_matplottini.utils import (
     add_legend_with_dark_shadow,
+    adjust_number_of_rows_and_columns,
     create_hex_palette,
     extend_palette,
 )
@@ -312,26 +313,11 @@ def barplots(
     ##############
 
     # Obtain the number of rows and columns to plot;
-    if number_of_rows is not None and number_of_columns is not None:
-        # If both the number of rows and the number of columns is present,
-        # give priority to the number of columns;
-        _number_of_columns = number_of_columns
-        _number_of_rows = int(np.ceil(len(categories) / _number_of_columns))
-        if _number_of_rows != number_of_rows:
-            print(
-                f"⚠️ both {number_of_rows=} and {number_of_columns=} are specified; "
-                f"overriding {number_of_rows=} to {_number_of_rows=}"
-            )
-    elif number_of_columns is None and number_of_rows is not None:
-        _number_of_rows = number_of_rows
-        _number_of_columns = int(np.ceil(len(categories) / _number_of_rows))
-    elif number_of_rows is None and number_of_columns is not None:
-        _number_of_columns = number_of_columns
-        _number_of_rows = int(np.ceil(len(categories) / _number_of_columns))
-    else:
-        # The number of rows and columns is approximately the square root of the number of plots;
-        _number_of_columns = int(np.ceil(np.sqrt(len(categories))))
-        _number_of_rows = int(np.ceil(len(categories) / _number_of_columns))
+    _number_of_rows, _number_of_columns = adjust_number_of_rows_and_columns(
+        number_of_rows=number_of_rows,
+        number_of_columns=number_of_columns,
+        number_of_plots=len(categories),
+    )
 
     # Setup the palette;
     palette = _setup_palette(palette=palette, bar_categories=bar_categories)

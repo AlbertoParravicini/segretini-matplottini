@@ -517,3 +517,44 @@ def save_plot(
             plt.savefig(_f, **savefig_kwargs)
         if verbose:
             print(f"💡 saved plot to {_f}")
+
+
+def adjust_number_of_rows_and_columns(
+    number_of_plots: int,
+    number_of_rows: Optional[int] = None,
+    number_of_columns: Optional[int] = None,
+) -> tuple[int, int]:
+    """
+    Adjust the input number of rows and number of columns to match the desired number of plots.
+    If either the number of rows or columns is present, the other value is inferred from the number of categories.
+    If both values are missing, the number of rows and columns is approximately the square root of the number of plots,
+    to provide a grid that is as square as possible.
+    If both the number of rows and the number of columns is present, the number of columns is given priority.
+
+    :param number_of_plots: The number of plots to draw.
+    :param number_of_rows: Number of rows of the grid of plots. If None, infer it from the number of categories.
+    :param number_of_columns: Number of columns of the grid of plots. If None, infer it from the number of categories.
+    :return: The adjusted number of rows and columns to use to draw the plots.
+    """
+    # Obtain the number of rows and columns to plot;
+    if number_of_rows is not None and number_of_columns is not None:
+        # If both the number of rows and the number of columns is present,
+        # give priority to the number of columns;
+        _number_of_columns = number_of_columns
+        _number_of_rows = int(np.ceil(number_of_plots / _number_of_columns))
+        if _number_of_rows != number_of_rows:
+            print(
+                f"⚠️ both {number_of_rows=} and {number_of_columns=} are specified; "
+                f"overriding {number_of_rows=} to {_number_of_rows=}"
+            )
+    elif number_of_columns is None and number_of_rows is not None:
+        _number_of_rows = number_of_rows
+        _number_of_columns = int(np.ceil(number_of_plots / _number_of_rows))
+    elif number_of_rows is None and number_of_columns is not None:
+        _number_of_columns = number_of_columns
+        _number_of_rows = int(np.ceil(number_of_plots / _number_of_columns))
+    else:
+        # The number of rows and columns is approximately the square root of the number of plots;
+        _number_of_columns = int(np.ceil(np.sqrt(number_of_plots)))
+        _number_of_rows = int(np.ceil(number_of_plots / _number_of_columns))
+    return _number_of_rows, _number_of_columns

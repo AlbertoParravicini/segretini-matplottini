@@ -2,15 +2,11 @@ from pathlib import Path
 
 import numpy as np
 from jaxtyping import Float, Integer
-
-# from segretini_matplottini.utils.plot_utils import reset_plot_style
 from sklearn.metrics import (
     f1_score,
 )
 
-from segretini_matplottini.plot.binary_classification import (
-    true_positives,
-)
+from segretini_matplottini.plot.binary_classification import binary_classification
 from segretini_matplottini.utils import (
     assemble_filenames_to_save_plot,
     save_plot,
@@ -60,11 +56,11 @@ def generate_data(
 
 if __name__ == "__main__":
     logits, targets = generate_data()
-    true_positives(logits, targets)
+    binary_classification(logits, targets)
     save_plot(
         assemble_filenames_to_save_plot(
             directory=PLOT_DIR,
-            plot_name="true_positives",
+            plot_name="binary_classification",
             add_timestamp_prefix_to_plot_name=False,
             store_plot_into_timestamp_subfolder=False,
         ),

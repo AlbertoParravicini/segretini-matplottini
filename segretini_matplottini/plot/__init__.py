@@ -4,8 +4,14 @@ from segretini_matplottini.plot.barplot import (  # noqa: F401
     barplots,
 )
 from segretini_matplottini.plot.binary_classification import (  # noqa: F401
+    binary_classification,
+    f1,
     false_negatives,
     false_positives,
+    precision,
+    precision_recall,
+    recall,
+    roc,
     true_negatives,
     true_positives,
 )

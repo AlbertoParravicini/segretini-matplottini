@@ -28,6 +28,7 @@ from segretini_matplottini.utils.plot import (  # noqa: F401
     add_arrow_to_barplot,
     add_labels,
     add_labels_to_bars,
+    adjust_number_of_rows_and_columns,
     assemble_filenames_to_save_plot,
     fix_label_length,
     get_exp_label,

@@ -351,7 +351,11 @@ def compute_relative_performance(
 def true_positives(
     logits: Float[np.ndarray, "#n"], targets: Float[np.ndarray, "#n"], classification_threshold: float
 ) -> int:
-    p = (logits >= classification_threshold).astype(bool)
+    p = (
+        (logits >= classification_threshold).astype(bool)
+        if classification_threshold < 1
+        else np.zeros(len(logits)).astype(bool)
+    )
     t = targets.astype(bool)
     return int((p & t).sum())
 
@@ -359,7 +363,11 @@ def true_positives(
 def true_negatives(
     logits: Float[np.ndarray, "#n"], targets: Float[np.ndarray, "#n"], classification_threshold: float
 ) -> int:
-    p = (logits >= classification_threshold).astype(bool)
+    p = (
+        (logits >= classification_threshold).astype(bool)
+        if classification_threshold < 1
+        else np.zeros(len(logits)).astype(bool)
+    )
     t = targets.astype(bool)
     return int((~p & ~t).sum())
 
@@ -367,7 +375,11 @@ def true_negatives(
 def false_positives(
     logits: Float[np.ndarray, "#n"], targets: Float[np.ndarray, "#n"], classification_threshold: float
 ) -> int:
-    p = (logits >= classification_threshold).astype(bool)
+    p = (
+        (logits >= classification_threshold).astype(bool)
+        if classification_threshold < 1
+        else np.zeros(len(logits)).astype(bool)
+    )
     t = targets.astype(bool)
     return int((p & ~t).sum())
 
@@ -375,7 +387,11 @@ def false_positives(
 def false_negatives(
     logits: Float[np.ndarray, "#n"], targets: Float[np.ndarray, "#n"], classification_threshold: float
 ) -> int:
-    p = (logits >= classification_threshold).astype(bool)
+    p = (
+        (logits >= classification_threshold).astype(bool)
+        if classification_threshold < 1
+        else np.zeros(len(logits)).astype(bool)
+    )
     t = targets.astype(bool)
     return int((~p & t).sum())
 
@@ -391,7 +407,11 @@ class ConfusionMatrix:
 def confusion_matrix(
     logits: Float[np.ndarray, "#n"], targets: Float[np.ndarray, "#n"], classification_threshold: float
 ) -> ConfusionMatrix:
-    p = (logits >= classification_threshold).astype(bool)
+    p = (
+        (logits >= classification_threshold).astype(bool)
+        if classification_threshold < 1
+        else np.zeros(len(logits)).astype(bool)
+    )
     t = targets.astype(bool)
     tp = (p & t).sum()
     tn = (~p & ~t).sum()

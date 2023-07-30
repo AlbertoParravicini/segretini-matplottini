@@ -65,6 +65,8 @@ PALETTE_ORANGE_GREEN = ["#E8CFB5", "#81C798", "#55A68B", "#358787"]
 # Two teal tones to use as extremes of a palette;
 TWO_TEAL_TONES = ["#B1DEBD", "#4BA3A2"]
 TWO_PINK_TONES = ["#FFA1C3", "#E8487D"]
+# A green and a pink colors;
+GREEN_AND_PINK_TONES = ("#48C2A3", MEGA_PINK)
 # Used for plots with a dark background;
 BACKGROUND_BLACK = "#0E1117"
 

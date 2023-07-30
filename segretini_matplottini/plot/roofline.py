@@ -236,7 +236,7 @@ def roofline(
         if add_operational_intensity_label:
             label = operational_intensity_label.format(operational_intensity[i])
             ax.annotate(
-                label, fontsize=font_size, xy=(operational_intensity[i] * 1.1, ax.get_ylim()[0] * 2), ha="left"
+                label, fontsize=font_size, xy=(operational_intensity[i] * 1.1, ax.get_ylim()[0] * 1.1), ha="left"
             )
 
     #####################
@@ -248,8 +248,7 @@ def roofline(
     ax.yaxis.set_major_locator(LogLocator(base=10, numticks=15))
     ax.tick_params(axis="x", direction="out", which="both", bottom=True, top=False)
     # Set grid on y axis;
-    ax.xaxis.grid(False)
-    ax.yaxis.grid(linewidth=0.5)
+    ax.grid(axis="y", linestyle="--", linewidth=0.5)
     # Make sure that all ticks are visible;
     for tic in ax.xaxis.get_major_ticks():
         tic.tick1line.set_visible(True)
@@ -259,13 +258,12 @@ def roofline(
         tic.tick2line.set_visible(False)
     # Set exponential labels on the y axis;
     ax.yaxis.set_major_formatter(lambda x, pos: get_exp_label(x))
-    ax.tick_params(axis="y", labelsize=font_size)
+    ax.tick_params(labelcolor="#2f2f2f", labelsize=font_size * 0.8, pad=1)
     # Fix ticks on the x axis, ensuring that all minor ticks appear;
-    ax.tick_params(labelcolor="black", labelsize=font_size, pad=1)
     ax.minorticks_on()
     # Set x and y axes labels;
-    ax.set_xlabel(xlabel.format(performance_unit) if performance_unit else xlabel, fontsize=font_size * 1.125)
-    ax.set_ylabel(ylabel.format(performance_unit) if performance_unit else ylabel, fontsize=font_size * 1.125)
+    ax.set_xlabel(xlabel.format(performance_unit) if performance_unit else xlabel, fontsize=font_size)
+    ax.set_ylabel(ylabel.format(performance_unit) if performance_unit else ylabel, fontsize=font_size)
 
     # Add legend;
     if add_legend:

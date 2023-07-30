@@ -12,7 +12,7 @@ from matplotlib.figure import Figure
 from matplotlib.patches import Rectangle
 
 from segretini_matplottini.utils.colors import BACKGROUND_BLACK
-from segretini_matplottini.utils.constants import DEFAULT_FONT_SIZE
+from segretini_matplottini.utils.constants import DEFAULT_DPI, DEFAULT_FONT_SIZE
 
 
 def activate_dark_background(background_color: str = BACKGROUND_BLACK) -> None:
@@ -75,6 +75,47 @@ def reset_plot_style(
     # Background color
     if dark_background:
         activate_dark_background()
+
+
+def adjust_number_of_rows_and_columns(
+    number_of_plots: int,
+    number_of_rows: Optional[int] = None,
+    number_of_columns: Optional[int] = None,
+) -> tuple[int, int]:
+    """
+    Adjust the input number of rows and number of columns to match the desired number of plots.
+    If either the number of rows or columns is present, the other value is inferred from the number of categories.
+    If both values are missing, the number of rows and columns is approximately the square root of the number of plots,
+    to provide a grid that is as square as possible.
+    If both the number of rows and the number of columns is present, the number of columns is given priority.
+
+    :param number_of_plots: The number of plots to draw.
+    :param number_of_rows: Number of rows of the grid of plots. If None, infer it from the number of categories.
+    :param number_of_columns: Number of columns of the grid of plots. If None, infer it from the number of categories.
+    :return: The adjusted number of rows and columns to use to draw the plots.
+    """
+    # Obtain the number of rows and columns to plot;
+    if number_of_rows is not None and number_of_columns is not None:
+        # If both the number of rows and the number of columns is present,
+        # give priority to the number of columns;
+        _number_of_columns = number_of_columns
+        _number_of_rows = int(np.ceil(number_of_plots / _number_of_columns))
+        if _number_of_rows != number_of_rows:
+            print(
+                f"⚠️ both {number_of_rows=} and {number_of_columns=} are specified; "
+                f"overriding {number_of_rows=} to {_number_of_rows=}"
+            )
+    elif number_of_columns is None and number_of_rows is not None:
+        _number_of_rows = number_of_rows
+        _number_of_columns = int(np.ceil(number_of_plots / _number_of_rows))
+    elif number_of_rows is None and number_of_columns is not None:
+        _number_of_columns = number_of_columns
+        _number_of_rows = int(np.ceil(number_of_plots / _number_of_columns))
+    else:
+        # The number of rows and columns is approximately the square root of the number of plots;
+        _number_of_columns = int(np.ceil(np.sqrt(number_of_plots)))
+        _number_of_rows = int(np.ceil(number_of_plots / _number_of_columns))
+    return _number_of_rows, _number_of_columns
 
 
 def add_arrow_to_barplot(
@@ -443,7 +484,8 @@ def assemble_filenames_to_save_plot(
     :param directory: Full path to the directory where the folders are stored.
         The parent of this directory must exist, while the directory itself might not exist yet.
     :param plot_name: Name of the plot, without extension.
-    :param file_format: List of extensions used to store the plot.
+    :param file_format: One or more extensions used to store the plot.
+        Extensions supported by Matplotlib: `eps, jpeg, jpg, pdf, pgf, png, ps, raw, rgba, svg, svgz, tif, tiff, webp`
     :param add_timestamp_prefix_to_plot_name: If True, add a timestamp prefix to the plot name.
     :param timestamp_prefix_for_plot_name: Format of the timestamp prefix.
         Used only if `add_timestamp_prefix_to_plot_name` is True.
@@ -459,6 +501,8 @@ def assemble_filenames_to_save_plot(
     """
     if isinstance(directory, str):
         directory = Path(directory)
+    if isinstance(file_format, str):
+        file_format = [file_format]
     if not directory.parent.exists():
         raise ValueError(f"❌ the parent directory {directory.parent} of {directory} does not exist.")
     # Obtain a single timestamp. Try formatting prefix and subfolder if necessary.
@@ -478,7 +522,7 @@ def assemble_filenames_to_save_plot(
 def save_plot(
     file_name: Union[str, list[str], Path, list[Path]],
     figure: Optional[Figure] = None,
-    dpi: int = 300,
+    dpi: int = DEFAULT_DPI,
     remove_white_margin: bool = False,
     verbose: bool = False,
     **kwargs: Any,
@@ -517,44 +561,3 @@ def save_plot(
             plt.savefig(_f, **savefig_kwargs)
         if verbose:
             print(f"💡 saved plot to {_f}")
-
-
-def adjust_number_of_rows_and_columns(
-    number_of_plots: int,
-    number_of_rows: Optional[int] = None,
-    number_of_columns: Optional[int] = None,
-) -> tuple[int, int]:
-    """
-    Adjust the input number of rows and number of columns to match the desired number of plots.
-    If either the number of rows or columns is present, the other value is inferred from the number of categories.
-    If both values are missing, the number of rows and columns is approximately the square root of the number of plots,
-    to provide a grid that is as square as possible.
-    If both the number of rows and the number of columns is present, the number of columns is given priority.
-
-    :param number_of_plots: The number of plots to draw.
-    :param number_of_rows: Number of rows of the grid of plots. If None, infer it from the number of categories.
-    :param number_of_columns: Number of columns of the grid of plots. If None, infer it from the number of categories.
-    :return: The adjusted number of rows and columns to use to draw the plots.
-    """
-    # Obtain the number of rows and columns to plot;
-    if number_of_rows is not None and number_of_columns is not None:
-        # If both the number of rows and the number of columns is present,
-        # give priority to the number of columns;
-        _number_of_columns = number_of_columns
-        _number_of_rows = int(np.ceil(number_of_plots / _number_of_columns))
-        if _number_of_rows != number_of_rows:
-            print(
-                f"⚠️ both {number_of_rows=} and {number_of_columns=} are specified; "
-                f"overriding {number_of_rows=} to {_number_of_rows=}"
-            )
-    elif number_of_columns is None and number_of_rows is not None:
-        _number_of_rows = number_of_rows
-        _number_of_columns = int(np.ceil(number_of_plots / _number_of_rows))
-    elif number_of_rows is None and number_of_columns is not None:
-        _number_of_columns = number_of_columns
-        _number_of_rows = int(np.ceil(number_of_plots / _number_of_columns))
-    else:
-        # The number of rows and columns is approximately the square root of the number of plots;
-        _number_of_columns = int(np.ceil(np.sqrt(number_of_plots)))
-        _number_of_rows = int(np.ceil(number_of_plots / _number_of_columns))
-    return _number_of_rows, _number_of_columns

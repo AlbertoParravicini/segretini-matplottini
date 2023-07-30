@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 from segretini_matplottini.plot import roofline
 from segretini_matplottini.utils import assemble_filenames_to_save_plot, save_plot
-from segretini_matplottini.utils.colors import BB4, BB5, G2, PEACH1
+from segretini_matplottini.utils.colors import BB4, BB5, G2, MEGA_PINK
 
 ##############################
 # Setup ######################
@@ -14,7 +14,7 @@ from segretini_matplottini.utils.colors import BB4, BB5, G2, PEACH1
 
 PLOT_DIR = Path(__file__).parent.parent / "plots"
 MARKERS = ["o", "X", "D", "P"]
-PALETTE = [PEACH1, G2, BB4, BB5]
+PALETTE = [MEGA_PINK, G2, BB4, BB5]
 
 ##############################
 # Load data and plot #########
@@ -80,6 +80,10 @@ def plot_2(data_dict: dict[str, Any]) -> tuple[plt.Figure, plt.Axes]:
         xmax=20,
         add_legend=True,
         legend_labels=[f"{c} Cores" for c in data_dict["num_cores"]],
+        figure_size=(3.5, 3.2),
+        left_padding=0.15,
+        bottom_padding=0.15,
+        right_padding=0.92,
     )
 
 

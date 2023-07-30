@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 
 from segretini_matplottini.plot import roofline
 from segretini_matplottini.utils import assemble_filenames_to_save_plot, save_plot
-from segretini_matplottini.utils.colors import BB4, BB5, G2, MEGA_PINK
+
+# from segretini_matplottini.utils.colors import BB4, BB5, G2, MEGA_PINK
 
 ##############################
 # Setup ######################
@@ -14,7 +15,7 @@ from segretini_matplottini.utils.colors import BB4, BB5, G2, MEGA_PINK
 
 PLOT_DIR = Path(__file__).parent.parent / "plots"
 MARKERS = ["o", "X", "D", "P"]
-PALETTE = [MEGA_PINK, G2, BB4, BB5]
+# PALETTE = [MEGA_PINK, G2, BB4, BB5]
 
 ##############################
 # Load data and plot #########
@@ -73,7 +74,7 @@ def plot_2(data_dict: dict[str, Any]) -> tuple[plt.Figure, plt.Axes]:
         data_dict["operational_intensity"],
         data_dict["peak_performance"],
         data_dict["peak_bandwidth"],
-        palette=PALETTE,
+        # palette=PALETTE,
         markers=MARKERS,
         performance_unit="FLOPS",
         xmin=0.01,
@@ -115,7 +116,7 @@ def plot_3(data_dict_1: dict[str, Any], data_dict_2: dict[str, Any]) -> tuple[pl
         data_dict_1["operational_intensity"],
         data_dict_1["peak_performance"],
         data_dict_1["peak_bandwidth"],
-        palette=PALETTE,
+        # palette=PALETTE,
         markers=MARKERS,
         ax=ax,
         performance_unit="FLOPS",
@@ -131,7 +132,7 @@ def plot_3(data_dict_1: dict[str, Any], data_dict_2: dict[str, Any]) -> tuple[pl
         data_dict_2["operational_intensity"],
         data_dict_2["peak_performance"],
         data_dict_2["peak_bandwidth"],
-        palette=PALETTE,
+        # palette=PALETTE,
         markers=MARKERS,
         ax=ax,
         performance_unit="FLOPS",

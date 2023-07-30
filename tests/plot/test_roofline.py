@@ -2,12 +2,12 @@ import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 
 from segretini_matplottini.plot import roofline
-from segretini_matplottini.utils.colors import BB4, BB5, G2, PEACH1
+from segretini_matplottini.utils.colors import PALETTE_ORANGE_BASELINE_AND_GREEN_TONES
 
 from .utils import reset_plot_style, save_tmp_plot  # noqa: F401
 
 MARKERS = ["o", "X", "D", "P"]
-PALETTE = [PEACH1, G2, BB4, BB5]
+PALETTE = PALETTE_ORANGE_BASELINE_AND_GREEN_TONES
 
 
 @save_tmp_plot

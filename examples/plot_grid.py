@@ -27,11 +27,7 @@ from segretini_matplottini.plot import (
 )
 from segretini_matplottini.utils import assemble_filenames_to_save_plot, save_plot
 from segretini_matplottini.utils.colors import (
-    BB4,
-    BB5,
-    G2,
     GREEN_AND_PINK_TONES,
-    MEGA_PINK,
 )
 
 #########
@@ -52,8 +48,6 @@ def plot_correlation_scatterplot(output_dir: Path) -> None:
     # Axes limits used in the plot, change them accordingy to your data;
     xlimits = (-0.2, 0.6)
     ylimits = (-0.1, 0.3)
-    # Color palette used for plotting;
-    palette = ["#3DB88F", GREEN_AND_PINK_TONES[0]]
     data = load_data_correlation_scatterplot()
     correlation_scatterplot(
         data=data,
@@ -62,7 +56,6 @@ def plot_correlation_scatterplot(output_dir: Path) -> None:
         hue="significant",
         xlimits=xlimits,
         ylimits=ylimits,
-        scatterplot_palette=palette,
         density_color=GREEN_AND_PINK_TONES[1],
         regression_color=GREEN_AND_PINK_TONES[0],
         xlabel="Speedup estimate, method A (%)",
@@ -89,16 +82,12 @@ def plot_correlation_scatterplot(output_dir: Path) -> None:
 
 def plot_roofline(output_dir: Path) -> None:
     # Create a Roofline model, with multiple lines and custom settings;
-    markers = ["o", "X", "D", "P"]
-    palette = [MEGA_PINK, G2, BB4, BB5]
     data_dict = load_data_roofline()
     roofline(
         data_dict["performance"],
         data_dict["operational_intensity"],
         data_dict["peak_performance"],
         data_dict["peak_bandwidth"],
-        palette=palette,
-        markers=markers,
         performance_unit="FLOPS",
         xmin=0.01,
         xmax=20,

@@ -14,11 +14,13 @@ from segretini_matplottini.utils import (
 from segretini_matplottini.utils import (
     reset_plot_style as _reset_plot_style,
 )
-from segretini_matplottini.utils.colors import BB4, BB5, G2, PEACH1
+from segretini_matplottini.utils.colors import MEGA_PINK, PALETTE_GREEN_TONES_6
 from segretini_matplottini.utils.constants import DEFAULT_DPI, DEFAULT_FONT_SIZE
 
 MARKERS = ["o", "X", "D", "P"]
-PALETTE = [PEACH1, G2, BB4, BB5]
+# A strong pink color and a few shades of green.
+# Skip the first color in the palette to avoid having two colors with the same luminance;
+PALETTE = [MEGA_PINK] + PALETTE_GREEN_TONES_6[1::2]
 
 
 def roofline(

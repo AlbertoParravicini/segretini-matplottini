@@ -14,7 +14,7 @@ from segretini_matplottini.utils import (
     extend_palette,
 )
 from segretini_matplottini.utils import reset_plot_style as _reset_plot_style
-from segretini_matplottini.utils.colors import PALETTE_G, PALETTE_O
+from segretini_matplottini.utils.colors import PALETTE_GREEN_TONES_6, TWO_PEACH_TONES
 from segretini_matplottini.utils.constants import DEFAULT_DPI, DEFAULT_FONT_SIZE
 
 
@@ -27,8 +27,8 @@ def correlation_scatterplot(
     plot_regression: bool = True,
     highlight_negative_area: bool = False,
     scatterplot_palette: Optional[list[str]] = None,
-    density_color: str = PALETTE_O[3],
-    regression_color: str = PALETTE_G[2],
+    density_color: str = TWO_PEACH_TONES[1],
+    regression_color: str = PALETTE_GREEN_TONES_6[1],
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
     xlimits: Optional[tuple[float, float]] = None,
@@ -115,10 +115,11 @@ def correlation_scatterplot(
 
     # Create default color palette;
     if scatterplot_palette is None:
-        if hue is None:
-            scatterplot_palette = sns.color_palette("rocket").as_hex()
-        else:
-            scatterplot_palette = sns.color_palette("rocket", len(data[hue].unique())).as_hex()
+        scatterplot_palette = PALETTE_GREEN_TONES_6[::2]
+    if hue is not None:
+        scatterplot_palette = extend_palette(scatterplot_palette, len(data[hue].unique()))
+    else:
+        scatterplot_color = scatterplot_palette = [scatterplot_palette[1]]
 
     # Set axes limits;
     if xlimits is not None:
@@ -182,7 +183,8 @@ def correlation_scatterplot(
         x=x,
         y=y,
         hue=hue,
-        palette=extend_palette(scatterplot_palette, len(data[hue].unique())) if hue is not None else None,
+        palette=scatterplot_palette if hue is not None else None,
+        color=scatterplot_color[0] if hue is None else None,
         s=15,
         data=data,
         ax=ax,
@@ -231,7 +233,6 @@ def correlation_scatterplot(
     # Add legend;
     if hue:
         labels = list(data[hue].unique())
-        scatterplot_palette = extend_palette(scatterplot_palette, len(labels))
         custom_lines = [
             Patch(facecolor=scatterplot_palette[::-1][i], edgecolor="#2f2f2f", label=_l) for i, _l in enumerate(labels)
         ]

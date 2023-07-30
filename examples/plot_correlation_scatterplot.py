@@ -15,9 +15,6 @@ from segretini_matplottini.utils.colors import GREEN_AND_PINK_TONES
 X_LIMITS = (-0.2, 0.6)
 Y_LIMITS = (-0.1, 0.3)
 
-# Color palette used for plotting;
-PALETTE = ["#3DB88F", GREEN_AND_PINK_TONES[0]]
-
 PLOT_DIR = Path(__file__).parent.parent / "plots"
 DATA_DIR = Path(__file__).parent.parent / "data"
 
@@ -43,7 +40,6 @@ def plot(data: pd.DataFrame) -> tuple[plt.Figure, plt.Axes]:
         hue="significant",
         xlimits=X_LIMITS,
         ylimits=Y_LIMITS,
-        scatterplot_palette=PALETTE,
         density_color=GREEN_AND_PINK_TONES[1],
         regression_color=GREEN_AND_PINK_TONES[0],
         xlabel="Speedup estimate, method A (%)",

@@ -492,7 +492,7 @@ def ridgeplot_compact(
     font_size: int = DEFAULT_FONT_SIZE,
     left_padding: float = 0.02,
     right_padding: float = 0.98,
-    bottom_padding: float = 0.19,
+    bottom_padding: float = 0.17,
     top_padding: float = 0.98,
     horizontal_spacing: float = 0.1,
     vertical_spacing: float = -0.2,

@@ -76,21 +76,16 @@ if __name__ == "__main__":
         verbose=True,
     )
     data = load_data_2()
-    _, ax = timeseries(
+    timeseries(
         data,
         xlabel="Time [min]",
         ylabel="Intensity",
         date_format="%H:%M:%S",
-        minutes_interval_major_ticks=4,
+        minutes_interval_major_ticks=2,
         minutes_interval_minor_ticks=1,
-        dark_background=False,
+        dark_background=True,
         draw_style="stem",
-        figure_size=(3.4, 3.1),
-        left_padding=0.15,
-        bottom_padding=0.18,
-        right_padding=0.94,
     )
-    ax.grid(axis="y", linestyle="--", linewidth=0.5)
     save_plot(
         assemble_filenames_to_save_plot(
             directory=PLOT_DIR,

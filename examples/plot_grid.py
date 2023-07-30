@@ -12,13 +12,13 @@ from tempfile import TemporaryDirectory
 
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
-
-from examples.plot_correlation_scatterplot import (
+from plot_correlation_scatterplot import (  # type: ignore
     load_data as load_data_correlation_scatterplot,
 )
-from examples.plot_ridgeplot import load_data as load_data_ridgeplot
-from examples.plot_roofline import load_data_2 as load_data_roofline
-from examples.plot_timeseries import load_data_2 as load_data_stem
+from plot_ridgeplot import load_data as load_data_ridgeplot  # type: ignore
+from plot_roofline import load_data_2 as load_data_roofline  # type: ignore
+from plot_timeseries import load_data_2 as load_data_stem  # type: ignore
+
 from segretini_matplottini.plot import (
     correlation_scatterplot,
     ridgeplot,

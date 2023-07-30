@@ -73,7 +73,7 @@ def plot_2(data_dict: dict[str, Any]) -> tuple[plt.Figure, plt.Axes]:
         data_dict["operational_intensity"],
         data_dict["peak_performance"],
         data_dict["peak_bandwidth"],
-        # palette=PALETTE,
+        palette=PALETTE,
         markers=MARKERS,
         performance_unit="FLOPS",
         xmin=0.01,

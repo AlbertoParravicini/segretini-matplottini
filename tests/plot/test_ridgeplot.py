@@ -23,8 +23,8 @@ def data() -> pd.DataFrame:
 
     # Compute relative execution time before and after transformations and remove outliers.
     # Also assign row/column identifiers to each benchmark for the ridgeplot;
-    data = remove_outliers_from_dataframe_ci(data, "exec_time_1_us", groupby=["name"], debug=True)
-    data = remove_outliers_from_dataframe_ci(data, "exec_time_2_us", groupby=["name"], debug=True)
+    data = remove_outliers_from_dataframe_ci(data, "exec_time_1_us", groupby=["name"], verbose=True)
+    data = remove_outliers_from_dataframe_ci(data, "exec_time_2_us", groupby=["name"], verbose=True)
 
     # Add relative execution time;
     data["rel_time_1"] = 1

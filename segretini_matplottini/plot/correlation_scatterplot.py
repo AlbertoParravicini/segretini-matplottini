@@ -14,7 +14,7 @@ from segretini_matplottini.utils import (
     extend_palette,
 )
 from segretini_matplottini.utils import reset_plot_style as _reset_plot_style
-from segretini_matplottini.utils.colors import PALETTE_G, PALETTE_O
+from segretini_matplottini.utils.colors import PALETTE_GREEN_TONES_6, TWO_PEACH_TONES
 from segretini_matplottini.utils.constants import DEFAULT_DPI, DEFAULT_FONT_SIZE
 
 
@@ -23,13 +23,14 @@ def correlation_scatterplot(
     x: str,
     y: str,
     hue: Optional[str] = None,
-    label: Optional[str] = None,
-    palette: Optional[list[str]] = None,
-    xlabel: Optional[str] = None,
-    ylabel: Optional[str] = None,
     plot_kde: bool = True,
     plot_regression: bool = True,
     highlight_negative_area: bool = False,
+    scatterplot_palette: Optional[list[str]] = None,
+    density_color: str = TWO_PEACH_TONES[1],
+    regression_color: str = PALETTE_GREEN_TONES_6[1],
+    xlabel: Optional[str] = None,
+    ylabel: Optional[str] = None,
     xlimits: Optional[tuple[float, float]] = None,
     ylimits: Optional[tuple[float, float]] = None,
     x_ticks_formatter: Callable[[Any, int], str] = lambda x, pos: f"{x * 100:.0f}%",
@@ -58,12 +59,15 @@ def correlation_scatterplot(
     :param y: Y-column of the plot.
     :param hue: Column of `data`, if present we split the color of the scatterplot
         according to the unique values in `hue`.
-    :param palette: Colors associated to the hue. It should have length equal to the unique values in `hue`.
-    :param xlabel: Label added to the x-axis.
-    :param ylabel: Label added to the y-axis.
     :param plot_kde: If True, add a seaborn KDE plot with the bivariate density.
     :param plot_regression: If True, add a Seaborn linear regression plot.
     :param highlight_negative_area: If True, highlight the negative part of the plot.
+    :param scatterplot_palette: Colors associated to the hues of the scatterplot.
+        It should have length equal to the unique values in `hue`.
+    :param density_color: Color of the bivariate density plot.
+    :param regression_color: Color of the lines in the regression plot.
+    :param xlabel: Label added to the x-axis.
+    :param ylabel: Label added to the y-axis.
     :param xlimits: If specified, truncate the x-axis to this interval.
     :param ylimits: If specified, truncate the y-axis to this interval.
     :param x_ticks_formatter: Callable function used to format x-axis tick labels.
@@ -110,11 +114,12 @@ def correlation_scatterplot(
         fig = ax.get_figure()
 
     # Create default color palette;
-    if palette is None:
-        if hue is None:
-            palette = sns.color_palette("rocket").as_hex()
-        else:
-            palette = sns.color_palette("rocket", len(data[hue].unique())).as_hex()
+    if scatterplot_palette is None:
+        scatterplot_palette = PALETTE_GREEN_TONES_6[::2]
+    if hue is not None:
+        scatterplot_palette = extend_palette(scatterplot_palette, len(data[hue].unique()))
+    else:
+        scatterplot_color = scatterplot_palette = [scatterplot_palette[1]]
 
     # Set axes limits;
     if xlimits is not None:
@@ -150,7 +155,7 @@ def correlation_scatterplot(
             y=y,
             data=data,
             levels=5,
-            color=PALETTE_O[3],
+            color=density_color,
             fill=True,
             alpha=0.5,
             zorder=2,
@@ -162,7 +167,7 @@ def correlation_scatterplot(
             x=x,
             y=y,
             data=data,
-            color=PALETTE_G[2],
+            color=regression_color,
             ax=ax,
             truncate=False,
             scatter=False,
@@ -171,14 +176,15 @@ def correlation_scatterplot(
         )
         # Update regression confidence intervals,
         #   to set the confidence bands as semi-transparent and change style and colors of borders;
-        plt.setp(ax.collections[-1], facecolor="w", edgecolor=PALETTE_G[2], alpha=0.6, linestyles="--", zorder=3)
+        plt.setp(ax.collections[-1], facecolor="w", edgecolor=regression_color, alpha=0.6, linestyles="--", zorder=3)
 
     # Add a scatterplot for individual elements of the dataset, and change color based on statistical significance;
     ax = sns.scatterplot(
         x=x,
         y=y,
         hue=hue,
-        palette=extend_palette(palette, len(data[hue].unique())) if hue is not None else None,
+        palette=scatterplot_palette if hue is not None else None,
+        color=scatterplot_color[0] if hue is None else None,
         s=15,
         data=data,
         ax=ax,
@@ -186,15 +192,6 @@ def correlation_scatterplot(
         linewidth=0.5,
         zorder=3,
     )
-    if label:
-        if hue:
-            d = data.groupby(hue).mean().reset_index()
-        else:
-            d = data
-        for _, row in d.iterrows():
-            ax.annotate(
-                row[label], xy=(row[x], row[y]), fontsize=font_size - 2, color="#2f2f2f", ha="left", zorder=100
-            )
     # Remove the existing legend from the axis, if present
     if ax.get_legend():
         ax.get_legend().remove()
@@ -225,30 +222,26 @@ def correlation_scatterplot(
         )
 
     # Turn on the grid;
-    ax.yaxis.grid(True, linewidth=0.5)
-    ax.xaxis.grid(True, linewidth=0.5)
+    ax.grid(axis="both", linestyle="--", linewidth=0.5)
 
     # Ticks and tick labels;
     ax.xaxis.set_major_locator(LinearLocator(9))
     ax.xaxis.set_major_formatter(x_ticks_formatter)
-    ax.tick_params(axis="x", labelsize=font_size - 2)
     ax.yaxis.set_major_locator(LinearLocator(9))
     ax.yaxis.set_major_formatter(y_ticks_formatter)
-    ax.tick_params(axis="y", labelsize=font_size - 2)
-
+    ax.tick_params(labelcolor="#2f2f2f", labelsize=font_size * 0.8)
     # Add legend;
     if hue:
         labels = list(data[hue].unique())
-        palette = extend_palette(palette, len(labels))
         custom_lines = [
-            Patch(facecolor=palette[::-1][i], edgecolor="#2f2f2f", label=_l) for i, _l in enumerate(labels)
+            Patch(facecolor=scatterplot_palette[::-1][i], edgecolor="#2f2f2f", label=_l) for i, _l in enumerate(labels)
         ]
         add_legend_with_dark_shadow(
             ax=ax,
             handles=custom_lines,
             labels=labels,
             bbox_to_anchor=(1, 0.0) if legend_position == "lower right" else None,
-            fontsize=font_size - 2,
+            fontsize=font_size,
             ncol=1 if vertical_legend else len(labels),
             loc=legend_position,
             handletextpad=0.3,

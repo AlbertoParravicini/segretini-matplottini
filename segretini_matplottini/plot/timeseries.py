@@ -136,8 +136,9 @@ def timeseries(
     #####################
 
     # Activate grid on the y axis
-    ax.grid(True, axis="y", lw=0.8)
-    ax.grid(False, axis="x")
+    # ax.grid(True, axis="y", lw=0.8)
+    # ax.grid(False, axis="x")
+    ax.grid(axis="y", linestyle="--", linewidth=0.5)
 
     # Set axes limits
     ax.set_xlim(min(x), max(x))
@@ -169,6 +170,7 @@ def timeseries(
         plt.xticks(ha="right", rotation_mode="anchor")
     else:
         ax.tick_params(axis="x", which="major", labelsize=font_size)
+    ax.yaxis.set_major_formatter(lambda x, pos: f"{x:.3f}")
     ax.yaxis.set_major_locator(LinearLocator(5))
     ax.tick_params(axis="y", which="major", labelsize=font_size - 2)
 

@@ -5,16 +5,13 @@ import pandas as pd
 import pytest
 
 from segretini_matplottini.plot import correlation_scatterplot
-from segretini_matplottini.utils.colors import PALETTE_G
+from segretini_matplottini.utils.colors import TWO_TEAL_TONES
 
 from .utils import reset_plot_style, save_tmp_plot  # noqa: F401
 
 # Axes limits used in the plot, change them accordingy to your data;
 X_LIMITS = (-0.2, 0.6)
 Y_LIMITS = (-0.1, 0.3)
-
-# Color palette used for plotting;
-PALETTE = [PALETTE_G[0], PALETTE_G[2]]
 
 DATA_DIR = Path(__file__).parent.parent.parent / "data"
 
@@ -47,7 +44,7 @@ def test_custom_settings(data: pd.DataFrame) -> None:
         hue="significant",
         xlimits=X_LIMITS,
         ylimits=Y_LIMITS,
-        palette=PALETTE,
+        scatterplot_palette=TWO_TEAL_TONES,
         xlabel="Speedup estimate, method A (%)",
         ylabel="Speedup estimate, method B (%)",
         highlight_negative_area=True,

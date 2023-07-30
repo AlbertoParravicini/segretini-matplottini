@@ -28,12 +28,12 @@ def load_data() -> pd.DataFrame:
     # Load data. The input dataframe is a collection of execution times of different benchmarks.
     # Each benchmark has around 100 samples,
     # and it has been measure before transformations ("exec_time_1_us") and after ("exec_time_2_us");
-    data = pd.read_csv(DATA_DIR / "ridgeplot_data.csv")
+    data: pd.DataFrame = pd.read_csv(DATA_DIR / "ridgeplot_data.csv")
 
     # Compute relative execution time before and after transformations and remove outliers.
     # Also assign row/column identifiers to each benchmark for the ridgeplot;
-    data = remove_outliers_from_dataframe_ci(data, "exec_time_1_us", groupby=["name"], debug=True)
-    data = remove_outliers_from_dataframe_ci(data, "exec_time_2_us", groupby=["name"], debug=True)
+    data = remove_outliers_from_dataframe_ci(data, "exec_time_1_us", groupby=["name"], verbose=True)
+    data = remove_outliers_from_dataframe_ci(data, "exec_time_2_us", groupby=["name"], verbose=True)
 
     # Add relative execution time;
     data["rel_time_1"] = 1

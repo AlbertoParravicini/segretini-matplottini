@@ -307,9 +307,9 @@ if __name__ == "__main__":
         fig, axes = plt.subplots(
             1,
             2,
-            figsize=(3 * 2, 1.8),
+            figsize=(2.7 * 2, 1.8),
             dpi=900,
-            gridspec_kw=dict(hspace=0, wspace=0.1, left=0.05, right=0.95, top=1, bottom=0),
+            gridspec_kw=dict(hspace=0, wspace=0.1, left=0.03, right=0.97, top=1, bottom=0),
         )
         for i, plot_name in enumerate(["binary_classification", "barplot_for_multiple_categories"]):
             ax = axes.flat[i]

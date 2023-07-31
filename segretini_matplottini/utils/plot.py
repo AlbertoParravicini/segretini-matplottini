@@ -48,7 +48,7 @@ def reset_plot_style(
     :param title_size: Size of the title.
     :param title_pad: Padding of the title.
     :param label_size: Size of the labels.
-    :param border_width: Line width of the axis borders.
+    :param border_width: Line width of the axis borders, and also of the ticks.
     :param dark_background: If True, use a dark background.
     """
     # Reset matplotlib settings;
@@ -65,7 +65,11 @@ def reset_plot_style(
     plt.rcParams["axes.labelpad"] = label_pad
     plt.rcParams["xtick.major.pad"] = xtick_major_pad
     plt.rcParams["ytick.major.pad"] = ytick_major_pad
+    # Set the width of the axes borders, and also the width of the ticks,
+    # so they have the same style;
     plt.rcParams["axes.linewidth"] = border_width
+    plt.rcParams["xtick.major.width"] = border_width
+    plt.rcParams["ytick.major.width"] = border_width
     if title_size is not None:
         plt.rcParams["axes.titlesize"] = title_size
     if title_pad is not None:

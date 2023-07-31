@@ -35,7 +35,7 @@ def roofline(
     palette: Optional[Union[list[str], str]] = None,
     markers: Optional[Union[list[str], str]] = None,
     scatter_size: float = 14,
-    xlabel: str = "Operational Intensity [{}/B]",
+    xlabel: str = "Operational intensity [{}/B]",
     ylabel: str = "Performance [{}/s]",
     performance_unit: str = "FLOPS",
     add_bandwidth_label: bool = True,

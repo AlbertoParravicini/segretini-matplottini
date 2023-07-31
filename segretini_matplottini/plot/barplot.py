@@ -30,7 +30,7 @@ def _setup_palette(palette: Optional[list[str]], bar_categories: list[str]) -> l
     elif len(palette) > len(bar_categories):
         print(f"⚠️  truncating palette to match the number of categories ({len(palette)} > {len(bar_categories)})")
         palette = palette[: len(bar_categories)]
-    else:
+    elif len(palette) < len(bar_categories):
         print(f"⚠️  extending palette to match the number of categories ({len(palette)} < {len(bar_categories)})")
         palette = extend_palette(palette, len(bar_categories))
     return palette
@@ -499,7 +499,7 @@ def barplot_for_multiple_categories(
     elif len(palette) > len(bar_categories):
         print(f"⚠️  truncating palette to match the number of categories ({len(palette)} > {len(bar_categories)})")
         palette = palette[: len(bar_categories)]
-    else:
+    elif len(palette) < len(bar_categories):
         print(f"⚠️  extending palette to match the number of categories ({len(palette)} < {len(bar_categories)})")
         palette = extend_palette(palette, len(bar_categories))
 

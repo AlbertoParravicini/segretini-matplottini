@@ -79,7 +79,7 @@ def plot_2(data_dict: dict[str, Any]) -> tuple[plt.Figure, plt.Axes]:
         xmin=0.01,
         xmax=20,
         add_legend=True,
-        legend_labels=[f"{c} Cores" for c in data_dict["num_cores"]],
+        legend_labels=[f"{c} Core{'s' if c > 1 else ''}" for c in data_dict["num_cores"]],
         figure_size=(3.5, 3.2),
         left_padding=0.15,
         bottom_padding=0.15,
@@ -122,7 +122,7 @@ def plot_3(data_dict_1: dict[str, Any], data_dict_2: dict[str, Any]) -> tuple[pl
         xmin=0.01,
         xmax=20,
         add_legend=True,
-        legend_labels=[f"{c} Cores" for c in data_dict_1["num_cores"]],
+        legend_labels=[f"{c} Core{'s' if c > 1 else ''}" for c in data_dict["num_cores"]],
     )
     # Second roofline
     ax = fig.add_subplot(gs[0, 1])

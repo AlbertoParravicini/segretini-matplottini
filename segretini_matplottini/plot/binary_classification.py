@@ -121,7 +121,7 @@ def _plot_binary_classification_curve(
     ##################
 
     # Draw the curve;
-    ax.plot(x, y, color="#2f2f2f", linewidth=0.6, zorder=3)
+    ax.plot(x, y, color="#2f2f2f", linewidth=0.5, zorder=3)
     # Fill area under curve;
     ax.fill_between(x, y, color=color, alpha=0.8, zorder=2)
 
@@ -1036,7 +1036,7 @@ def binary_classification(
     )
 
     if reset_plot_style:
-        _reset_plot_style(label_pad=1, xtick_major_pad=1, ytick_major_pad=1)
+        _reset_plot_style(label_pad=1, xtick_major_pad=1, ytick_major_pad=1, border_width=0.6)
     fig, axes = plt.subplots(_number_of_rows, _number_of_columns, figsize=figure_size, dpi=DEFAULT_DPI)
     plt.subplots_adjust(
         left=left_padding,

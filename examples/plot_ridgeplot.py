@@ -54,7 +54,7 @@ if __name__ == "__main__":
     data = load_data()
     ridgeplot(
         data,
-        xlabel="Relative Execution Time",
+        xlabel="Relative execution time",
         legend_labels=("Before transformations", "After transformations"),
         plot_confidence_intervals=True,
         xlimits=(0.7, 1.3),
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     )
     ridgeplot_compact(
         data,
-        xlabel="Relative Execution Time",
+        xlabel="Relative execution time",
         legend_labels=("Before transformations", "After transformations"),
         xlimits=(0.7, 1.3),
     )

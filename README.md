@@ -3,6 +3,8 @@
 A collection of Matplotlib and Seaborn recipes and utilities collected over years of colorful plot-making,
 to help researchers create publication-ready plots with ease.
 
+👇 For example, a `correlation_scatterplot`, a stacked `roofline` plot, a `timeseries` plot with `stems`, and a `ridgeplot`. Find other examples below!
+
 ![Grid of example plots](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/grid.png)
 
 ## 🚂 Installation
@@ -37,6 +39,31 @@ segretini-matplottini (this folder)
     ├── README.md   -> This file!
     └── (...)       -> Configuration files for linters, and other setup files.
 ```
+
+## 🌞 Getting started
+
+The best way to get started is to check out the [`plots`](plots/) folder, to find plots generated with `segretini-matplottini`.
+If you find a plot you like, you can find the code to generate it in the [`examples`](examples/) folder.
+
+### Some plots available in `segretini-matplottini`
+
+This is a non-inclusive list of custom plots that are available out-of-the-box in `segretini-matplottini`.
+* `correlation_scatterplot` visualizes the relation between two variables, combining a scatterplot, a 2D density plot, and a linear regression with confidence intervals. Learn more with [this](examples/plot_correlation_scatterplot.py) example. 
+* `ridgeplot` shows the distribution of two variables, grouped by the specified factor. For example, one can visualize the latency of two implementations of the same algorithm, across multiple runs of different datasets. Learn more with [this](examples/plot_ridgeplot.py) example. 
+* `roofline` plots the [Roofline model](https://en.wikipedia.org/wiki/Roofline_model) for the input operational intensity and performance values. Learn more with [this](examples/plot_roofline.py) example. 
+* `binary_classfication` summarizes the performance of a binary classifier, plotting curves such as ROC, Precision-Recall, and F1 score for different classfication thresholds. Learn more with [this](examples/plot_binary_classification.py) example.
+
+### Some utilities available in `segretini-matplottini`
+
+The astute reader might say "hey, I don't need any of those plots, why should I care about `segretini-matplottini`?".
+There's a lot more than plotting functions! The `utils` can be applied to any Matplotlib plot, to simplify your life when it comes to create complex visualizations.
+* [data](segretini_matplottini/utils/data.py) contains functions to preprocess your experiment results by [removing outliers](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/segretini_matplottini/utils/data.py#L158) and computing the [relative performance](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/segretini_matplottini/utils/data.py#L242) from absolute performance numbers.
+* [colors](segretini_matplottini/utils/colors.py) provides utilities to convert your palettes to [grayscale](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/segretini_matplottini/utils/colors.py#L48) to check how your plot will look when printed in black and white, and to simplify the [creation of palettes](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/segretini_matplottini/utils/colors.py#L61) given the start and end colors. It also has plenty of beautiful colors to choose from, validated for black and white printing and color blindness.
+* [plot](segretini_matplottini/utils/plot.py) is the source for general plotting utilities, from [computing](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/segretini_matplottini/utils/plot.py#L323) and [adding](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/segretini_matplottini/utils/plot.py#L390) labels to barplots to [saving plots](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/segretini_matplottini/utils/plot.py#L461) with a standardized structure, so they won't get lost or overwritten by accident.
+
+In the examples below, a `binary_classification` plot with a few of the available sub-plots turned on, and a `barplot` that takes advantage of the `utils` to compute relative performance and add labels to bars.
+
+![Grid of example plots, binary classification and barplot](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/grid_2.png)
 
 ## 👨‍🔬 Development notes
 

@@ -11,6 +11,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
 from plot_barplot import load_data_2 as load_data_barplot  # type: ignore
 from plot_binary_classification import (  # type: ignore
     generate_data as load_data_binary_classification,
@@ -272,32 +273,32 @@ def plot_barplot(output_dir: Path) -> None:
 
 if __name__ == "__main__":
     PLOT_DIR.mkdir(parents=True, exist_ok=True)
-    # with TemporaryDirectory() as tmp_dir:
-    #     output_dir = Path(tmp_dir)
-    #     plot_correlation_scatterplot(output_dir)
-    #     plot_roofline(output_dir)
-    #     plot_stem(output_dir)
-    #     plot_ridgeplot(output_dir)
-    #     # Load the four plots as PNGs, put them as a horizontal grid.
-    #     # This is done to create a grid of plots to show in the README.md file,
-    #     # but if you were to compose plots in a paper,
-    #     # you should create a grid in LaTex and load plots as PDFs, to avoid quality loss;
-    #     fig, axes = plt.subplots(1, 4, figsize=(3.5 * 2, 3.5 * 2), dpi=900, gridspec_kw=dict(hspace=0, wspace=0))
-    #     for i, plot_name in enumerate(["correlation_scatterplot", "roofline_stacked", "stem", "ridgeplot_large"]):
-    #         ax: Axes = axes.flat[i]
-    #         ax.imshow(plt.imread(output_dir / f"{plot_name}.png"))
-    #         ax.axis("off")
-    #     save_plot(
-    #         assemble_filenames_to_save_plot(
-    #             directory=PLOT_DIR,
-    #             plot_name="grid",
-    #             add_timestamp_prefix_to_plot_name=False,
-    #             store_plot_into_timestamp_subfolder=False,
-    #         ),
-    #         verbose=True,
-    #         remove_white_margin=True,
-    #         dpi=900,
-    #     )
+    with TemporaryDirectory() as tmp_dir:
+        output_dir = Path(tmp_dir)
+        plot_correlation_scatterplot(output_dir)
+        plot_roofline(output_dir)
+        plot_stem(output_dir)
+        plot_ridgeplot(output_dir)
+        # Load the four plots as PNGs, put them as a horizontal grid.
+        # This is done to create a grid of plots to show in the README.md file,
+        # but if you were to compose plots in a paper,
+        # you should create a grid in LaTex and load plots as PDFs, to avoid quality loss;
+        fig, axes = plt.subplots(1, 4, figsize=(3.5 * 2, 3.5 * 2), dpi=900, gridspec_kw=dict(hspace=0, wspace=0))
+        for i, plot_name in enumerate(["correlation_scatterplot", "roofline_stacked", "stem", "ridgeplot_large"]):
+            ax: Axes = axes.flat[i]
+            ax.imshow(plt.imread(output_dir / f"{plot_name}.png"))
+            ax.axis("off")
+        save_plot(
+            assemble_filenames_to_save_plot(
+                directory=PLOT_DIR,
+                plot_name="grid",
+                add_timestamp_prefix_to_plot_name=False,
+                store_plot_into_timestamp_subfolder=False,
+            ),
+            verbose=True,
+            remove_white_margin=True,
+            dpi=900,
+        )
     # Another grid, with two other examples;
     with TemporaryDirectory() as tmp_dir:
         output_dir = Path(tmp_dir)

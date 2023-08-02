@@ -36,21 +36,21 @@ def _setup_palette(palette: Optional[list[str]], bar_categories: list[str]) -> l
     return palette
 
 
-def _add_legend(ax: Axes, x_to_legend_label_map: dict[str, str], bar_categories: list[str]) -> Axes:
-    labels = [x_to_legend_label_map.get(m, m) for m in bar_categories]
+def _add_legend(ax: Axes, x_to_legend_label_map: dict[str, str], x_axis_categories: list[str]) -> Axes:
+    labels = [x_to_legend_label_map.get(m, m) for m in x_axis_categories]
     handles: list[Rectangle] = []
     # Retrieve the colors from the patches of the barplot.
     # If there are more patches than categories,
     # it's because we are dividing the plots by an additional category.
-    # In this case, we need to get one every `bar_categories` patches.
+    # In this case, we need to get one every `x_axis_categories` patches.
     rectangles = [p for p in ax.patches if isinstance(p, Rectangle)]
-    if len(rectangles) == len(bar_categories):
+    if len(rectangles) == len(x_axis_categories):
         sample_rectangles = rectangles
-    elif len(rectangles) > len(bar_categories):
-        sample_rectangles = ax.patches[:: len(bar_categories)]
+    elif len(rectangles) > len(x_axis_categories):
+        sample_rectangles = rectangles[:: len(rectangles) // len(x_axis_categories)]
     else:
         raise ValueError(
-            f"❌ the number of bars ({len(rectangles)}) is less than the number of categories ({len(bar_categories)})"
+            f"❌ the number of bars ({len(rectangles)}) is less than the number of categories ({len(x_axis_categories)})"
         )
     for r in sample_rectangles:
         assert isinstance(r, Rectangle)
@@ -552,12 +552,12 @@ def barplot_for_multiple_categories(
     ax.set_xlabel(xlabel if xlabel is not None else "", fontsize=font_size)
     ax.set_ylabel(ylabel if ylabel is not None else "", fontsize=font_size)
     # Set the x-tick labels in every axis;
-    ax.tick_params(axis="x", labelsize=font_size * 0.8)
+    ax.tick_params(axis="x", labelsize=font_size * 0.7)
     # Plot a vertical line to separate the average results from the other bar groups;
     if add_bars_for_averages:
         ax.axvline(x=0.5, color="#2f2f2f", linewidth=0.5, linestyle="--")
     # Create a common legend shown below the plot;
     if hue is not None:
-        ax = _add_legend(ax, x_to_legend_label_map, bar_categories)
+        ax = _add_legend(ax, x_to_legend_label_map, data[hue].unique())
 
     return fig, ax

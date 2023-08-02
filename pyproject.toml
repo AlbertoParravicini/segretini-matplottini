@@ -27,6 +27,9 @@ dev = [
     "pytest >= 7.4.0",
     "mypy >= 1.4.1"
 ]
+notebook = [
+    "notebook >= 7.0.1",
+]
 
 [tool.setuptools]
 packages = ["segretini_matplottini"]

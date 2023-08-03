@@ -147,16 +147,18 @@ def add_arrow_to_barplot(
     rectangles = [p for p in ax.patches if isinstance(p, Rectangle)]
     assert len(rectangles) > 0, "❌ no bars found in the plot, make sure to draw a barplot first!"
     x_coord = rectangles[0].get_x() - (rectangles[0].get_x() - ax.get_xlim()[0]) / 2
+    y_start: float = 0.01
+    y_end: float = 0.99
     ax.annotate(
         "",
-        xy=(x_coord, ax.get_ylim()[1] - 0.02 * (ax.get_ylim()[1] - ax.get_ylim()[0])),
-        xytext=(x_coord, ax.get_ylim()[0] + 0.01 * (ax.get_ylim()[1] - ax.get_ylim()[0])),
+        xy=(x_coord, y_end),
+        xytext=(x_coord, y_start),
         arrowprops=dict(
             arrowstyle="->" if higher_is_better else "<-",
             color=arrow_color,
             linewidth=line_width,
         ),
-        annotation_clip=False,
+        xycoords=ax.get_xaxis_transform(),
     )
     return ax
 

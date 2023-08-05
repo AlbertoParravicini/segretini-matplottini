@@ -26,6 +26,7 @@ When evaluating a binary classification model it is common to evaluate its perfo
 New utilities in `segretini_matplottini.utils`:
 * `add_arrow_to_barplot` adds an up or down arrow to a barplot, to highlight that a higher value or a lower value is better.
 * `create_hex_palette` creates a linear palette starting from a starting and ending color, with the requested number of colors. Just a wrapper around `sns.color_palette`, but easier to use.
+* `convert_color_to_deficiency` and `convert_colors_to_deficiency` to simulate the impact of different color deficiencies in a color or in a palette of colors.
 * `get_labels_for_bars` obtains the labels to add on top of the bars in a barplot, representing the height of each bar.
 * `add_labels_to_bars` adds textual labels to a barplot, with options to customize the position and the style of the labels. You can combine it with `get_labels_for_bars` to add labels automatically, or you can manually pass custom labels if to obtain extra control. See `examples/plot_barplot.py` for an example.
 

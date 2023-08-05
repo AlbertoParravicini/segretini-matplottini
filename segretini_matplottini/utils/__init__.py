@@ -1,7 +1,10 @@
 from segretini_matplottini.utils.colors import (  # noqa: F401
+    convert_color_to_deficiency,
+    convert_color_to_grayscale,
+    convert_colors_to_deficiency,
+    convert_colors_to_grayscale,
     create_hex_palette,
     extend_palette,
-    hex_color_to_grayscale,
 )
 from segretini_matplottini.utils.data import (  # noqa: F401
     ConfusionMatrix,
@@ -26,9 +29,8 @@ from segretini_matplottini.utils.legend import (  # noqa: F401
 from segretini_matplottini.utils.plot import (  # noqa: F401
     activate_dark_background,
     add_arrow_to_barplot,
-    add_labels,
     add_labels_to_bars,
-    adjust_number_of_rows_and_columns,
+    adjust_rows_and_columns_to_number_of_plots,
     assemble_filenames_to_save_plot,
     fix_label_length,
     get_exp_label,

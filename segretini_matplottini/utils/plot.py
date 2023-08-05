@@ -81,7 +81,7 @@ def reset_plot_style(
         activate_dark_background()
 
 
-def adjust_number_of_rows_and_columns(
+def adjust_rows_and_columns_to_number_of_plots(
     number_of_plots: int,
     number_of_rows: Optional[int] = None,
     number_of_columns: Optional[int] = None,
@@ -242,88 +242,6 @@ def update_bars_width(ax: Axes, percentage_width: float = 1) -> None:
         patch.set_width(percentage_width)
         # Recenter the bar
         patch.set_x(patch.get_x() + 0.5 * diff)
-
-
-def add_labels(
-    ax: Axes,
-    labels: Optional[list[float]] = None,
-    vertical_offsets: Optional[list[float]] = None,
-    patch_num: Optional[list[int]] = None,
-    fontsize: int = 14,
-    rotation: int = 0,
-    skip_zero: bool = False,
-    format_str: str = "{:.2f}x",
-    label_color: str = "#2f2f2f",
-    max_only: bool = False,
-    skip_bars: int = 0,
-    max_bars: Optional[int] = None,
-    skip_value: Optional[float] = None,
-    skip_threshold: float = 1e-6,
-    skip_nan_bars: bool = True,
-    max_height: Optional[float] = None,
-) -> None:
-    """
-    Add labels above barplots.
-
-    :param ax: Current axis, it is assumed that each ax.Patch is a bar over which we want to add a label.
-    :param labels: Optional labels to add. If not present, add the bar height.
-    :param vertical_offsets: Additional vertical offset for each label.
-        Useful when displaying error bars (see @get_upper_ci_size), and for fine tuning.
-    :param patch_num: Indices of patches to which we add labels, if some of them should be skipped.
-    :param fontsize: Size of each label.
-    :param rotation: Rotation of the labels (e.g. `90` for 90°).
-    :param skip_zero: If True, don't put a label over the first bar.
-    :param format_str: Format of each label, by default use speedup (e.g. 2.10x).
-    :param label_color: Hexadecimal color used for labels.
-    :param max_only: Add only the label with highest value.
-    :param skip_bars: Start adding labels after the specified number of bars.
-    :param max_bars: Don't add labels after the specified bar.
-    :param skip_value: Don't add labels equal to the specified value.
-    :param skip_threshold: Threshold used to determine if a label's value is close enough to `skip_value`
-        and should be skipped
-    :param skip_nan_bars: If True, skip bars with NaN height when placing labels.
-    :param max_height: If present, place labels at this maximum specified height (e.g. the y axis limit).
-    """
-    if not vertical_offsets:
-        # 5% above each bar, by default;
-        vertical_offsets = [ax.get_ylim()[1] * 0.05] * len(ax.patches)
-    if not labels:
-        labels = [p.get_height() for p in ax.patches]
-        if max_only:
-            argmax = np.argmax(labels)
-    patches = []
-    if not patch_num:
-        patches = ax.patches
-    else:
-        patches = [p for i, p in enumerate(ax.patches) if i in patch_num]
-    if skip_nan_bars:
-        labels = [_l for _l in labels if not pd.isna(_l)]
-        patches = [p for p in patches if not pd.isna(p.get_height())]
-
-    # Iterate through the list of axes' patches
-    for i, p in enumerate(patches[skip_bars:max_bars]):
-        if (
-            labels[i]
-            and (i > 0 or not skip_zero)
-            and (not max_only or i == argmax)
-            and i < len(labels)
-            and i < len(vertical_offsets)
-        ):
-            if skip_value and np.abs(labels[i] - skip_value) < skip_threshold:
-                continue  # Skip labels equal to the specified value;
-            height = vertical_offsets[i] + p.get_height()
-            if max_height is not None and height > max_height:
-                height = max_height
-            ax.text(
-                p.get_x() + p.get_width() / 2,
-                height,
-                format_str.format(str(labels[i])),
-                fontsize=fontsize,
-                color=label_color,
-                ha="center",
-                va="bottom",
-                rotation=rotation,
-            )
 
 
 def get_labels_for_bars(

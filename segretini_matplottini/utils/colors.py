@@ -70,7 +70,7 @@ def convert_color_to_grayscale(
 
 
 def convert_colors_to_grayscale(
-    colors: Union[list[str], list[tuple[int, int, int]]], color_space: Literal["hls", "hsv"]
+    colors: Union[list[str], list[tuple[int, int, int]]], color_space: Literal["hsv", "hls"] = "hsv"
 ) -> list[str]:
     """
     Convert a list of colors into the corresponding grayscale palette,

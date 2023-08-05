@@ -11,7 +11,7 @@ from matplotlib.ticker import LinearLocator
 
 from segretini_matplottini.utils import (
     add_legend_with_dark_shadow,
-    adjust_number_of_rows_and_columns,
+    adjust_rows_and_columns_to_number_of_plots,
     create_hex_palette,
     extend_palette,
 )
@@ -313,7 +313,7 @@ def barplots(
     ##############
 
     # Obtain the number of rows and columns to plot;
-    _number_of_rows, _number_of_columns = adjust_number_of_rows_and_columns(
+    _number_of_rows, _number_of_columns = adjust_rows_and_columns_to_number_of_plots(
         number_of_rows=number_of_rows,
         number_of_columns=number_of_columns,
         number_of_plots=len(categories),
@@ -325,7 +325,7 @@ def barplots(
     # Initialize figure;
     if reset_plot_style:
         _reset_plot_style(label_pad=2)
-    fig, axes = plt.subplots(_number_of_rows, _number_of_columns, figsize=figure_size, dpi=DEFAULT_DPI)
+    fig, axes = plt.subplots(_number_of_rows, _number_of_columns, figsize=figure_size, dpi=DEFAULT_DPI, squeeze=False)
     # If number_of_rows == number_of_columns == 1,
     # wrap the axes as if we had multiple axes;
     if isinstance(axes, Axes):
@@ -369,15 +369,7 @@ def barplots(
     _add_legend(axes.flat[0], x_to_legend_label_map, bar_categories)
     # Convert the axes array to a 2D list.
     # Remove deleted axes, by checking if they no longer have a figure reference
-    axes_list: list[list[Axes]]
-    if len(axes.shape) == 2:
-        axes_list = axes.tolist()
-    elif len(axes.shape) == 1 and _number_of_rows == 1:
-        axes_list = [axes.tolist()]
-    elif len(axes.shape) == 1 and _number_of_columns == 1:
-        axes_list = [[ax] for ax in axes.tolist()]
-    else:
-        raise ValueError(f"❌ unexpected shape of axes: {axes.shape}")
+    axes_list: list[list[Axes]] = axes.tolist()
     non_stale_axes_list: list[list[Axes]] = [[ax_j for ax_j in ax_i if ax_j.figure is not None] for ax_i in axes_list]
     return fig, non_stale_axes_list
 

@@ -15,6 +15,10 @@ What do you want do to with `segretini-matplottini`? Pick the installation that 
 
 Install `segretini-matplottini` with `pip`.
 
+```shell
+pip install segretini-matplottini
+```
+
 ### I want to run the examples
 
 Clone the repository and install `segretini-matplottini` with `pip`. You might want to do so in a dedicated `conda` environment.
@@ -114,6 +118,7 @@ To build a new version of `segretini-matplottini`, run the following command. Ma
 
 ```shell
 python -m build
+python -m twine upload dist/*
 ```
 
 ## 💡 Tips and Tricks

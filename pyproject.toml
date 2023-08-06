@@ -27,6 +27,7 @@ dev = [
     "pytest >= 7.4.0",
     "mypy >= 1.4.1",
     "build >= 0.10.0",
+    "twine >= 4.0.2",
 ]
 notebook = [
     "notebook >= 7.0.1",

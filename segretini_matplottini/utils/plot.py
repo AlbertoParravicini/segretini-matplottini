@@ -318,7 +318,7 @@ def add_labels_to_bars(
     rotation: float = 0,
     label_color: str = "#2f2f2f",
     location: Literal["above", "below"] = "above",
-    vertical_padding: float = 0.005,
+    vertical_offset_points: float = 0.5,
     do_not_exceed_ylim: bool = True,
     tolerance_for_ylim: float = 0.05,
 ) -> Axes:
@@ -332,7 +332,7 @@ def add_labels_to_bars(
     :param label_color: Hexadecimal color used for labels.
     :param location: If "above", add labels above the top of each bar.
         If "below", add labels below the top of each bar.
-    :param vertical_padding: Vertical padding, as a percentage of the vertical size of the plot.
+    :param vertical_offset_points: Vertical padding, as offset points w.r.t. the top of each bar.
     :param do_not_exceed_ylim: If True, labels that would exceed the y-axis limits are added at the limit.
     :param tolerance_for_ylim: Tolerance used to determine if a label's value is close enough to the y-axis limit,
         and should be added at the limit. The tolerance is a percentage of the vertical size of the plot.
@@ -346,10 +346,10 @@ def add_labels_to_bars(
         labels
     ), f"❌ the number of labels ({len(labels)}) and rectangles ({len(rectangles)}) must match."
     # Compute the vertical padding using the vertical size of the plot;
-    _vertical_padding = vertical_padding * (ax.get_ylim()[1] - ax.get_ylim()[0])
+    _vertical_offset_points = vertical_offset_points
     if location == "below":
         # Invert the padding, and add a bit of extra space to avoid overlapping with the bar;
-        _vertical_padding = -_vertical_padding - 0.01
+        _vertical_offset_points = -_vertical_offset_points - 1
     # Get the tolerance for the y-axis limits.
     # We need a tolerance since values close to the top/bottom would overlap with the border of the plot;
     _tolerance_for_ylim = tolerance_for_ylim * (ax.get_ylim()[1] - ax.get_ylim()[0])
@@ -368,11 +368,13 @@ def add_labels_to_bars(
             # Only if the location is below, since if it's above it does not get clipped;
             elif height - _tolerance_for_ylim < y_min and location == "below":
                 height = y_min
-        ax.text(
-            bar.get_x() + bar.get_width() / 2.0,
-            height + _vertical_padding,
-            label,
-            ha="center",
+        label_x_coordinate = bar.get_x() + bar.get_width() / 2.0
+        label_y_coordinate = height
+        ax.annotate(
+            text=label,
+            xy=(label_x_coordinate, label_y_coordinate),  # Coordinates of the label, in data-coordinates;
+            xytext=(0, vertical_offset_points),  # Coordinates of the text, as offset points w.r.t. `xy`;
+            textcoords="offset points",
             fontsize=font_size,
             color=label_color,
             rotation=rotation,

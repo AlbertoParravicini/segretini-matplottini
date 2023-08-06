@@ -1,0 +1,16 @@
+model,dataset,value
+A,dataset_10,0.15
+A,dataset_2,1.22
+A,dataset_4,0.30
+A,dataset_1,0.45
+A,dataset_3,0.31
+B,dataset_10,0.35
+B,dataset_2,1.47
+B,dataset_4,0.33
+B,dataset_1,0.72
+B,dataset_3,0.75
+C,dataset_10,0.54
+C,dataset_2,1.37
+C,dataset_4,0.32
+C,dataset_1,0.85
+C,dataset_3,0.90

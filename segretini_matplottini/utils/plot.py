@@ -81,7 +81,7 @@ def reset_plot_style(
         activate_dark_background()
 
 
-def adjust_number_of_rows_and_columns(
+def adjust_rows_and_columns_to_number_of_plots(
     number_of_plots: int,
     number_of_rows: Optional[int] = None,
     number_of_columns: Optional[int] = None,
@@ -147,16 +147,18 @@ def add_arrow_to_barplot(
     rectangles = [p for p in ax.patches if isinstance(p, Rectangle)]
     assert len(rectangles) > 0, "❌ no bars found in the plot, make sure to draw a barplot first!"
     x_coord = rectangles[0].get_x() - (rectangles[0].get_x() - ax.get_xlim()[0]) / 2
+    y_start: float = 0.01
+    y_end: float = 0.99
     ax.annotate(
         "",
-        xy=(x_coord, ax.get_ylim()[1] - 0.02 * (ax.get_ylim()[1] - ax.get_ylim()[0])),
-        xytext=(x_coord, ax.get_ylim()[0] + 0.01 * (ax.get_ylim()[1] - ax.get_ylim()[0])),
+        xy=(x_coord, y_end),
+        xytext=(x_coord, y_start),
         arrowprops=dict(
             arrowstyle="->" if higher_is_better else "<-",
             color=arrow_color,
             linewidth=line_width,
         ),
-        annotation_clip=False,
+        xycoords=ax.get_xaxis_transform(),
     )
     return ax
 
@@ -242,88 +244,6 @@ def update_bars_width(ax: Axes, percentage_width: float = 1) -> None:
         patch.set_x(patch.get_x() + 0.5 * diff)
 
 
-def add_labels(
-    ax: Axes,
-    labels: Optional[list[float]] = None,
-    vertical_offsets: Optional[list[float]] = None,
-    patch_num: Optional[list[int]] = None,
-    fontsize: int = 14,
-    rotation: int = 0,
-    skip_zero: bool = False,
-    format_str: str = "{:.2f}x",
-    label_color: str = "#2f2f2f",
-    max_only: bool = False,
-    skip_bars: int = 0,
-    max_bars: Optional[int] = None,
-    skip_value: Optional[float] = None,
-    skip_threshold: float = 1e-6,
-    skip_nan_bars: bool = True,
-    max_height: Optional[float] = None,
-) -> None:
-    """
-    Add labels above barplots.
-
-    :param ax: Current axis, it is assumed that each ax.Patch is a bar over which we want to add a label.
-    :param labels: Optional labels to add. If not present, add the bar height.
-    :param vertical_offsets: Additional vertical offset for each label.
-        Useful when displaying error bars (see @get_upper_ci_size), and for fine tuning.
-    :param patch_num: Indices of patches to which we add labels, if some of them should be skipped.
-    :param fontsize: Size of each label.
-    :param rotation: Rotation of the labels (e.g. `90` for 90°).
-    :param skip_zero: If True, don't put a label over the first bar.
-    :param format_str: Format of each label, by default use speedup (e.g. 2.10x).
-    :param label_color: Hexadecimal color used for labels.
-    :param max_only: Add only the label with highest value.
-    :param skip_bars: Start adding labels after the specified number of bars.
-    :param max_bars: Don't add labels after the specified bar.
-    :param skip_value: Don't add labels equal to the specified value.
-    :param skip_threshold: Threshold used to determine if a label's value is close enough to `skip_value`
-        and should be skipped
-    :param skip_nan_bars: If True, skip bars with NaN height when placing labels.
-    :param max_height: If present, place labels at this maximum specified height (e.g. the y axis limit).
-    """
-    if not vertical_offsets:
-        # 5% above each bar, by default;
-        vertical_offsets = [ax.get_ylim()[1] * 0.05] * len(ax.patches)
-    if not labels:
-        labels = [p.get_height() for p in ax.patches]
-        if max_only:
-            argmax = np.argmax(labels)
-    patches = []
-    if not patch_num:
-        patches = ax.patches
-    else:
-        patches = [p for i, p in enumerate(ax.patches) if i in patch_num]
-    if skip_nan_bars:
-        labels = [_l for _l in labels if not pd.isna(_l)]
-        patches = [p for p in patches if not pd.isna(p.get_height())]
-
-    # Iterate through the list of axes' patches
-    for i, p in enumerate(patches[skip_bars:max_bars]):
-        if (
-            labels[i]
-            and (i > 0 or not skip_zero)
-            and (not max_only or i == argmax)
-            and i < len(labels)
-            and i < len(vertical_offsets)
-        ):
-            if skip_value and np.abs(labels[i] - skip_value) < skip_threshold:
-                continue  # Skip labels equal to the specified value;
-            height = vertical_offsets[i] + p.get_height()
-            if max_height is not None and height > max_height:
-                height = max_height
-            ax.text(
-                p.get_x() + p.get_width() / 2,
-                height,
-                format_str.format(str(labels[i])),
-                fontsize=fontsize,
-                color=label_color,
-                ha="center",
-                va="bottom",
-                rotation=rotation,
-            )
-
-
 def get_labels_for_bars(
     ax: Axes,
     skip_zeros: bool = True,
@@ -398,7 +318,7 @@ def add_labels_to_bars(
     rotation: float = 0,
     label_color: str = "#2f2f2f",
     location: Literal["above", "below"] = "above",
-    vertical_padding: float = 0.005,
+    vertical_offset_points: float = 0.5,
     do_not_exceed_ylim: bool = True,
     tolerance_for_ylim: float = 0.05,
 ) -> Axes:
@@ -412,7 +332,7 @@ def add_labels_to_bars(
     :param label_color: Hexadecimal color used for labels.
     :param location: If "above", add labels above the top of each bar.
         If "below", add labels below the top of each bar.
-    :param vertical_padding: Vertical padding, as a percentage of the vertical size of the plot.
+    :param vertical_offset_points: Vertical padding, as offset points w.r.t. the top of each bar.
     :param do_not_exceed_ylim: If True, labels that would exceed the y-axis limits are added at the limit.
     :param tolerance_for_ylim: Tolerance used to determine if a label's value is close enough to the y-axis limit,
         and should be added at the limit. The tolerance is a percentage of the vertical size of the plot.
@@ -426,10 +346,10 @@ def add_labels_to_bars(
         labels
     ), f"❌ the number of labels ({len(labels)}) and rectangles ({len(rectangles)}) must match."
     # Compute the vertical padding using the vertical size of the plot;
-    _vertical_padding = vertical_padding * (ax.get_ylim()[1] - ax.get_ylim()[0])
+    _vertical_offset_points = vertical_offset_points
     if location == "below":
         # Invert the padding, and add a bit of extra space to avoid overlapping with the bar;
-        _vertical_padding = -_vertical_padding - 0.01
+        _vertical_offset_points = -_vertical_offset_points - 1
     # Get the tolerance for the y-axis limits.
     # We need a tolerance since values close to the top/bottom would overlap with the border of the plot;
     _tolerance_for_ylim = tolerance_for_ylim * (ax.get_ylim()[1] - ax.get_ylim()[0])
@@ -448,16 +368,19 @@ def add_labels_to_bars(
             # Only if the location is below, since if it's above it does not get clipped;
             elif height - _tolerance_for_ylim < y_min and location == "below":
                 height = y_min
-        ax.text(
-            bar.get_x() + bar.get_width() / 2.0,
-            height + _vertical_padding,
-            label,
-            ha="center",
+        label_x_coordinate = bar.get_x() + bar.get_width() / 2.0
+        label_y_coordinate = height
+        ax.annotate(
+            text=label,
+            xy=(label_x_coordinate, label_y_coordinate),  # Coordinates of the label, in data-coordinates;
+            xytext=(0, _vertical_offset_points),  # Coordinates of the text, as offset points w.r.t. `xy`;
+            textcoords="offset points",
             fontsize=font_size,
             color=label_color,
             rotation=rotation,
             va="bottom" if location == "above" else "top",
             clip_on=False,
+            ha="center",
         )
     return ax
 

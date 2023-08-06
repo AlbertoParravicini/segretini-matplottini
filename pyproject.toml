@@ -25,7 +25,11 @@ dev = [
     "ruff >= 0.0.280",
     "pre-commit >= 3.3.3",
     "pytest >= 7.4.0",
-    "mypy >= 1.4.1"
+    "mypy >= 1.4.1",
+    "build >= 0.10.0",
+]
+notebook = [
+    "notebook >= 7.0.1",
 ]
 
 [tool.setuptools]

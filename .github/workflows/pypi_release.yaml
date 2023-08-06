@@ -1,11 +1,11 @@
-# Automatic release on PyPI,
-# adapted from https://medium.com/@VersuS_/automate-pypi-releases-with-github-actions-4c5a9cfe947d
+# Automatic release on PyPI on merge to master
 name: Publish segretini-matplottini to PyPI 📦
 
 on:
-  push:
-    tags:
-     - '*'
+  pull_request:
+    types: [closed]
+    branches:
+      - master
 
 jobs:
   build-n-publish:
@@ -29,13 +29,29 @@ jobs:
         python -m pip install ".[dev]" --upgrade pip
     - name: Build package
       run: python -m build
-    - name: Extract tag name
-      id: tag
-      run: echo "TAG_NAME=$(echo $GITHUB_REF | cut -d / -f 3)" >> $GITHUB_OUTPUT
-    - name: Update version in setup.py
-      run: >-
-        sed -i "s/{{VERSION_PLACEHOLDER}}/${{ steps.tag.outputs.TAG_NAME }}/g" pyproject.toml
     - name: Publish distribution to PyPI 📦
       uses: pypa/gh-action-pypi-publish@master
       with:
+        user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: # Get the version from pyproject.toml
+          $(grep -E '^version = ".*"$' pyproject.toml | cut -d'"' -f2)
+        release_name: 
+          $(grep -E '^version = ".*"$' pyproject.toml | cut -d'"' -f2)
+        body: |
+          Automated release with tag ${{ steps.create_release.outputs.tag_name }}.
+        draft: false
+        prerelease: false
+
+    - name: Commit changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git commit -am "Bump version to ${{ steps.create_release.outputs.tag_name }}"
+        git push

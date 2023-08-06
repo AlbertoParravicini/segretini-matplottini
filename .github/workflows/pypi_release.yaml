@@ -1,0 +1,57 @@
+# Automatic release on PyPI on merge to master
+name: Publish segretini-matplottini to PyPI 📦
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - master
+
+jobs:
+  build-n-publish:
+
+    name: Publish segretini-matplottini to PyPI 📦
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    strategy:
+      matrix:
+        python-version: ["3.9"]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install ".[dev]" --upgrade pip
+    - name: Build package
+      run: python -m build
+    - name: Publish distribution to PyPI 📦
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: # Get the version from pyproject.toml
+          $(grep -E '^version = ".*"$' pyproject.toml | cut -d'"' -f2)
+        release_name: 
+          $(grep -E '^version = ".*"$' pyproject.toml | cut -d'"' -f2)
+        body: |
+          Automated release with tag ${{ steps.create_release.outputs.tag_name }}.
+        draft: false
+        prerelease: false
+
+    - name: Commit changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git commit -am "Bump version to ${{ steps.create_release.outputs.tag_name }}"
+        git push

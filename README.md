@@ -9,19 +9,35 @@ to help researchers create publication-ready plots with ease.
 
 ## 🚂 Installation
 
-Clone the repository and install `segretini-matplottini` with `pip`.
+What do you want do to with `segretini-matplottini`? Pick the installation that suits you best.
+
+### I want to use `segretini-matplottini` as a package in my projects
+
+Install `segretini-matplottini` with `pip`.
+
+### I want to run the examples
+
+Clone the repository and install `segretini-matplottini` with `pip`. You might want to do so in a dedicated `conda` environment.
 
 ```shell
 git clone https://github.com/AlbertoParravicini/segretini-matplottini.git
 cd segretini-matplottini
+conda create -n segretini_matplottini python=3.9
+conda activate segretini_matplottini
 pip install .
 ```
+
+### I want to run the examples and the notebooks
 
 If you want to play with notebooks, also install `jupyter`.
 
 ```shell
 pip install ".[notebook]"
 ```
+
+### I like `segretini-matplottini` so much that I want to contribute to it
+
+Jump ahead to the [Development notes](#👨‍🔬-development-notes) section!
 
 ## ✍️ Repository Structure
 
@@ -97,7 +113,7 @@ ruff . --fix --config ruff.toml
 To build a new version of `segretini-matplottini`, run the following command. Make sure that you have `dev` dependencies installed.
 
 ```shell
-python3 -m build
+python -m build
 ```
 
 ## 💡 Tips and Tricks

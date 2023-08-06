@@ -3,7 +3,7 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-version = "0.2.0"
+version = "0.2.1"
 name = "segretini-matplottini"
 description = "Colorful recipes and utilities for Matplolib and Seaborn, to create publication-ready plots"
 authors = [{name = "Alberto Parravicini", email = "alberto.parravicini@polimi.it"}]

@@ -21,6 +21,7 @@ jobs:
       url: https://pypi.org/project/segretini-matplottini/
     permissions:
       id-token: write
+      contents: write
 
     steps:
     - name: Checkout code
@@ -37,18 +38,17 @@ jobs:
     - name: Publish distribution to PyPI 📦
       uses: pypa/gh-action-pypi-publish@release/v1
     - name: Create GitHub Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: "marvinpinto/action-automatic-releases@latest"
       with:
-        # Get the version from pyproject.toml
-        tag_name: v$(grep -E '^version = ".*"$' pyproject.toml | cut -d'"' -f2)
-        release_name: v$(grep -E '^version = ".*"$' pyproject.toml | cut -d'"' -f2)
-        body: |
-          Automated release with tag ${{ steps.create_release.outputs.tag_name }}.
-        draft: false
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        automatic_release_tag: v$(grep -E '^version = ".*"$' pyproject.toml | cut -d'"' -f2)
         prerelease: false
+        draft: false
+        title: "Automated release with tag ${{ steps.create_release.outputs.tag_name }}."
+        files: |
+          dist/*
+          CHANGELOG.md
+          LICENSE
 
     - name: Commit changes
       run: |

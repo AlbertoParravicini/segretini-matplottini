@@ -7,7 +7,7 @@
 !.pre-commit-config.yaml
 !.github/
 !.github/workflows/
-!.github/workflows/pull_request.yaml
+!.github/workflows/*.yaml
 !ruff.toml
 !mypy.ini
 !README.md

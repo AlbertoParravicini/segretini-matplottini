@@ -373,13 +373,14 @@ def add_labels_to_bars(
         ax.annotate(
             text=label,
             xy=(label_x_coordinate, label_y_coordinate),  # Coordinates of the label, in data-coordinates;
-            xytext=(0, vertical_offset_points),  # Coordinates of the text, as offset points w.r.t. `xy`;
+            xytext=(0, _vertical_offset_points),  # Coordinates of the text, as offset points w.r.t. `xy`;
             textcoords="offset points",
             fontsize=font_size,
             color=label_color,
             rotation=rotation,
             va="bottom" if location == "above" else "top",
             clip_on=False,
+            ha="center",
         )
     return ax
 

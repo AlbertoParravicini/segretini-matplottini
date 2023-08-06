@@ -14,7 +14,6 @@ from segretini_matplottini.utils import (
     get_labels_for_bars,
     save_plot,
 )
-from segretini_matplottini.utils.colors import PALETTE_ORANGE_BASELINE_AND_GREEN_TONES
 from segretini_matplottini.utils.constants import DEFAULT_FONT_SIZE
 
 ##############################
@@ -35,10 +34,6 @@ def load_data_1() -> pd.DataFrame:
 
 def load_data_2() -> pd.DataFrame:
     return pd.read_csv(DATA_DIR / "barplot_for_multiple_categories_data.csv")
-
-
-def load_data_3() -> pd.DataFrame:
-    return pd.read_csv(DATA_DIR / "notebooks/1_getting_started_with_barplots/barplot_data.csv")
 
 
 if __name__ == "__main__":
@@ -123,60 +118,6 @@ if __name__ == "__main__":
         assemble_filenames_to_save_plot(
             directory=PLOT_DIR,
             plot_name="barplot_for_multiple_categories",
-            add_timestamp_prefix_to_plot_name=False,
-            store_plot_into_timestamp_subfolder=False,
-        ),
-        verbose=True,
-    )
-    # Plot a single barplot
-    data = load_data_3()
-    data = data.sort_values(by="dataset", key=lambda x: x.str.split("_").str[1].astype(int))
-    _, ax = barplot_for_multiple_categories(
-        data,
-        x="dataset",
-        y="value",
-        hue="model",
-        xlabel="Dataset",
-        ylabel="Value",
-        ylimits=(0, 2),
-        y_axis_ticks_count=9,
-        palette=PALETTE_ORANGE_BASELINE_AND_GREEN_TONES,
-        hue_category_to_x_tick_label_map={
-            "dataset_10": "Dataset 10",
-            "dataset_1": "Dataset 1",
-            "dataset_2": "Dataset 2",
-            "dataset_4": "Dataset 4",
-            "dataset_3": "Dataset 3",
-        },
-        x_to_legend_label_map={
-            "A": "Baseline",
-            "B": "Current state-of-the-art",
-            "C": "Our model",
-        },
-    )
-    ax = add_labels_to_bars(
-        ax=ax,
-        labels=get_labels_for_bars(
-            ax, normalize_wrt_minimum=True, skip_value=1, label_format_str=lambda x: f"{x:.2f}X"
-        ),
-        font_size=DEFAULT_FONT_SIZE - 5,
-        location="above",
-    )
-    # ax = add_labels_to_bars(
-    #     ax=ax,
-    #     labels=get_labels_for_bars(
-    #         ax
-    #     ),
-    #     font_size=DEFAULT_FONT_SIZE - 5,
-    #     location="below",
-    #     vertical_padding=0.008
-    # )
-    ax.get_legend().set_bbox_to_anchor((0.56, 0))
-    ax = add_arrow_to_barplot(ax=ax, higher_is_better=True, left_margin_to_add=0.2)
-    save_plot(
-        assemble_filenames_to_save_plot(
-            directory=PLOT_DIR,
-            plot_name="a_much_better_barplot",
             add_timestamp_prefix_to_plot_name=False,
             store_plot_into_timestamp_subfolder=False,
         ),

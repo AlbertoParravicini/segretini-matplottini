@@ -5,7 +5,7 @@ to help researchers create publication-ready plots with ease.
 
 👇 For example, a `correlation_scatterplot`, a stacked `roofline` plot, a `timeseries` plot with `stems`, and a `ridgeplot`. Find other examples below!
 
-![Grid of example plots](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/grid.png)
+![Grid of example plots](https://raw.githubusercontent.com/AlbertoParravicini/segretini-matplottini/master/plots/grid.png)
 
 ## 🚂 Installation
 
@@ -96,7 +96,7 @@ There's a lot more than plotting functions! The `utils` can be applied to any Ma
 
 In the examples below, a `binary_classification` plot with a few of the available sub-plots turned on, and a `barplot` that takes advantage of the `utils` to compute relative performance and add labels to bars.
 
-![Grid of example plots, binary classification and barplot](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/grid_2.png)
+![Grid of example plots, binary classification and barplot](https://raw.githubusercontent.com/AlbertoParravicini/segretini-matplottini/master/plots/grid_2.png)
 
 ## 👨‍🔬 Development notes
 

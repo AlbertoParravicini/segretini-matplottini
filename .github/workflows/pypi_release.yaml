@@ -8,7 +8,7 @@ on:
       - master
 
 jobs:
-  build-n-publish:
+  pypi-publish:
 
     name: Publish segretini-matplottini to PyPI 📦
     runs-on: ubuntu-latest
@@ -16,6 +16,11 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.9"]
+    environment:
+      name: pypi
+      url: https://pypi.org/project/segretini-matplottini/
+    permissions:
+      id-token: write
 
     steps:
     - name: Checkout code
@@ -30,10 +35,7 @@ jobs:
     - name: Build package
       run: python -m build
     - name: Publish distribution to PyPI 📦
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}
+      uses: pypa/gh-action-pypi-publish@release/v1
     - name: Create GitHub Release
       id: create_release
       uses: actions/create-release@v1

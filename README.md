@@ -121,12 +121,7 @@ ruff . --fix --config ruff.toml
 
 ### Building and releasing
 
-To build a new version of `segretini-matplottini`, run the following command. Make sure that you have `dev` dependencies installed.
-
-```shell
-python -m build
-python -m twine upload dist/*
-```
+New releases of `segretini-matplottini` are built and uploaded to `pypi` every time a pull request is merged to `master`. Remember to update the `version` field in `pyproject.toml`, or the release on `pypi` will fail.
 
 ## 💡 Tips and Tricks
 

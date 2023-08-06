@@ -367,7 +367,7 @@ def _interpolate_color_deficiency_matrices(
     # If strength is 0.76, we obtain the matrices for 0.7 and 0.8, and interpolate them with strength 0.6 and 0.4;
     matrix_1, matrix_2 = _find_closest_color_deficiency_matrices(deficiency=deficiency, strength=strength)
     # If the strength is 0.761, the interpolation strength is 0.61;
-    interpolation_strength = np.modf(strength * 10)[0]
+    interpolation_strength: float = np.modf(strength * 10)[0]
     return matrix_1 * interpolation_strength + matrix_2 * (1 - interpolation_strength)
 
 

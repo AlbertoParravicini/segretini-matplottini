@@ -27,6 +27,7 @@
 !plots/*.pdf
 !plots/notebooks/1_getting_started_with_barplots
 !plots/notebooks/1_getting_started_with_barplots/*.png
+!plots/notebooks/1_getting_started_with_barplots/*.pdf
 !tests/
 !tests/plot/
 !tests/utils/

@@ -3,6 +3,15 @@
 
 Here you can find a list of the latest updates to `segretini_matplottini`, such as new recipes for plots.
 
+## 2023-08-06
+
+🤯 Added an introductory notebook, `notebooks/1_getting_started_with_barplots.ipynb`.
+* The notebook provides an introduction to Matplotlib and Seaborn, and guides the reader into creating a beautiful barplot.
+* It explains some important concepts behind creating a great visualization, and also a few advanced customization tricks.
+This is what you will be able to create in the end.
+
+![Barplot created from the notebook](https://github.com/AlbertoParravicini/segretini-matplottini/blob/master/plots/notebooks/1_getting_started_with_barplots/our_amazing_barplot_v3.png)
+
 ## 2023-07-26
 
 ### Barplots 

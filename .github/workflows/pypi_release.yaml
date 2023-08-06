@@ -46,15 +46,8 @@ jobs:
         automatic_release_tag: ${{ steps.get_tag_name.outputs.tag_name }}
         prerelease: false
         draft: false
-        title: "Automated release with tag ${{ steps.get_tag_name.outputs.tag_name }}."
+        title: "${{ steps.get_tag_name.outputs.tag_name }}"
         files: |
           dist/*
           CHANGELOG.md
           LICENSE
-
-    - name: Commit changes
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git commit -am "Bump version to ${{ steps.get_tag_name.outputs.TAG_NAME }}"
-        git push

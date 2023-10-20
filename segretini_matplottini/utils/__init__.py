@@ -24,6 +24,7 @@ from segretini_matplottini.utils.data import (  # noqa: F401
 )
 from segretini_matplottini.utils.legend import (  # noqa: F401
     add_legend_with_dark_shadow,
+    get_legend_handles_from_colors,
     transpose_legend_labels,
 )
 from segretini_matplottini.utils.plot import (  # noqa: F401

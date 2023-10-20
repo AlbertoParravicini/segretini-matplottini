@@ -8,7 +8,7 @@ from matplotlib.axis import Axis
 from matplotlib.backend_bases import RendererBase
 from matplotlib.figure import Figure
 from matplotlib.legend import Legend
-from matplotlib.patches import Patch, Shadow
+from matplotlib.patches import Patch, Rectangle, Shadow
 
 
 class LegendWithDarkShadow(Legend):
@@ -49,6 +49,30 @@ class LegendWithDarkShadow(Legend):
 
         renderer.close_group("legend")
         self.stale = False
+
+
+def get_legend_handles_from_colors(
+    colors: list[str], edge_color: str="#2f2f2f", line_width: float = 0.5
+) -> list[Rectangle]:
+    """
+    Obtain a list of handles to create a legend from a list of colors.
+
+    :param colors: List of colors.
+    :param edge_color: Color of the edge of the legend handle.
+    :param line_width: Width of the line that surrounds the handle.
+    :return: List of handles.
+    """
+    return [
+        Rectangle(
+            (0, 0),
+            1,
+            1,
+            facecolor=c,
+            edgecolor=edge_color,
+            linewidth=line_width,
+        )
+        for c in colors
+    ]
 
 
 def add_legend_with_dark_shadow(
@@ -108,7 +132,10 @@ def add_legend_with_dark_shadow(
 
 
 def transpose_legend_labels(
-    labels: list[str], handles: list[Patch], max_elements_per_row: int = 6, default_elements_per_col: int = 2
+    labels: list[str],
+    handles: list[Patch],
+    max_elements_per_row: int = 6,
+    default_elements_per_col: int = 2,
 ) -> tuple[list[str], list[Patch]]:
     """
     Matplotlib by defaults places elements in the legend from top to bottom.

@@ -66,7 +66,7 @@ def convert_color_to_grayscale(
     elif color_space == "hsv":
         hsv_color = rgb_to_hsv(to_rgb(color))
         hsv_color[1] = 0
-        return str(to_hex(hsv_to_rgb(hsv_color)))
+        return str(to_hex(hsv_to_rgb(hsv_color)))  # type: ignore
 
 
 def convert_colors_to_grayscale(

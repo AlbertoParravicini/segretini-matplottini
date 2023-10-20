@@ -68,7 +68,7 @@ def performance_scaling(
 
     # Set axes limits;
     if set_axes_limits:
-        ax.set_xlim(X_LIMITS)
+        ax.set_xlim(X_LIMITS)  # type: ignore
         ax.set_ylim(Y_LIMITS)
 
     #################
@@ -92,6 +92,7 @@ def performance_scaling(
         edgecolor="#2f2f2f",
         linewidth=0.5,
         zorder=4,
+        legend=False,
     )
 
     # Add a regression plot to highlight the correlation between variables, with 95% confidence intervals;
@@ -119,7 +120,6 @@ def performance_scaling(
             slope_2_years = 10 ** (slope * 2)
             slope_20_years = 10 ** (slope * 20)
             kind_increase[kind] = (slope_2_years, slope_20_years)
-    ax.legend_.remove()  # Hack to remove legend;
 
     #####################
     # Add labels ########
@@ -261,7 +261,7 @@ def performance_scaling(
 
     # Add axes labels;
     plt.ylabel("Performance Scaling", fontsize=8)
-    plt.xlabel(None)
+    plt.xlabel("")
 
     return fig, ax
 

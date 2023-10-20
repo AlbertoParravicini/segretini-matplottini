@@ -92,7 +92,7 @@ def test_double_roofline() -> None:
     gs = gridspec.GridSpec(num_row, num_col, top=0.95, bottom=0.2, left=0.1, right=0.92, hspace=0, wspace=0.4)
     # First roofline
     ax = fig.add_subplot(gs[0, 0])
-    ax = roofline(
+    fig, ax = roofline(
         performance_1,
         operational_intensity_1,
         peak_performance_1,
@@ -108,7 +108,7 @@ def test_double_roofline() -> None:
     )
     # Second roofline
     ax = fig.add_subplot(gs[0, 1])
-    ax = roofline(
+    fig, ax = roofline(
         performance_2,
         operational_intensity_2,
         peak_performance_2,

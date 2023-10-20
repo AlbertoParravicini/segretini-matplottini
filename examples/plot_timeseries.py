@@ -46,7 +46,7 @@ def load_data_2() -> pd.Series:
     data = data.mask(data < data.quantile(0.5), other=0)
     z = pd.Series(np.zeros(len(data)), index=data.index)
     local_maxima = argrelextrema(data.values, np.greater, order=3)[0]
-    z[local_maxima] = data[local_maxima]
+    z.iloc[local_maxima] = data.iloc[local_maxima]
     return z
 
 

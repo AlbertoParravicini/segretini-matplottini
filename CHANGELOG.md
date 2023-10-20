@@ -3,6 +3,28 @@
 
 Here you can find a list of the latest updates to `segretini_matplottini`, such as new recipes for plots.
 
+## 2023-10-20
+
+* Added a `get_legend_handles_from_colors` function in `segretini_matplottini.utils` to create the legend handles from a list of colors. Now you can create a personalized legend as follows.
+
+```python
+from segretini_matplottini.utils.legend import (
+    add_legend_with_dark_shadow,
+    get_legend_handles_from_colors,
+)
+fig, ax = plt.subplots()
+palette = ["#48C2A3","#FF6494"]
+add_legend_with_dark_shadow(
+    handles=get_legend_handles_from_colors(palette),
+    labels=["Label A", "Label B"],
+    ax=ax,
+)
+```
+
+* Fixed `timeseries` with `stem` not working when an existing `ax` is passed.
+* Added the option to specify `xlim` in `timeseries`.
+* Bumped support to Seaborn 0.13.0 and Matplotlib 3.8.0.
+
 ## 2023-08-06
 
 🤯 Added an introductory notebook, `notebooks/1_getting_started_with_barplots.ipynb`.

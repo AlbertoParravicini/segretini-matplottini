@@ -1,4 +1,4 @@
-from typing import Any, Callable, Optional
+from typing import Callable, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -33,8 +33,8 @@ def correlation_scatterplot(
     ylabel: Optional[str] = None,
     xlimits: Optional[tuple[float, float]] = None,
     ylimits: Optional[tuple[float, float]] = None,
-    x_ticks_formatter: Callable[[Any, int], str] = lambda x, pos: f"{x * 100:.0f}%",
-    y_ticks_formatter: Callable[[Any, int], str] = lambda x, pos: f"{x * 100:.0f}%",
+    x_ticks_formatter: Callable[[float, float], str] = lambda x, pos: f"{x * 100:.0f}%",
+    y_ticks_formatter: Callable[[float, float], str] = lambda x, pos: f"{x * 100:.0f}%",
     vertical_legend: bool = False,
     legend_position: str = "best",
     label_color: str = "#2f2f2f",
@@ -111,7 +111,10 @@ def correlation_scatterplot(
             right=right_padding,
         )
     else:
-        fig = ax.get_figure()
+        _fig = ax.get_figure()
+        assert _fig is not None, "❌ the axis has no figure associated"
+        fig = _fig
+    assert ax is not None, "❌ the axis is None"
 
     # Create default color palette;
     if scatterplot_palette is None:
@@ -176,6 +179,7 @@ def correlation_scatterplot(
         )
         # Update regression confidence intervals,
         #   to set the confidence bands as semi-transparent and change style and colors of borders;
+        assert ax is not None, "❌ the axis is None"
         plt.setp(ax.collections[-1], facecolor="w", edgecolor=regression_color, alpha=0.6, linestyles="--", zorder=3)
 
     # Add a scatterplot for individual elements of the dataset, and change color based on statistical significance;
@@ -192,6 +196,7 @@ def correlation_scatterplot(
         linewidth=0.5,
         zorder=3,
     )
+    assert ax is not None, "❌ the axis is None"
     # Remove the existing legend from the axis, if present
     if ax.get_legend():
         ax.get_legend().remove()
@@ -251,7 +256,7 @@ def correlation_scatterplot(
 
     # Add axes labels;
     if xlabel is not None:
-        plt.xlabel(xlabel=xlabel, fontsize=font_size)
+        plt.xlabel(xlabel=xlabel if xlabel is not None else "", fontsize=font_size)
     if xlabel is not None:
-        plt.ylabel(ylabel=ylabel, fontsize=font_size)
+        plt.ylabel(ylabel=ylabel if ylabel is not None else "", fontsize=font_size)
     return fig, ax

@@ -114,7 +114,9 @@ def _plot_binary_classification_curve(
         fig, ax = plt.subplots(figsize=figure_size, dpi=DEFAULT_DPI)
         plt.subplots_adjust(top=top_padding, bottom=bottom_padding, left=left_padding, right=right_padding)
     else:
-        fig = ax.get_figure()
+        _fig = ax.get_figure()
+        assert _fig is not None, "❌ the axis has no figure associated"
+        fig = _fig
 
     ##################
     # Add main plots #

@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Literal, Optional, get_args
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -20,6 +20,7 @@ def timeseries(
     line_width: float = 0.5,
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
+    xlimits: Optional[tuple[float, float]] = None,
     ylimits: Optional[tuple[float, float]] = None,
     date_format: Optional[str] = None,
     seconds_interval_major_ticks: Optional[int] = None,
@@ -48,6 +49,7 @@ def timeseries(
     :param line_width: Width of the time-series line.
     :param xlabel: Label of the x-axis.
     :param ylabel: Label of the y-axis.
+    :param xlimits: Limits of the y-axis. If none, use `[min(x), max(x)]`.
     :param ylimits: Limits of the y-axis. If none, use `[min(x), max(x)]`.
     :param date_format: If not None, try formatting x-axis tick labels with the specified time format.
     :param seconds_interval_major_ticks: If not None and `date_format` is present,
@@ -116,32 +118,38 @@ def timeseries(
         fig, ax = plt.subplots(figsize=figure_size, dpi=DEFAULT_DPI)
         plt.subplots_adjust(top=top_padding, bottom=bottom_padding, left=left_padding, right=right_padding)
     else:
-        fig = ax.get_figure()
+        _fig = ax.get_figure()
+        assert _fig is not None, "❌ the axis has no figure associated"
+        fig = _fig
 
     ##################
     # Add main plots #
     ##################
 
     if draw_style == "stem":
-        stems = ax.stem(x, y, linefmt=line_color, markerfmt=" ", basefmt=" ", use_line_collection=True)
+        stems = ax.stem(x, y, linefmt=line_color, markerfmt=" ", basefmt=" ")
         plt.setp(stems, "linewidth", line_width)  # Set stem line width
     else:
         ax.plot(x, y, lw=line_width, color=line_color, drawstyle=draw_style)
         if fill:
             step = None if "steps" not in draw_style else draw_style.replace("steps-", "")
-            plt.fill_between(x, y, alpha=0.5, color=line_color, step=step)
+            assert step is None or step in get_args(
+                Literal["pre", "mid", "post"]
+            ), f"❌ invalid step value, must be 'pre', 'mid' or 'post', not {step}"
+            ax.fill_between(x, y, alpha=0.5, color=line_color, step=step)  # type: ignore
 
     #####################
     # Style fine-tuning #
     #####################
 
     # Activate grid on the y axis
-    # ax.grid(True, axis="y", lw=0.8)
-    # ax.grid(False, axis="x")
     ax.grid(axis="y", linestyle="--", linewidth=0.5)
 
     # Set axes limits
-    ax.set_xlim(min(x), max(x))
+    if xlimits is None:
+        ax.set_xlim(min(x), max(x))
+    else:
+        ax.set_xlim(xlimits)
     if ylimits is None:
         ax.set_ylim(min(y), max(y))
     else:

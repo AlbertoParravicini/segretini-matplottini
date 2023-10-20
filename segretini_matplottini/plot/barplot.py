@@ -1,4 +1,4 @@
-from typing import Callable, Optional
+from typing import Callable, Optional, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -163,7 +163,12 @@ def barplot(
         fig, ax = plt.subplots(figsize=figure_size, dpi=DEFAULT_DPI)
         plt.subplots_adjust(top=top_padding, bottom=bottom_padding, left=left_padding, right=right_padding)
     else:
-        fig = ax.get_figure()
+        _fig = ax.get_figure()
+        assert _fig is not None, "❌ the axis has no figure associated"
+        fig = _fig
+    # Assigning "palette" without assigning "hue" is no longer supported in Seaborn.
+    # We get the same effect by setting the "x" variable to "hue", and setting "legend" to False.
+    hue = x
 
     ##################
     # Add main plots #
@@ -174,12 +179,14 @@ def barplot(
         x=x,
         y=y,
         ax=ax,
+        hue=hue,
         errorbar=None,
         palette=palette,
         saturation=0.9,
         edgecolor="#2f2f2f",
         linewidth=0.5,
         width=0.7,
+        legend=False,
     )
 
     #####################
@@ -213,7 +220,7 @@ def barplots(
     y: str,
     category: str,
     add_bars_for_averages: bool = False,
-    aggregation_function_for_average: Callable[[pd.Series], float] = np.mean,
+    aggregation_function_for_average: Union[str, Callable[[pd.Series], float]] = "mean",
     number_of_rows: Optional[int] = None,
     number_of_columns: Optional[int] = None,
     ylimits: Optional[tuple[float, float]] = None,
@@ -251,6 +258,8 @@ def barplots(
         that represents the average across all categories.
     :param aggregation_function_for_average: Function to use to aggregate the values of `y` across all categories,
         to compute the average. By default, use the mean.
+        Either a string representing an aggregation supported by Pandas ("mean", "median", ...) or a Callable
+        that can be applied to a Pandas Series.
     :param number_of_rows: Number of rows of the grid of plots. If None, infer it from the number of categories.
     :param number_of_columns: Number of columns of the grid of plots. If None, infer it from the number of categories.
     :param ylimits: Limits of the y-axis. If none, they are inferred by Matplotlib.
@@ -343,13 +352,13 @@ def barplots(
     # Add main plots #
     ##################
 
-    for i, (category, temp_data) in enumerate(_data.groupby(category, sort=False)):
+    for i, (_category, temp_data) in enumerate(_data.groupby(category, sort=False)):
         ax: plt.Axes = axes.flat[i]
         _, ax = barplot(
             temp_data,
             x=x,
             y=y,
-            ylabel=category_to_y_label_map.get(category, category),
+            ylabel=category_to_y_label_map.get(_category, _category),
             ylimits=ylimits,
             add_legend=False,
             y_axis_ticks_count=y_axis_ticks_count,
@@ -380,7 +389,7 @@ def barplot_for_multiple_categories(
     y: str,
     hue: Optional[str] = None,
     add_bars_for_averages: bool = True,
-    aggregation_function_for_average: Callable[[pd.Series], float] = np.mean,
+    aggregation_function_for_average: Union[str, Callable[[pd.Series], float]] = "mean",
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
     ylimits: Optional[tuple[float, float]] = None,
@@ -417,6 +426,8 @@ def barplot_for_multiple_categories(
         that represents the average across all categories.
     :param aggregation_function_for_average: Function to use to aggregate the values of `y` across all categories,
         to compute the average. By default, use the mean.
+        Either a string representing an aggregation supported by Pandas ("mean", "median", ...) or a Callable
+        that can be applied to a Pandas Series.
     :param xlabel: Label to add to the x-axis, if present.
     :param ylabel: Label to add to the y-axis, if present.
     :param ylimits: Limits of the y-axis. If none, they are inferred by Matplotlib.
@@ -502,7 +513,9 @@ def barplot_for_multiple_categories(
         fig, ax = plt.subplots(figsize=figure_size, dpi=DEFAULT_DPI)
         plt.subplots_adjust(top=top_padding, bottom=bottom_padding, left=left_padding, right=right_padding)
     else:
-        fig = ax.get_figure()
+        _fig = ax.get_figure()
+        assert _fig is not None, "❌ the axis has no figure associated"
+        fig = _fig
 
     ##################
     # Add main plots #
@@ -513,7 +526,7 @@ def barplot_for_multiple_categories(
         data=_data,
         x=x,
         y=y,
-        hue=hue,
+        hue=_hue,
         ax=ax,
         errorbar=None,
         width=0.8,
@@ -522,15 +535,13 @@ def barplot_for_multiple_categories(
         edgecolor="#2f2f2f",
         linewidth=0.5,
         hue_order=bar_categories,
+        legend=False,
     )
 
     #####################
     # Style fine-tuning #
     #####################
 
-    # Delete the legend, we recreate it later;
-    if ax.get_legend() is not None:
-        ax.get_legend().remove()
     # Limit y-axis;
     if ylimits is not None:
         ax.set_ylim(ylimits)

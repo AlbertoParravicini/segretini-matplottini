@@ -28,7 +28,7 @@ git clone https://github.com/AlbertoParravicini/segretini-matplottini.git
 cd segretini-matplottini
 conda create -n segretini_matplottini python=3.9
 conda activate segretini_matplottini
-pip install .
+pip install -e .
 ```
 
 ### I want to run the examples and the notebooks

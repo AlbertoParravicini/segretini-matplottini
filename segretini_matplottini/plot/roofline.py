@@ -154,7 +154,9 @@ def roofline(
             right=right_padding,
         )
     else:
-        fig = ax.get_figure()
+        _fig = ax.get_figure()
+        assert _fig is not None, "❌ the axis has no figure associated"
+        fig = _fig
 
     # Always set log-axes;
     plt.yscale("log")

@@ -7,7 +7,7 @@ import pytest
 from segretini_matplottini.plot import correlation_scatterplot
 from segretini_matplottini.utils.colors import TWO_TEAL_TONES
 
-from .utils import reset_plot_style, save_tmp_plot  # noqa: F401
+from .utils import save_tmp_plot  # noqa: F401
 
 # Axes limits used in the plot, change them accordingy to your data;
 X_LIMITS = (-0.2, 0.6)

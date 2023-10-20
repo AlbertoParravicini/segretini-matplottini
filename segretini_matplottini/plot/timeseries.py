@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Literal, Optional, get_args
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -118,19 +118,24 @@ def timeseries(
         fig, ax = plt.subplots(figsize=figure_size, dpi=DEFAULT_DPI)
         plt.subplots_adjust(top=top_padding, bottom=bottom_padding, left=left_padding, right=right_padding)
     else:
-        fig = ax.get_figure()
+        _fig = ax.get_figure()
+        assert _fig is not None, "❌ the axis has no figure associated"
+        fig = _fig
 
     ##################
     # Add main plots #
     ##################
 
     if draw_style == "stem":
-        stems = ax.stem(x, y, linefmt=line_color, markerfmt=" ", basefmt=" ", use_line_collection=True)
+        stems = ax.stem(x, y, linefmt=line_color, markerfmt=" ", basefmt=" ")
         plt.setp(stems, "linewidth", line_width)  # Set stem line width
     else:
         ax.plot(x, y, lw=line_width, color=line_color, drawstyle=draw_style)
         if fill:
             step = None if "steps" not in draw_style else draw_style.replace("steps-", "")
+            assert step is None or step in get_args(
+                Literal["pre", "mid", "post"]
+            ), f"❌ invalid step value, must be 'pre', 'mid' or 'post', not {step}"
             ax.fill_between(x, y, alpha=0.5, color=line_color, step=step)
 
     #####################

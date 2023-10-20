@@ -36,8 +36,8 @@ def load_data() -> pd.DataFrame:
     data = remove_outliers_from_dataframe_ci(data, "exec_time_2_us", groupby=["name"], verbose=True)
 
     # Add relative execution time;
-    data["rel_time_1"] = 1
-    data["rel_time_2"] = 1
+    data["rel_time_1"] = 1.0
+    data["rel_time_2"] = 1.0
     for _, g in data.groupby("name", as_index=False):
         data.loc[g.index, "rel_time_1"] = g["exec_time_1_us"] / np.mean(g["exec_time_1_us"])
         data.loc[g.index, "rel_time_2"] = g["exec_time_2_us"] / np.mean(g["exec_time_1_us"])

@@ -110,7 +110,7 @@ def plot_3(data_dict_1: dict[str, Any], data_dict_2: dict[str, Any]) -> tuple[pl
     gs = gridspec.GridSpec(num_row, num_col, top=0.95, bottom=0.2, left=0.1, right=0.92, hspace=0, wspace=0.4)
     # First roofline
     ax = fig.add_subplot(gs[0, 0])
-    ax = roofline(
+    fig, ax = roofline(
         data_dict_1["performance"],
         data_dict_1["operational_intensity"],
         data_dict_1["peak_performance"],
@@ -126,7 +126,7 @@ def plot_3(data_dict_1: dict[str, Any], data_dict_2: dict[str, Any]) -> tuple[pl
     )
     # Second roofline
     ax = fig.add_subplot(gs[0, 1])
-    ax = roofline(
+    fig, ax = roofline(
         data_dict_2["performance"],
         data_dict_2["operational_intensity"],
         data_dict_2["peak_performance"],

@@ -266,7 +266,7 @@ def _add_legend(palette: tuple[str, str], legend_labels: tuple[str, str], g: sns
         columnspacing=1,
         shadow_offset=1,
     )
-    leg.set_title(None)
+    leg.set_title("")
     leg.set_alignment("left")
     leg.get_frame().set_facecolor("white")
 

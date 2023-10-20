@@ -1,58 +1,16 @@
-from typing import Any, Optional
+from typing import Any, Optional, Sequence, Union
 
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.artist import allow_rasterization
-from matplotlib.axis import Axis
-from matplotlib.backend_bases import RendererBase
+from matplotlib.artist import Artist
+from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.legend import Legend
-from matplotlib.patches import Patch, Rectangle, Shadow
-
-
-class LegendWithDarkShadow(Legend):
-    """
-    A custom legend style with a rectangular box and a dark shadow around the box.
-    """
-
-    def __post_init__(self) -> None:
-        self.shadow_offset = 2
-
-    @allow_rasterization
-    def draw(self, renderer: RendererBase) -> None:
-        # docstring inherited
-        if not self.get_visible():
-            return
-
-        renderer.open_group("legend", gid=self.get_gid())
-
-        fontsize = renderer.points_to_pixels(self._fontsize)
-
-        # If mode == fill, set the width of the legend_box to the
-        # width of the parent (minus pads);
-        if self._mode in ["expand"]:
-            pad = 2 * (self.borderaxespad + self.borderpad) * fontsize
-            self._legend_box.set_width(self.get_bbox_to_anchor().width - pad)
-
-        # Update the location and size of the legend. This needs to
-        # be done in any case to clip the figure right;
-        bbox = self._legend_box.get_window_extent(renderer)
-        self.legendPatch.set_bounds(bbox.x0, bbox.y0, bbox.width, bbox.height)
-        self.legendPatch.set_mutation_scale(fontsize)
-
-        if self.shadow:
-            Shadow(self.legendPatch, self.shadow_offset, -self.shadow_offset, alpha=1).draw(renderer)
-
-        self.legendPatch.draw(renderer)
-        self._legend_box.draw(renderer)
-
-        renderer.close_group("legend")
-        self.stale = False
+from matplotlib.patches import Patch, Rectangle
 
 
 def get_legend_handles_from_colors(
-    colors: list[str], edge_color: str="#2f2f2f", line_width: float = 0.5
+    colors: list[str], edge_color: str = "#2f2f2f", line_width: float = 0.5
 ) -> list[Rectangle]:
     """
     Obtain a list of handles to create a legend from a list of colors.
@@ -76,53 +34,42 @@ def get_legend_handles_from_colors(
 
 
 def add_legend_with_dark_shadow(
-    handles: list[Patch],
+    handles: Sequence[Artist],
     labels: list[str],
     fig: Optional[Figure] = None,
-    ax: Optional[Axis] = None,
+    ax: Optional[Axes] = None,
     shadow_offset: int = 2,
     line_width: float = 0.5,
-    *args: Any,
     **kwargs: Any,
-) -> tuple[LegendWithDarkShadow, Axis]:
+) -> tuple[Legend, Axes]:
     """
     Add a legend with dark shadow to the specified axis.
 
     :param fig: Figure where the legend is added.
-    :param ax: Axis where the legend is added. If both figure and axis are specified,
+    :param ax: Axes where the legend is added. If both figure and axis are specified,
         draw the legend in the axis. If neither figure nor axis are specified, draw the legend in the current figure.
     :param shadow_offset: Offset of the shadow from the legend.
     :param line_width: Width of the legend box.
-    :param args: Any argument passed to the legend constructor.
     :param kwargs: Any keyword argument passed to the legend constructor.
     """
-    # If both figure and axis are missing, draw in the current figure;
-    if fig is None and ax is None:
-        fig = plt.gcf()
-    legend_kwargs = (
-        dict(
-            fancybox=False,
-            framealpha=1,
-            shadow=True,
-            edgecolor="#2f2f2f",
-        )
-        | kwargs
-    )
-    # If the axis is specified, always draw in the axis;
-    where_to_draw = fig
+    # If both figure and axis are missing, draw in the current figure.
+    # If the axis is specified, always draw in the axis
+    _fig: Figure = fig if fig is not None else plt.gcf()
+    where_to_draw: Union[Figure, Axes] = _fig
     if ax is not None:
-        # Draw in the current axis;
-        handles, labels, _, kwargs = matplotlib.legend._parse_legend_args(
-            [ax], handles=handles, labels=labels, *args, **kwargs
-        )
         where_to_draw = ax
-    leg = LegendWithDarkShadow(
+    legend_kwargs: Any = dict(fancybox=False, framealpha=1, edgecolor="#2f2f2f") | kwargs
+    leg = Legend(
         where_to_draw,
         handles,
         labels,
+        shadow=dict(
+            ox=shadow_offset,
+            oy=-shadow_offset,
+            alpha=1,
+        ),
         **legend_kwargs,
     )
-    leg.shadow_offset = shadow_offset
     leg.get_frame().set_linewidth(line_width)
     # Add legend to the axis;
     if ax is None:

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -62,7 +62,7 @@ def remove_outliers_ci(data: Float[np.ndarray, "#n"], sigmas: float = 3) -> Floa
     :param sigmas: Number of standard deviations outside which a value is consider to be an outlier.
     :return: The array without outliers.
     """
-    return data[np.abs(st.zscore(data)) < sigmas]  # type: ignore
+    return data[np.abs(st.zscore(data)) < sigmas]
 
 
 def remove_outliers_iqr(
@@ -84,7 +84,7 @@ def remove_outliers_iqr(
     q1 = np.quantile(data, 1 - quantile)
     q3 = np.quantile(data, quantile)
     iqr = scipy.stats.iqr(data, rng=(100 - 100 * quantile, 100 * quantile))
-    return data[(data >= q1 - iqr * iqr_extension) & (data <= q3 + iqr * iqr_extension)]  # type: ignore
+    return data[(data >= q1 - iqr * iqr_extension) & (data <= q3 + iqr * iqr_extension)]
 
 
 def find_outliers_right_quantile(
@@ -104,7 +104,7 @@ def find_outliers_right_quantile(
     """
     assert quantile <= 1
     q = np.quantile(data, quantile)
-    return data > q * iqr_extension  # type: ignore
+    return data > q * iqr_extension
 
 
 def _remove_outliers_from_dataframe(
@@ -245,7 +245,7 @@ def compute_relative_performance(
     value: str,
     baseline_category: str,
     groupby: Optional[list[str]] = None,
-    aggregation_function: Callable[[pd.Series], float] = np.mean,
+    aggregation_function: Union[str, Callable[[pd.Series], float]] = "mean",
     relative_performance_format_string: Callable[[str], str] = lambda x: f"{x}_relative_performance",
     lower_is_better: bool = False,
     add_baseline_value_to_result: bool = False,
@@ -297,6 +297,8 @@ def compute_relative_performance(
         It must be a value that appear in `data[category]`.
     :param groupby: If not None, group data by the columns whose names are the values of `group_by`.
     :param aggregation_function: Function used to aggregate values.
+        Either a string representing an aggregation supported by Pandas ("mean", "median", ...) or a Callable
+        that can be applied to a Pandas Series.
     :param relative_performance_format_string: Function used to format the name of the column
         where the relative performance is stored.
     :param lower_is_better: If True, invert the relative performance in case a metric is better for lower values.

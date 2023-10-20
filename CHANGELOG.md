@@ -23,6 +23,7 @@ add_legend_with_dark_shadow(
 
 * Fixed `timeseries` with `stem` not working when an existing `ax` is passed.
 * Added the option to specify `xlim` in `timeseries`.
+* Bumped support to Seaborn 0.13.0 and Matplotlib 3.8.0.
 
 ## 2023-08-06
 

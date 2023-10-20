@@ -68,7 +68,7 @@ def performance_scaling(
 
     # Set axes limits;
     if set_axes_limits:
-        ax.set_xlim(X_LIMITS)
+        ax.set_xlim(X_LIMITS)  # type: ignore
         ax.set_ylim(Y_LIMITS)
 
     #################

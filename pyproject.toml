@@ -16,7 +16,8 @@ dependencies = [
     "statsmodels >= 0.10",
     "scikit-learn >= 1.1.2",
     "jaxtyping >= 0.2.20",
-    "matplotlib >= 3.8.0"
+    "matplotlib >= 3.8.0",
+    "pandas-stubs >= 2.1.1"
 ]
 
 [project.optional-dependencies]

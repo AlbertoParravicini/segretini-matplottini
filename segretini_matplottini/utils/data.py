@@ -62,7 +62,7 @@ def remove_outliers_ci(data: Float[np.ndarray, "#n"], sigmas: float = 3) -> Floa
     :param sigmas: Number of standard deviations outside which a value is consider to be an outlier.
     :return: The array without outliers.
     """
-    return data[np.abs(st.zscore(data)) < sigmas]  # type: ignore
+    return data[np.abs(st.zscore(data)) < sigmas]
 
 
 def remove_outliers_iqr(
@@ -84,7 +84,7 @@ def remove_outliers_iqr(
     q1 = np.quantile(data, 1 - quantile)
     q3 = np.quantile(data, quantile)
     iqr = scipy.stats.iqr(data, rng=(100 - 100 * quantile, 100 * quantile))
-    return data[(data >= q1 - iqr * iqr_extension) & (data <= q3 + iqr * iqr_extension)]  # type: ignore
+    return data[(data >= q1 - iqr * iqr_extension) & (data <= q3 + iqr * iqr_extension)]
 
 
 def find_outliers_right_quantile(
@@ -104,7 +104,7 @@ def find_outliers_right_quantile(
     """
     assert quantile <= 1
     q = np.quantile(data, quantile)
-    return data > q * iqr_extension  # type: ignore
+    return data > q * iqr_extension
 
 
 def _remove_outliers_from_dataframe(

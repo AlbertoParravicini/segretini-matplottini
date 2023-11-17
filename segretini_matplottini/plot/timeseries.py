@@ -136,7 +136,8 @@ def timeseries(
             assert step is None or step in get_args(
                 Literal["pre", "mid", "post"]
             ), f"❌ invalid step value, must be 'pre', 'mid' or 'post', not {step}"
-            ax.fill_between(x, y, alpha=0.5, color=line_color, step=step)  # type: ignore
+            fill_between_step: Literal["pre", "mid", "post"] = step  # type: ignore
+            ax.fill_between(x, y, alpha=0.5, color=line_color, step=fill_between_step)
 
     #####################
     # Style fine-tuning #

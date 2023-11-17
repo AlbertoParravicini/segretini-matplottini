@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Optional, Union, overload
 
 import numpy as np
 import pandas as pd
@@ -9,9 +9,9 @@ from jaxtyping import Bool, Float
 
 
 def get_ci_size(
-    x: Float[np.ndarray, "#n"],
+    x: Float[Union[np.ndarray, pd.Series], "#n"],
     ci: float = 0.95,
-    estimator_func: Callable[[Float[np.ndarray, "#n"]], float] = np.mean,
+    estimator_func: Callable[[Float[Union[np.ndarray, pd.Series], "#n"]], float] = np.mean,
     get_raw_location: bool = False,
 ) -> tuple[float, float, float]:
     """
@@ -37,7 +37,9 @@ def get_ci_size(
 
 
 def get_upper_ci_size(
-    x: Float[np.ndarray, "#n"], ci: float = 0.95, estimator_func: Callable[[Float[np.ndarray, "#n"]], float] = np.mean
+    x: Float[Union[np.ndarray, pd.Series], "#n"],
+    ci: float = 0.95,
+    estimator_func: Callable[[Float[Union[np.ndarray, pd.Series], "#n"]], float] = np.mean,
 ) -> float:
     """
     Compute the size of the upper confidence interval for the mean of a sequence `x`,
@@ -52,7 +54,19 @@ def get_upper_ci_size(
     return get_ci_size(x, ci, estimator_func=estimator_func)[0]
 
 
-def remove_outliers_ci(data: Float[np.ndarray, "#n"], sigmas: float = 3) -> Float[np.ndarray, "#m"]:
+@overload
+def remove_outliers_ci(data: Float[pd.Series, "#n"], sigmas: float = 3) -> Float[pd.Series, "#m"]:
+    ...
+
+
+@overload
+def remove_outliers_ci(data: Float[np.ndarray, "#n"], sigmas: float = 3) -> Float[np.ndarray, "#m"]:  # type: ignore
+    ...
+
+
+def remove_outliers_ci(
+    data: Float[Union[np.ndarray, pd.Series], "#n"], sigmas: float = 3
+) -> Float[Union[np.ndarray, pd.Series], "#m"]:
     """
     Filter a sequence of data by keeping only values within "sigma" standard deviations from the mean.
     This is a simple way to filter outliers, it is more useful to clean data
@@ -65,9 +79,23 @@ def remove_outliers_ci(data: Float[np.ndarray, "#n"], sigmas: float = 3) -> Floa
     return data[np.abs(st.zscore(data)) < sigmas]  # type: ignore
 
 
+@overload
 def remove_outliers_iqr(
+    data: Float[pd.Series, "#n"], quantile: float = 0.75, iqr_extension: float = 1.5
+) -> Float[pd.Series, "#m"]:
+    ...
+
+
+@overload
+def remove_outliers_iqr(  # type: ignore
     data: Float[np.ndarray, "#n"], quantile: float = 0.75, iqr_extension: float = 1.5
 ) -> Float[np.ndarray, "#m"]:
+    ...
+
+
+def remove_outliers_iqr(
+    data: Float[Union[np.ndarray, pd.Series], "#n"], quantile: float = 0.75, iqr_extension: float = 1.5
+) -> Float[Union[np.ndarray, pd.Series], "#m"]:
     """
     Filter a sequence of data by removing outliers looking at the quantiles of the distribution.
     Find quantiles (by default, `Q1` and `Q3`), and interquantile range (by default, `Q3 - Q1`),

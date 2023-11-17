@@ -353,6 +353,7 @@ def barplots(
     ##################
 
     for i, (_category, temp_data) in enumerate(_data.groupby(category, sort=False)):
+        assert isinstance(_category, str)
         ax: plt.Axes = axes.flat[i]
         _, ax = barplot(
             temp_data,
@@ -561,6 +562,6 @@ def barplot_for_multiple_categories(
         ax.axvline(x=0.5, color="#2f2f2f", linewidth=0.5, linestyle="--")
     # Create a common legend shown below the plot;
     if hue is not None:
-        ax = _add_legend(ax, x_to_legend_label_map, data[hue].unique())
+        ax = _add_legend(ax, x_to_legend_label_map, data[hue].unique().tolist())
 
     return fig, ax

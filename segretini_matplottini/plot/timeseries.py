@@ -100,11 +100,11 @@ def timeseries(
     # Setup data #
     ##############
 
-    y = np.array(x.copy())
+    _y = np.array(x.copy())
     try:
-        x = np.array(pd.to_datetime(x.index))
+        _x = np.array(pd.to_datetime(x.index))
     except ValueError:
-        x = np.arange(len(x))
+        _x = np.arange(len(x))
 
     ##############
     # Setup plot #
@@ -127,17 +127,17 @@ def timeseries(
     ##################
 
     if draw_style == "stem":
-        stems = ax.stem(x, y, linefmt=line_color, markerfmt=" ", basefmt=" ")
+        stems = ax.stem(_x, _y, linefmt=line_color, markerfmt=" ", basefmt=" ")
         plt.setp(stems, "linewidth", line_width)  # Set stem line width
     else:
-        ax.plot(x, y, lw=line_width, color=line_color, drawstyle=draw_style)
+        ax.plot(_x, _y, lw=line_width, color=line_color, drawstyle=draw_style)
         if fill:
             step = None if "steps" not in draw_style else draw_style.replace("steps-", "")
             assert step is None or step in get_args(
                 Literal["pre", "mid", "post"]
             ), f"❌ invalid step value, must be 'pre', 'mid' or 'post', not {step}"
             fill_between_step: Literal["pre", "mid", "post"] = step  # type: ignore
-            ax.fill_between(x, y, alpha=0.5, color=line_color, step=fill_between_step)
+            ax.fill_between(_x, _y, alpha=0.5, color=line_color, step=fill_between_step)
 
     #####################
     # Style fine-tuning #
@@ -148,11 +148,11 @@ def timeseries(
 
     # Set axes limits
     if xlimits is None:
-        ax.set_xlim(min(x), max(x))
+        ax.set_xlim(min(_x), max(_x))
     else:
         ax.set_xlim(xlimits)
     if ylimits is None:
-        ax.set_ylim(min(y), max(y))
+        ax.set_ylim(min(_y), max(_y))
     else:
         ax.set_ylim(ylimits)
 

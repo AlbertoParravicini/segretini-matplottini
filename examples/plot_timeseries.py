@@ -21,13 +21,13 @@ DATA_DIR = Path(__file__).parent.parent / "data"
 
 
 def load_data_1() -> pd.Series:
-    data = pd.read_csv(DATA_DIR / "timeseries_data.csv")
-    data = data.iloc[:, 0]
+    data_csv = pd.read_csv(DATA_DIR / "timeseries_data.csv")
+    data = data_csv.iloc[:, 0]
     data = data / data.max()
     # Format the index as a timestamp
     frames_per_sec = 24
     timestamps_sec = data.index / frames_per_sec
-    data.index = pd.to_datetime(
+    data.index = pd.to_datetime(  # type: ignore
         pd.Series(timestamps_sec).apply(lambda x: datetime.datetime.fromtimestamp(x).strftime("%H:%M:%S.%f")),
         format="mixed",
     ) - datetime.timedelta(hours=1)
@@ -42,11 +42,11 @@ def load_data_2() -> pd.Series:
     """
     Load some sparse data that can be considered as a video frame-wise annotation.
     """
-    data = load_data_1()
-    data = data.mask(data < data.quantile(0.5), other=0)
-    z = pd.Series(np.zeros(len(data)), index=data.index)
-    local_maxima = argrelextrema(data.values, np.greater, order=3)[0]
-    z.iloc[local_maxima] = data.iloc[local_maxima]
+    data_csv = load_data_1()
+    data_csv = data_csv.mask(data < data.quantile(0.5), other=0)
+    z: pd.Series = pd.Series(np.zeros(len(data_csv)), index=data_csv.index)
+    local_maxima = argrelextrema(data_csv.values, np.greater, order=3)[0]
+    z.iloc[local_maxima] = data_csv.iloc[local_maxima]
     return z
 
 

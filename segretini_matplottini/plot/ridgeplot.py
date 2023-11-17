@@ -411,7 +411,9 @@ def ridgeplot(
                 fillcolor = matplotlib.colors.to_rgba(
                     color, alpha=0.2
                 )  # Add alpha to facecolor, while leaving the border opaque;
-                upper, lower, _ = get_ci_size(_data[_data[identifier_column] == label][c], get_raw_location=True)
+                upper, lower, _ = get_ci_size(
+                    _data[_data[identifier_column] == label][c].to_numpy(), get_raw_location=True
+                )
                 new_patch = Rectangle(
                     (lower, 0), upper - lower, y_max, linewidth=0.8, edgecolor=color, facecolor=fillcolor, zorder=4
                 )

@@ -14,13 +14,12 @@ DATA_DIR = Path(__file__).parent.parent.parent / "data"
 
 @pytest.fixture
 def data() -> pd.Series:
-    data = pd.read_csv(DATA_DIR / "timeseries_data.csv")
-    data = data.iloc[:, 0]
-    data = data / data.max()
+    data_csv = pd.read_csv(DATA_DIR / "timeseries_data.csv")
+    data: pd.Series = data_csv.iloc[:, 0] / data_csv.iloc[:, 0].max()
     # Format the index as a timestamp
     frames_per_sec = 24
     timestamps_sec = data.index / frames_per_sec
-    data.index = pd.to_datetime(
+    data.index = pd.to_datetime(  # type: ignore
         pd.Series(timestamps_sec).apply(lambda x: datetime.datetime.fromtimestamp(x).strftime("%H:%M:%S.%f")),
         format="mixed",
     ) - datetime.timedelta(hours=1)

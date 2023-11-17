@@ -270,7 +270,7 @@ def get_labels_for_bars(
     :return: A list of labels, one for each bar. Bars that have been skipped have an empty string as label.
     """
     assert hasattr(ax, "containers"), f"❌ the axis {ax} does not have any container, are you sure it's a barplot?"
-    containers: list[BarContainer] = ax.containers
+    containers: list[BarContainer] = ax.containers  # type: ignore
     labels_for_each_category: list[list[str]] = []
 
     # If plotting bars grouped by a category, they will appear in separate BarContainers.

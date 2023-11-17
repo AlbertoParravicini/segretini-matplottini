@@ -4,12 +4,13 @@ import matplotlib.pyplot as plt
 from segretini_matplottini.plot import roofline
 from segretini_matplottini.utils.colors import PALETTE_ORANGE_BASELINE_AND_GREEN_TONES
 
-from .utils import reset_plot_style, save_tmp_plot  # noqa: F401
+from .utils import close_plot_after_test, reset_plot_style, save_tmp_plot  # noqa: F401
 
 MARKERS = ["o", "X", "D", "P"]
 PALETTE = PALETTE_ORANGE_BASELINE_AND_GREEN_TONES
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_default() -> None:
     performance = 0.4 * 10**9
@@ -24,6 +25,7 @@ def test_default() -> None:
     )
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_single_roofline() -> None:
     performance = 0.4 * 10**9
@@ -40,6 +42,7 @@ def test_single_roofline() -> None:
     )
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_stacked_roofline() -> None:
     packet_size = 15
@@ -69,6 +72,7 @@ def test_stacked_roofline() -> None:
     )
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_double_roofline() -> None:
     packet_size = 15

@@ -9,7 +9,7 @@ from segretini_matplottini.utils import (
     remove_outliers_from_dataframe_ci,
 )
 
-from .utils import reset_plot_style, save_tmp_plot  # noqa: F401
+from .utils import close_plot_after_test, reset_plot_style, save_tmp_plot  # noqa: F401
 
 DATA_DIR = Path(__file__).parent.parent.parent / "data"
 
@@ -27,8 +27,8 @@ def data() -> pd.DataFrame:
     data = remove_outliers_from_dataframe_ci(data, "exec_time_2_us", groupby=["name"], verbose=True)
 
     # Add relative execution time;
-    data["rel_time_1"] = 1
-    data["rel_time_2"] = 1
+    data["rel_time_1"] = 1.0
+    data["rel_time_2"] = 1.0
     for _, g in data.groupby("name", as_index=False):
         data.loc[g.index, "rel_time_1"] = g["exec_time_1_us"] / np.mean(g["exec_time_1_us"])
         data.loc[g.index, "rel_time_2"] = g["exec_time_2_us"] / np.mean(g["exec_time_1_us"])
@@ -37,6 +37,7 @@ def data() -> pd.DataFrame:
     return data
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_ridgeplot_default(data: pd.DataFrame) -> None:
     ridgeplot(
@@ -44,6 +45,7 @@ def test_ridgeplot_default(data: pd.DataFrame) -> None:
     )
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_ridgeplot(data: pd.DataFrame) -> None:
     ridgeplot(
@@ -55,6 +57,7 @@ def test_ridgeplot(data: pd.DataFrame) -> None:
     )
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_ridgeplot_compact_default(data: pd.DataFrame) -> None:
     ridgeplot_compact(
@@ -62,6 +65,7 @@ def test_ridgeplot_compact_default(data: pd.DataFrame) -> None:
     )
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_ridgeplot_compact(data: pd.DataFrame) -> None:
     ridgeplot_compact(
@@ -72,6 +76,7 @@ def test_ridgeplot_compact(data: pd.DataFrame) -> None:
     )
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_ridgeplot_one_col(data: pd.DataFrame) -> None:
     ridgeplot(
@@ -84,6 +89,7 @@ def test_ridgeplot_one_col(data: pd.DataFrame) -> None:
     )
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_ridgeplot_compact_one_col(data: pd.DataFrame) -> None:
     ridgeplot_compact(
@@ -95,6 +101,7 @@ def test_ridgeplot_compact_one_col(data: pd.DataFrame) -> None:
     )
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_ridgeplot_three_col(data: pd.DataFrame) -> None:
     ridgeplot(
@@ -107,6 +114,7 @@ def test_ridgeplot_three_col(data: pd.DataFrame) -> None:
     )
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_ridgeplot_compact_three_col(data: pd.DataFrame) -> None:
     ridgeplot_compact(

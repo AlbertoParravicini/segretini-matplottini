@@ -7,7 +7,7 @@ import pytest
 from segretini_matplottini.plot import correlation_scatterplot
 from segretini_matplottini.utils.colors import TWO_TEAL_TONES
 
-from .utils import save_tmp_plot  # noqa: F401
+from .utils import close_plot_after_test, save_tmp_plot  # noqa: F401
 
 # Axes limits used in the plot, change them accordingy to your data;
 X_LIMITS = (-0.2, 0.6)
@@ -26,6 +26,7 @@ def data() -> pd.DataFrame:
     return data
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_default_settings(data: pd.DataFrame) -> None:
     correlation_scatterplot(
@@ -35,6 +36,7 @@ def test_default_settings(data: pd.DataFrame) -> None:
     )
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_custom_settings(data: pd.DataFrame) -> None:
     correlation_scatterplot(
@@ -51,6 +53,7 @@ def test_custom_settings(data: pd.DataFrame) -> None:
     )
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_no_regression(data: pd.DataFrame) -> None:
     correlation_scatterplot(
@@ -61,6 +64,7 @@ def test_no_regression(data: pd.DataFrame) -> None:
     )
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_no_kde(data: pd.DataFrame) -> None:
     correlation_scatterplot(
@@ -71,6 +75,7 @@ def test_no_kde(data: pd.DataFrame) -> None:
     )
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_existing_axis(data: pd.DataFrame) -> None:
     _, ax = plt.subplots(1, 1, figsize=(3, 3))

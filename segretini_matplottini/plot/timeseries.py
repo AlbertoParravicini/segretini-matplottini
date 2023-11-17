@@ -6,7 +6,7 @@ import pandas as pd
 from matplotlib.axes import Axes
 from matplotlib.dates import DateFormatter, HourLocator, MinuteLocator, SecondLocator
 from matplotlib.figure import Figure
-from matplotlib.ticker import LinearLocator
+from matplotlib.ticker import LinearLocator, Locator
 
 from segretini_matplottini.utils import activate_dark_background
 from segretini_matplottini.utils import reset_plot_style as _reset_plot_style
@@ -22,6 +22,7 @@ def timeseries(
     ylabel: Optional[str] = None,
     xlimits: Optional[tuple[float, float]] = None,
     ylimits: Optional[tuple[float, float]] = None,
+    y_ticks_locator: Locator = LinearLocator(5),
     date_format: Optional[str] = None,
     seconds_interval_major_ticks: Optional[int] = None,
     minutes_interval_major_ticks: Optional[int] = None,
@@ -49,6 +50,8 @@ def timeseries(
     :param line_width: Width of the time-series line.
     :param xlabel: Label of the x-axis.
     :param ylabel: Label of the y-axis.
+    :param y_ticks_locator: Locator used to set the y-axis tick positions.
+        By default, use linearly spaced ticks.
     :param xlimits: Limits of the y-axis. If none, use `[min(x), max(x)]`.
     :param ylimits: Limits of the y-axis. If none, use `[min(x), max(x)]`.
     :param date_format: If not None, try formatting x-axis tick labels with the specified time format.
@@ -100,11 +103,11 @@ def timeseries(
     # Setup data #
     ##############
 
-    y = np.array(x.copy())
+    _y = np.array(x.copy())
     try:
-        x = np.array(pd.to_datetime(x.index))
+        _x = np.array(pd.to_datetime(x.index))
     except ValueError:
-        x = np.arange(len(x))
+        _x = np.arange(len(x))
 
     ##############
     # Setup plot #
@@ -127,16 +130,17 @@ def timeseries(
     ##################
 
     if draw_style == "stem":
-        stems = ax.stem(x, y, linefmt=line_color, markerfmt=" ", basefmt=" ")
+        stems = ax.stem(_x, _y, linefmt=line_color, markerfmt=" ", basefmt=" ")
         plt.setp(stems, "linewidth", line_width)  # Set stem line width
     else:
-        ax.plot(x, y, lw=line_width, color=line_color, drawstyle=draw_style)
+        ax.plot(_x, _y, lw=line_width, color=line_color, drawstyle=draw_style)
         if fill:
             step = None if "steps" not in draw_style else draw_style.replace("steps-", "")
             assert step is None or step in get_args(
                 Literal["pre", "mid", "post"]
             ), f"❌ invalid step value, must be 'pre', 'mid' or 'post', not {step}"
-            ax.fill_between(x, y, alpha=0.5, color=line_color, step=step)  # type: ignore
+            fill_between_step: Literal["pre", "mid", "post"] = step  # type: ignore
+            ax.fill_between(_x, _y, alpha=0.5, color=line_color, step=fill_between_step)
 
     #####################
     # Style fine-tuning #
@@ -147,11 +151,11 @@ def timeseries(
 
     # Set axes limits
     if xlimits is None:
-        ax.set_xlim(min(x), max(x))
+        ax.set_xlim(min(_x), max(_x))
     else:
         ax.set_xlim(xlimits)
     if ylimits is None:
-        ax.set_ylim(min(y), max(y))
+        ax.set_ylim(min(_y), max(_y))
     else:
         ax.set_ylim(ylimits)
 
@@ -179,7 +183,7 @@ def timeseries(
     else:
         ax.tick_params(axis="x", which="major", labelsize=font_size)
     ax.yaxis.set_major_formatter(lambda x, pos: f"{x:.3f}")
-    ax.yaxis.set_major_locator(LinearLocator(5))
+    ax.yaxis.set_major_locator(y_ticks_locator)
     ax.tick_params(axis="y", which="major", labelsize=font_size - 2)
 
     if xlabel is not None:

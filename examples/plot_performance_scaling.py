@@ -102,7 +102,9 @@ def performance_scaling(
             # We fit a straight line on the log of the relative performance, as the scaling is exponential.
             # Then, the real prediction is 10**prediction;
             regr = linear_model.LinearRegression()
-            regr.fit(data_tmp["year"].values.reshape(-1, 1), np.log10(data_tmp["performance"].values.reshape(-1, 1)))
+            regr.fit(
+                data_tmp["year"].to_numpy().reshape(-1, 1), np.log10(data_tmp["performance"].to_numpy().reshape(-1, 1))
+            )
             data_tmp["prediction"] = np.power(10, regr.predict(data_tmp["year"].values.astype(float).reshape(-1, 1)))
             ax = sns.lineplot(
                 x=[data_tmp["year"].iloc[0], data_tmp["year"].iloc[-1]],
@@ -135,7 +137,7 @@ def performance_scaling(
     kind_to_col = {k: get_color(PALETTE[i]) for i, k in enumerate(data["kind"].unique())}
 
     data["name"] = data["name"].fillna("")
-    for i, row in data.iterrows():
+    for _, row in data.iterrows():
         label = row["name"]
         # Label-specific adjustments;
         if label:
@@ -234,6 +236,7 @@ def performance_scaling(
     )
 
     for i, (k, v) in enumerate(kind_increase.items()):
+        assert isinstance(k, str)
         # Use two annotations, to make the text look justified;
         ax.annotate(
             get_kind_label(k) + ":" + (pad if i == 0 else ""),

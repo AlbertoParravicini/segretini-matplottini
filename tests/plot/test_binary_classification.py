@@ -16,7 +16,7 @@ from segretini_matplottini.plot import (
     true_positives,
 )
 
-from .utils import reset_plot_style, save_tmp_plot  # noqa: F401
+from .utils import close_plot_after_test, reset_plot_style, save_tmp_plot  # noqa: F401
 
 
 @pytest.fixture
@@ -43,6 +43,7 @@ def data() -> tuple[Float[np.ndarray, "#n"], Integer[np.ndarray, "#n"]]:
     return logits, targets
 
 
+@close_plot_after_test
 def test_true_positives(data: tuple[Float[np.ndarray, "#n"], Integer[np.ndarray, "#n"]]) -> None:
     logits, targets = data
     _, ax = true_positives(logits, targets)
@@ -58,6 +59,7 @@ def test_true_positives(data: tuple[Float[np.ndarray, "#n"], Integer[np.ndarray,
     assert ydata[-1] == 0
 
 
+@close_plot_after_test
 def test_true_negatives(data: tuple[Float[np.ndarray, "#n"], Integer[np.ndarray, "#n"]]) -> None:
     logits, targets = data
     _, ax = true_negatives(logits, targets)
@@ -73,6 +75,7 @@ def test_true_negatives(data: tuple[Float[np.ndarray, "#n"], Integer[np.ndarray,
     assert ydata[-1] == (targets == 0).sum()
 
 
+@close_plot_after_test
 def test_false_positives(data: tuple[Float[np.ndarray, "#n"], Integer[np.ndarray, "#n"]]) -> None:
     logits, targets = data
     _, ax = false_positives(logits, targets)
@@ -88,6 +91,7 @@ def test_false_positives(data: tuple[Float[np.ndarray, "#n"], Integer[np.ndarray
     assert ydata[-1] == 0
 
 
+@close_plot_after_test
 def test_false_negatives(data: tuple[Float[np.ndarray, "#n"], Integer[np.ndarray, "#n"]]) -> None:
     logits, targets = data
     _, ax = false_negatives(logits, targets)
@@ -103,6 +107,7 @@ def test_false_negatives(data: tuple[Float[np.ndarray, "#n"], Integer[np.ndarray
     assert ydata[-1] == (targets == 1).sum()
 
 
+@close_plot_after_test
 def test_precision(data: tuple[Float[np.ndarray, "#n"], Integer[np.ndarray, "#n"]]) -> None:
     logits, targets = data
     _, ax = precision(logits, targets)
@@ -118,6 +123,7 @@ def test_precision(data: tuple[Float[np.ndarray, "#n"], Integer[np.ndarray, "#n"
     assert ydata[-1] == precision_score(y_true=targets, y_pred=logits >= 1, zero_division=0)
 
 
+@close_plot_after_test
 def test_recall(data: tuple[Float[np.ndarray, "#n"], Integer[np.ndarray, "#n"]]) -> None:
     logits, targets = data
     _, ax = recall(logits, targets)
@@ -133,6 +139,7 @@ def test_recall(data: tuple[Float[np.ndarray, "#n"], Integer[np.ndarray, "#n"]])
     assert ydata[-1] == 0
 
 
+@close_plot_after_test
 def test_auc(data: tuple[Float[np.ndarray, "#n"], Integer[np.ndarray, "#n"]]) -> None:
     logits, targets = data
     _, ax = roc(logits, targets)
@@ -148,6 +155,7 @@ def test_auc(data: tuple[Float[np.ndarray, "#n"], Integer[np.ndarray, "#n"]]) ->
     assert ydata[-1] == 1
 
 
+@close_plot_after_test
 def test_f1(data: tuple[Float[np.ndarray, "#n"], Integer[np.ndarray, "#n"]]) -> None:
     logits, targets = data
     _, ax = f1(logits, targets)
@@ -163,6 +171,7 @@ def test_f1(data: tuple[Float[np.ndarray, "#n"], Integer[np.ndarray, "#n"]]) -> 
     assert ydata[-1] == f1_score(y_true=targets, y_pred=logits >= 1, zero_division=0)
 
 
+@close_plot_after_test
 def test_precision_recall(data: tuple[Float[np.ndarray, "#n"], Integer[np.ndarray, "#n"]]) -> None:
     logits, targets = data
     _, ax = precision_recall(logits, targets)

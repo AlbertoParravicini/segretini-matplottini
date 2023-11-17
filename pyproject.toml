@@ -3,7 +3,7 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-version = "0.3.0"
+version = "0.4.0"
 name = "segretini-matplottini"
 description = "Colorful recipes and utilities for Matplolib and Seaborn, to create publication-ready plots"
 authors = [{name = "Alberto Parravicini", email = "alberto.parravicini@polimi.it"}]
@@ -16,14 +16,15 @@ dependencies = [
     "statsmodels >= 0.10",
     "scikit-learn >= 1.1.2",
     "jaxtyping >= 0.2.20",
-    "matplotlib >= 3.8.0"
+    "matplotlib >= 3.8.0",
+    "pandas-stubs >= 2.1.1"
 ]
 
 [project.optional-dependencies]
 dev = [
     "black >= 23.7",
     "isort >= 5.12.0",
-    "ruff >= 0.0.280",
+    "ruff >= 0.1.1",
     "pre-commit >= 3.3.3",
     "pytest >= 7.4.0",
     "mypy >= 1.6.1",

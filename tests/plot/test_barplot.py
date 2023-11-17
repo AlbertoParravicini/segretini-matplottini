@@ -16,7 +16,7 @@ from segretini_matplottini.utils import (
 )
 from segretini_matplottini.utils.constants import DEFAULT_FONT_SIZE
 
-from .utils import reset_plot_style, save_tmp_plot  # noqa: F401
+from .utils import close_plot_after_test, reset_plot_style, save_tmp_plot  # noqa: F401
 
 DATA_DIR = Path(__file__).parent.parent.parent / "data"
 
@@ -31,6 +31,7 @@ def data_2() -> pd.DataFrame:
     return pd.read_csv(DATA_DIR / "barplot_for_multiple_categories_data.csv")
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_default(data_1: pd.DataFrame) -> None:
     fig, ax = barplot(
@@ -42,6 +43,7 @@ def test_default(data_1: pd.DataFrame) -> None:
     assert len(rectangles) == 3
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_custom_parameters(data_1: pd.DataFrame) -> None:
     _, ax = barplot(
@@ -63,6 +65,7 @@ def test_custom_parameters(data_1: pd.DataFrame) -> None:
     assert len(rectangles) == 3
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_custom_parameters_and_arrow_and_labels(data_1: pd.DataFrame) -> None:
     _, ax = barplot(
@@ -86,6 +89,7 @@ def test_custom_parameters_and_arrow_and_labels(data_1: pd.DataFrame) -> None:
     assert len(rectangles) == 3
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_default_barplots(data_1: pd.DataFrame) -> None:
     _, axes = barplots(
@@ -103,6 +107,7 @@ def test_default_barplots(data_1: pd.DataFrame) -> None:
             assert len(rectangles) == 3
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_default_barplots_one_row(data_1: pd.DataFrame) -> None:
     _, axes = barplots(
@@ -120,6 +125,7 @@ def test_default_barplots_one_row(data_1: pd.DataFrame) -> None:
             assert len(rectangles) == 3
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_default_barplots_one_col(data_1: pd.DataFrame) -> None:
     _, axes = barplots(
@@ -137,6 +143,7 @@ def test_default_barplots_one_col(data_1: pd.DataFrame) -> None:
             assert len(rectangles) == 3
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_default_barplots_two_col(data_1: pd.DataFrame) -> None:
     _, axes = barplots(
@@ -156,6 +163,7 @@ def test_default_barplots_two_col(data_1: pd.DataFrame) -> None:
             assert len(rectangles) == 3
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_custom_parameters_barplots(data_1: pd.DataFrame) -> None:
     _, axes = barplots(
@@ -182,6 +190,7 @@ def test_custom_parameters_barplots(data_1: pd.DataFrame) -> None:
             assert len(rectangles) == 3
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_single_plot_barplots(data_1: pd.DataFrame) -> None:
     data_1 = data_1.groupby(["model"]).mean(numeric_only=True).reset_index()
@@ -205,6 +214,7 @@ def test_single_plot_barplots(data_1: pd.DataFrame) -> None:
             assert len(rectangles) == 3
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_custom_parameters_and_arrow_and_labels_barplots(data_1: pd.DataFrame) -> None:
     _, axes = barplots(
@@ -236,6 +246,7 @@ def test_custom_parameters_and_arrow_and_labels_barplots(data_1: pd.DataFrame) -
             assert len(rectangles) == 3
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_default_for_multiple_categories(data_2: pd.DataFrame) -> None:
     barplot_for_multiple_categories(
@@ -246,6 +257,7 @@ def test_default_for_multiple_categories(data_2: pd.DataFrame) -> None:
     )
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_custom_parameters_for_multiple_categories(data_2: pd.DataFrame) -> None:
     _, ax = barplot_for_multiple_categories(
@@ -273,6 +285,7 @@ def test_custom_parameters_for_multiple_categories(data_2: pd.DataFrame) -> None
     assert len(rectangles) == 16
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_custom_parameters_no_averages_for_multiple_categories(data_2: pd.DataFrame) -> None:
     _, ax = barplot_for_multiple_categories(
@@ -300,6 +313,7 @@ def test_custom_parameters_no_averages_for_multiple_categories(data_2: pd.DataFr
     assert len(rectangles) == 12
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_no_hue_for_multiple_categories(data_2: pd.DataFrame) -> None:
     _, ax = barplot_for_multiple_categories(
@@ -326,6 +340,7 @@ def test_no_hue_for_multiple_categories(data_2: pd.DataFrame) -> None:
     assert len(rectangles) == 4
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_custom_parameters_and_arrow_and_labels_for_multiple_categories(data_2: pd.DataFrame) -> None:
     _, ax = barplot_for_multiple_categories(
@@ -355,6 +370,7 @@ def test_custom_parameters_and_arrow_and_labels_for_multiple_categories(data_2: 
     assert len(rectangles) == 16
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_custom_parameters_and_arrow_and_labels_no_hue_for_multiple_categories(data_2: pd.DataFrame) -> None:
     _, ax = barplot_for_multiple_categories(

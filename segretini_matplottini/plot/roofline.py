@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.lines import Line2D
-from matplotlib.ticker import LogLocator
+from matplotlib.ticker import Locator, LogLocator
 
 from segretini_matplottini.utils import (
     add_legend_with_dark_shadow,
@@ -37,6 +37,8 @@ def roofline(
     scatter_size: float = 14,
     xlabel: str = "Operational intensity [{}/B]",
     ylabel: str = "Performance [{}/s]",
+    x_ticks_locator: Locator = LogLocator(base=10, numticks=15),
+    y_ticks_locator: Locator = LogLocator(base=10, numticks=15),
     performance_unit: str = "FLOPS",
     add_bandwidth_label: bool = True,
     bandwidth_label: str = "{:.1f} GB/s",
@@ -71,6 +73,10 @@ def roofline(
     :param scatter_size: Size of individual scatter points added to the Roofline.
     :param xlabel: Label to place on the x-axis. The default value puts the "performance unit" (e.g. FLOPS) inside it.
     :param ylabel: Label to place on the y-axis. The default value puts the "performance unit" (e.g. FLOPS) inside it.
+    :param x_ticks_locator: Locator used to set the x-axis tick positions.
+        By default, use a LogLocator.
+    :param y_ticks_locator: Locator used to set the y-axis tick positions.
+        By default, use a LogLocator.
     :param performance_unit: Performance measurement unit placed in the labels, e.g. FLOPS.
     :param add_bandwidth_label: If True, add bandwidth labels above each peak bandwidth line.
     :param bandwidth_label: Label used for bandwidth labels, it should contain a {} marker to dynamically place values.
@@ -248,8 +254,8 @@ def roofline(
     #####################
 
     # Set tick number and parameters on x and y axes;
-    ax.xaxis.set_major_locator(LogLocator(base=10, numticks=15))
-    ax.yaxis.set_major_locator(LogLocator(base=10, numticks=15))
+    ax.xaxis.set_major_locator(x_ticks_locator)
+    ax.yaxis.set_major_locator(y_ticks_locator)
     ax.tick_params(axis="x", direction="out", which="both", bottom=True, top=False)
     # Set grid on y axis;
     ax.grid(axis="y", linestyle="--", linewidth=0.5)

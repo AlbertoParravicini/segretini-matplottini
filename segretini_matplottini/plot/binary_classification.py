@@ -5,7 +5,7 @@ import numpy as np
 from jaxtyping import Bool, Float, Integer
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
-from matplotlib.ticker import FuncFormatter, LinearLocator
+from matplotlib.ticker import FuncFormatter, LinearLocator, Locator
 from sklearn.metrics import (
     f1_score,
     precision_recall_curve,
@@ -44,8 +44,8 @@ def _plot_binary_classification_curve(
     ylimits: Optional[tuple[int, int]] = None,
     annotate_best_y: bool = False,
     annotate_area_under_curve: bool = False,
-    x_axis_ticks_count: int = 6,
-    y_axis_ticks_count: int = 6,
+    x_ticks_locator: Locator = LinearLocator(6),
+    y_ticks_locator: Locator = LinearLocator(6),
     color: str = MEGA_PINK,
     ax: Optional[Axes] = None,
     figure_size: tuple[float, float] = (1.5, 1.4),
@@ -74,8 +74,10 @@ def _plot_binary_classification_curve(
     :param annotate_area_under_curve: If True, add an annotation with the area under the curve.
         Useful to measure the area under the curve for plots where
         the metric is meaningful (e.g. Precision-Recall curve).
-    :param x_axis_ticks_count: Number of ticks on the x-axis.
-    :param y_axis_ticks_count: Number of ticks on the y-axis.
+    :param x_ticks_locator: Locator used to set the x-axis tick positions.
+        By default, place linearly spaced ticks.
+    :param y_ticks_locator: Locator used to set the y-axis tick positions.
+        By default, place linearly spaced ticks.
     :param color: Color for the curve and the filling color.
     :param ax: An axis to use for the plot. If None, create a new one.
     :param figure_size: Size of the figure, in inches. The default is a bit less than half the `\columnwidth` of
@@ -136,7 +138,7 @@ def _plot_binary_classification_curve(
     ax.set_ylim(ylimits)
 
     # Format ticks on the x-axis;
-    ax.xaxis.set_major_locator(LinearLocator(x_axis_ticks_count))
+    ax.xaxis.set_major_locator(x_ticks_locator)
     ax.xaxis.set_major_formatter(lambda x, _: f"{x:.1f}")
     ax.tick_params(axis="x", labelsize=font_size * 0.7)
 
@@ -151,7 +153,7 @@ def _plot_binary_classification_curve(
         else:
             return f"{int(x)}"
 
-    ax.yaxis.set_major_locator(LinearLocator(y_axis_ticks_count))
+    ax.yaxis.set_major_locator(y_ticks_locator)
     ax.yaxis.set_major_formatter(_y_ticks_major_formatter)
     ax.tick_params(axis="y", labelsize=font_size * 0.7)
     ax.tick_params(labelcolor="#2f2f2f")
@@ -202,8 +204,8 @@ def true_positives(
     ylabel: str = "TP",
     xlimits: tuple[int, int] = (0, 1),
     color: str = MEGA_PINK,
-    x_axis_ticks_count: int = 6,
-    y_axis_ticks_count: int = 6,
+    x_ticks_locator: Locator = LinearLocator(6),
+    y_ticks_locator: Locator = LinearLocator(6),
     ax: Optional[Axes] = None,
     figure_size: tuple[float, float] = (1.5, 1.4),
     font_size: int = DEFAULT_FONT_SIZE,
@@ -226,8 +228,10 @@ def true_positives(
     :param ylabel: Label for the y-axis.
     :param xlimits: Limits for the x-axis.
     :param color: Color for the curve and the filling color.
-    :param x_axis_ticks_count: Number of ticks on the x-axis.
-    :param y_axis_ticks_count: Number of ticks on the y-axis.
+    :param x_ticks_locator: Locator used to set the x-axis tick positions.
+        By default, place linearly spaced ticks.
+    :param y_ticks_locator: Locator used to set the y-axis tick positions.
+        By default, place linearly spaced ticks.
     :param ax: An axis to use for the plot. If None, create a new one.
     :param figure_size: Size of the figure, in inches. The default is a bit less than half the `\columnwidth` of
         a two-columns template in LaTeX, so that one can add two or three curves per column.
@@ -259,8 +263,8 @@ def true_positives(
         color=color,
         annotate_area_under_curve=False,
         annotate_best_y=False,
-        x_axis_ticks_count=x_axis_ticks_count,
-        y_axis_ticks_count=y_axis_ticks_count,
+        x_ticks_locator=x_ticks_locator,
+        y_ticks_locator=y_ticks_locator,
         ax=ax,
         figure_size=figure_size,
         font_size=font_size,
@@ -280,8 +284,8 @@ def true_negatives(
     ylabel: str = "TN",
     xlimits: tuple[int, int] = (0, 1),
     color: str = MEGA_PINK,
-    x_axis_ticks_count: int = 6,
-    y_axis_ticks_count: int = 6,
+    x_ticks_locator: Locator = LinearLocator(6),
+    y_ticks_locator: Locator = LinearLocator(6),
     ax: Optional[Axes] = None,
     figure_size: tuple[float, float] = (1.5, 1.4),
     font_size: int = DEFAULT_FONT_SIZE,
@@ -304,8 +308,10 @@ def true_negatives(
     :param ylabel: Label for the y-axis.
     :param xlimits: Limits for the x-axis.
     :param color: Color for the curve and the filling color.
-    :param x_axis_ticks_count: Number of ticks on the x-axis.
-    :param y_axis_ticks_count: Number of ticks on the y-axis.
+    :param x_ticks_locator: Locator used to set the x-axis tick positions.
+        By default, place linearly spaced ticks.
+    :param y_ticks_locator: Locator used to set the y-axis tick positions.
+        By default, place linearly spaced ticks.
     :param ax: An axis to use for the plot. If None, create a new one.
     :param figure_size: Size of the figure, in inches. The default is a bit less than half the `\columnwidth` of
         a two-columns template in LaTeX, so that one can add two or three curves per column.
@@ -337,8 +343,8 @@ def true_negatives(
         color=color,
         annotate_area_under_curve=False,
         annotate_best_y=False,
-        x_axis_ticks_count=x_axis_ticks_count,
-        y_axis_ticks_count=y_axis_ticks_count,
+        x_ticks_locator=x_ticks_locator,
+        y_ticks_locator=y_ticks_locator,
         ax=ax,
         figure_size=figure_size,
         font_size=font_size,
@@ -358,8 +364,8 @@ def false_positives(
     ylabel: str = "FP",
     xlimits: tuple[int, int] = (0, 1),
     color: str = MEGA_PINK,
-    x_axis_ticks_count: int = 6,
-    y_axis_ticks_count: int = 6,
+    x_ticks_locator: Locator = LinearLocator(6),
+    y_ticks_locator: Locator = LinearLocator(6),
     ax: Optional[Axes] = None,
     figure_size: tuple[float, float] = (1.5, 1.4),
     font_size: int = DEFAULT_FONT_SIZE,
@@ -382,8 +388,10 @@ def false_positives(
     :param ylabel: Label for the y-axis.
     :param xlimits: Limits for the x-axis.
     :param color: Color for the curve and the filling color.
-    :param x_axis_ticks_count: Number of ticks on the x-axis.
-    :param y_axis_ticks_count: Number of ticks on the y-axis.
+    :param x_ticks_locator: Locator used to set the x-axis tick positions.
+        By default, place linearly spaced ticks.
+    :param y_ticks_locator: Locator used to set the y-axis tick positions.
+        By default, place linearly spaced ticks.
     :param ax: An axis to use for the plot. If None, create a new one.
     :param figure_size: Size of the figure, in inches. The default is a bit less than half the `\columnwidth` of
         a two-columns template in LaTeX, so that one can add two or three curves per column.
@@ -415,8 +423,8 @@ def false_positives(
         color=color,
         annotate_area_under_curve=False,
         annotate_best_y=False,
-        x_axis_ticks_count=x_axis_ticks_count,
-        y_axis_ticks_count=y_axis_ticks_count,
+        x_ticks_locator=x_ticks_locator,
+        y_ticks_locator=y_ticks_locator,
         ax=ax,
         figure_size=figure_size,
         font_size=font_size,
@@ -436,8 +444,8 @@ def false_negatives(
     ylabel: str = "FN",
     xlimits: tuple[int, int] = (0, 1),
     color: str = MEGA_PINK,
-    x_axis_ticks_count: int = 6,
-    y_axis_ticks_count: int = 6,
+    x_ticks_locator: Locator = LinearLocator(6),
+    y_ticks_locator: Locator = LinearLocator(6),
     ax: Optional[Axes] = None,
     figure_size: tuple[float, float] = (1.5, 1.4),
     font_size: int = DEFAULT_FONT_SIZE,
@@ -460,8 +468,10 @@ def false_negatives(
     :param ylabel: Label for the y-axis.
     :param xlimits: Limits for the x-axis.
     :param color: Color for the curve and the filling color.
-    :param x_axis_ticks_count: Number of ticks on the x-axis.
-    :param y_axis_ticks_count: Number of ticks on the y-axis.
+    :param x_ticks_locator: Locator used to set the x-axis tick positions.
+        By default, place linearly spaced ticks.
+    :param y_ticks_locator: Locator used to set the y-axis tick positions.
+        By default, place linearly spaced ticks.
     :param ax: An axis to use for the plot. If None, create a new one.
     :param figure_size: Size of the figure, in inches. The default is a bit less than half the `\columnwidth` of
         a two-columns template in LaTeX, so that one can add two or three curves per column.
@@ -493,8 +503,8 @@ def false_negatives(
         color=color,
         annotate_area_under_curve=False,
         annotate_best_y=False,
-        x_axis_ticks_count=x_axis_ticks_count,
-        y_axis_ticks_count=y_axis_ticks_count,
+        x_ticks_locator=x_ticks_locator,
+        y_ticks_locator=y_ticks_locator,
         ax=ax,
         figure_size=figure_size,
         font_size=font_size,
@@ -514,8 +524,8 @@ def precision(
     ylabel: str = "Precision",
     xlimits: tuple[int, int] = (0, 1),
     color: str = MEGA_PINK,
-    x_axis_ticks_count: int = 6,
-    y_axis_ticks_count: int = 6,
+    x_ticks_locator: Locator = LinearLocator(6),
+    y_ticks_locator: Locator = LinearLocator(6),
     ax: Optional[Axes] = None,
     figure_size: tuple[float, float] = (1.5, 1.4),
     font_size: int = DEFAULT_FONT_SIZE,
@@ -543,8 +553,10 @@ def precision(
     :param ylabel: Label for the y-axis.
     :param xlimits: Limits for the x-axis.
     :param color: Color for the curve and the filling color.
-    :param x_axis_ticks_count: Number of ticks on the x-axis.
-    :param y_axis_ticks_count: Number of ticks on the y-axis.
+    :param x_ticks_locator: Locator used to set the x-axis tick positions.
+        By default, place linearly spaced ticks.
+    :param y_ticks_locator: Locator used to set the y-axis tick positions.
+        By default, place linearly spaced ticks.
     :param ax: An axis to use for the plot. If None, create a new one.
     :param figure_size: Size of the figure, in inches. The default is a bit less than half the `\columnwidth` of
         a two-columns template in LaTeX, so that one can add two or three curves per column.
@@ -577,8 +589,8 @@ def precision(
         color=color,
         annotate_area_under_curve=True,
         annotate_best_y=False,
-        x_axis_ticks_count=x_axis_ticks_count,
-        y_axis_ticks_count=y_axis_ticks_count,
+        x_ticks_locator=x_ticks_locator,
+        y_ticks_locator=y_ticks_locator,
         ax=ax,
         figure_size=figure_size,
         font_size=font_size,
@@ -598,8 +610,8 @@ def recall(
     ylabel: str = "Recall",
     xlimits: tuple[int, int] = (0, 1),
     color: str = MEGA_PINK,
-    x_axis_ticks_count: int = 6,
-    y_axis_ticks_count: int = 6,
+    x_ticks_locator: Locator = LinearLocator(6),
+    y_ticks_locator: Locator = LinearLocator(6),
     ax: Optional[Axes] = None,
     figure_size: tuple[float, float] = (1.5, 1.4),
     font_size: int = DEFAULT_FONT_SIZE,
@@ -627,8 +639,10 @@ def recall(
     :param ylabel: Label for the y-axis.
     :param xlimits: Limits for the x-axis.
     :param color: Color for the curve and the filling color.
-    :param x_axis_ticks_count: Number of ticks on the x-axis.
-    :param y_axis_ticks_count: Number of ticks on the y-axis.
+    :param x_ticks_locator: Locator used to set the x-axis tick positions.
+        By default, place linearly spaced ticks.
+    :param y_ticks_locator: Locator used to set the y-axis tick positions.
+        By default, place linearly spaced ticks.
     :param ax: An axis to use for the plot. If None, create a new one.
     :param figure_size: Size of the figure, in inches. The default is a bit less than half the `\columnwidth` of
         a two-columns template in LaTeX, so that one can add two or three curves per column.
@@ -661,8 +675,8 @@ def recall(
         color=color,
         annotate_area_under_curve=True,
         annotate_best_y=False,
-        x_axis_ticks_count=x_axis_ticks_count,
-        y_axis_ticks_count=y_axis_ticks_count,
+        x_ticks_locator=x_ticks_locator,
+        y_ticks_locator=y_ticks_locator,
         ax=ax,
         figure_size=figure_size,
         font_size=font_size,
@@ -682,8 +696,8 @@ def f1(
     ylabel: str = "F1",
     xlimits: tuple[int, int] = (0, 1),
     color: str = MEGA_PINK,
-    x_axis_ticks_count: int = 6,
-    y_axis_ticks_count: int = 6,
+    x_ticks_locator: Locator = LinearLocator(6),
+    y_ticks_locator: Locator = LinearLocator(6),
     ax: Optional[Axes] = None,
     figure_size: tuple[float, float] = (1.5, 1.4),
     font_size: int = DEFAULT_FONT_SIZE,
@@ -712,8 +726,10 @@ def f1(
     :param ylabel: Label for the y-axis.
     :param xlimits: Limits for the x-axis.
     :param color: Color for the curve and the filling color.
-    :param x_axis_ticks_count: Number of ticks on the x-axis.
-    :param y_axis_ticks_count: Number of ticks on the y-axis.
+    :param x_ticks_locator: Locator used to set the x-axis tick positions.
+        By default, place linearly spaced ticks.
+    :param y_ticks_locator: Locator used to set the y-axis tick positions.
+        By default, place linearly spaced ticks.
     :param ax: An axis to use for the plot. If None, create a new one.
     :param figure_size: Size of the figure, in inches. The default is a bit less than half the `\columnwidth` of
         a two-columns template in LaTeX, so that one can add two or three curves per column.
@@ -746,8 +762,8 @@ def f1(
         color=color,
         annotate_area_under_curve=True,
         annotate_best_y=True,
-        x_axis_ticks_count=x_axis_ticks_count,
-        y_axis_ticks_count=y_axis_ticks_count,
+        x_ticks_locator=x_ticks_locator,
+        y_ticks_locator=y_ticks_locator,
         ax=ax,
         figure_size=figure_size,
         font_size=font_size,
@@ -767,8 +783,8 @@ def roc(
     ylabel: str = "TP Rate",
     xlimits: tuple[int, int] = (0, 1),
     color: str = MEGA_PINK,
-    x_axis_ticks_count: int = 6,
-    y_axis_ticks_count: int = 6,
+    x_ticks_locator: Locator = LinearLocator(6),
+    y_ticks_locator: Locator = LinearLocator(6),
     ax: Optional[Axes] = None,
     figure_size: tuple[float, float] = (1.5, 1.4),
     font_size: int = DEFAULT_FONT_SIZE,
@@ -793,8 +809,10 @@ def roc(
     :param ylabel: Label for the y-axis.
     :param xlimits: Limits for the x-axis.
     :param color: Color for the curve and the filling color.
-    :param x_axis_ticks_count: Number of ticks on the x-axis.
-    :param y_axis_ticks_count: Number of ticks on the y-axis.
+    :param x_ticks_locator: Locator used to set the x-axis tick positions.
+        By default, place linearly spaced ticks.
+    :param y_ticks_locator: Locator used to set the y-axis tick positions.
+        By default, place linearly spaced ticks.
     :param ax: An axis to use for the plot. If None, create a new one.
     :param figure_size: Size of the figure, in inches. The default is a bit less than half the `\columnwidth` of
         a two-columns template in LaTeX, so that one can add two or three curves per column.
@@ -839,8 +857,8 @@ def roc(
         color=color,
         annotate_area_under_curve=True,
         annotate_best_y=False,
-        x_axis_ticks_count=x_axis_ticks_count,
-        y_axis_ticks_count=y_axis_ticks_count,
+        x_ticks_locator=x_ticks_locator,
+        y_ticks_locator=y_ticks_locator,
         ax=ax,
         figure_size=figure_size,
         font_size=font_size,
@@ -859,8 +877,8 @@ def precision_recall(
     ylabel: str = "Precision",
     xlimits: tuple[int, int] = (0, 1),
     color: str = MEGA_PINK,
-    x_axis_ticks_count: int = 6,
-    y_axis_ticks_count: int = 6,
+    x_ticks_locator: Locator = LinearLocator(6),
+    y_ticks_locator: Locator = LinearLocator(6),
     ax: Optional[Axes] = None,
     figure_size: tuple[float, float] = (1.5, 1.4),
     font_size: int = DEFAULT_FONT_SIZE,
@@ -883,8 +901,10 @@ def precision_recall(
     :param ylabel: Label for the y-axis.
     :param xlimits: Limits for the x-axis.
     :param color: Color for the curve and the filling color.
-    :param x_axis_ticks_count: Number of ticks on the x-axis.
-    :param y_axis_ticks_count: Number of ticks on the y-axis.
+    :param x_ticks_locator: Locator used to set the x-axis tick positions.
+        By default, place linearly spaced ticks.
+    :param y_ticks_locator: Locator used to set the y-axis tick positions.
+        By default, place linearly spaced ticks.
     :param ax: An axis to use for the plot. If None, create a new one.
     :param figure_size: Size of the figure, in inches. The default is a bit less than half the `\columnwidth` of
         a two-columns template in LaTeX, so that one can add two or three curves per column.
@@ -922,8 +942,8 @@ def precision_recall(
         color=color,
         annotate_area_under_curve=True,
         annotate_best_y=False,
-        x_axis_ticks_count=x_axis_ticks_count,
-        y_axis_ticks_count=y_axis_ticks_count,
+        x_ticks_locator=x_ticks_locator,
+        y_ticks_locator=y_ticks_locator,
         ax=ax,
         figure_size=figure_size,
         font_size=font_size,
@@ -951,8 +971,8 @@ def binary_classification(
     number_of_columns: Optional[int] = None,
     num_thresholds: int = 100,
     color: str = MEGA_PINK,
-    x_axis_ticks_count: int = 6,
-    y_axis_ticks_count: int = 6,
+    x_ticks_locator: Locator = LinearLocator(6),
+    y_ticks_locator: Locator = LinearLocator(6),
     figure_size: tuple[float, float] = (3.5, 3.2),
     font_size: int = DEFAULT_FONT_SIZE,
     left_padding: float = 0.09,
@@ -985,8 +1005,10 @@ def binary_classification(
     :param num_thresholds: Number of thresholds for which the curves are computed.
         More thresholds means a smoother curve, but more computation time.
     :param color: Color for the curve and the filling color.
-    :param x_axis_ticks_count: Number of ticks on the x-axis.
-    :param y_axis_ticks_count: Number of ticks on the y-axis.
+    :param x_ticks_locator: Locator used to set the x-axis tick positions.
+        By default, place linearly spaced ticks.
+    :param y_ticks_locator: Locator used to set the y-axis tick positions.
+        By default, place linearly spaced ticks.
     :param ax: An axis to use for the plot. If None, create a new one.
     :param figure_size: Size of the figure, in inches. The default is a bit less than half the `\columnwidth` of
         a two-columns template in LaTeX, so that one can add two or three curves per column.
@@ -1056,8 +1078,8 @@ def binary_classification(
             color=color,
             font_size=font_size,
             num_thresholds=num_thresholds,
-            x_axis_ticks_count=x_axis_ticks_count,
-            y_axis_ticks_count=y_axis_ticks_count,
+            x_ticks_locator=x_ticks_locator,
+            y_ticks_locator=y_ticks_locator,
         )
         # Remove a parameter not supported by `precision_recall`
         if plotting_function == precision_recall:

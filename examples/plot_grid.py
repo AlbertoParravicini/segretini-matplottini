@@ -12,6 +12,7 @@ from tempfile import TemporaryDirectory
 
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
+from matplotlib.ticker import LinearLocator
 from plot_barplot import load_data_2 as load_data_barplot  # type: ignore
 from plot_binary_classification import (  # type: ignore
     generate_data as load_data_binary_classification,
@@ -239,7 +240,7 @@ def plot_barplot(output_dir: Path) -> None:
             "model_4": "Model C",
         },
         ylimits=(0, 2),
-        y_axis_ticks_count=11,
+        y_ticks_locator=LinearLocator(11),
         figure_size=(3.5, 3.5 * 2 / 3),
         bottom_padding=0.28,
         left_padding=0.14,

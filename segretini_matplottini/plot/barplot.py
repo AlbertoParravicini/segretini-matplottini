@@ -7,7 +7,7 @@ import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from matplotlib.patches import Rectangle
-from matplotlib.ticker import LinearLocator
+from matplotlib.ticker import LinearLocator, Locator
 
 from segretini_matplottini.utils import (
     add_legend_with_dark_shadow,
@@ -86,7 +86,7 @@ def barplot(
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
     ylimits: Optional[tuple[float, float]] = None,
-    y_axis_ticks_count: int = 6,
+    y_ticks_locator: Locator = LinearLocator(6),
     palette: Optional[list[str]] = None,
     add_legend: bool = False,
     x_to_legend_label_map: Optional[dict[str, str]] = None,
@@ -110,7 +110,7 @@ def barplot(
     :param xlabel: Label to add to the x-axis, if present.
     :param ylabel: Label to add to the y-axis, if present.
     :param ylimits: Limits of the y-axis. If none, they are inferred by Matplotlib.
-    :param y_axis_ticks_count: Number of ticks to show on the y-axis.
+    :param y_ticks_locator: Locator used to set the y-axis tick positions.
     :param palette: A list of colors to use for the bars. If None, use a default palette.
     :param add_legend: If True, add a legend to the plot. Disabled by default,
         since the information is redundant w.r.t. the x-axis tick labels.
@@ -199,7 +199,7 @@ def barplot(
     # Add a grid on the y-axis;
     ax.grid(axis="y", linestyle="--", linewidth=0.5)
     # Increase the number of y-ticks;
-    ax.yaxis.set_major_locator(LinearLocator(y_axis_ticks_count))
+    ax.yaxis.set_major_locator(y_ticks_locator)
     ax.yaxis.set_major_formatter(lambda x, pos: f"{x:.2f}")
     ax.tick_params(axis="y", labelsize=font_size * 0.7)
     # Set axes labels;
@@ -224,7 +224,7 @@ def barplots(
     number_of_rows: Optional[int] = None,
     number_of_columns: Optional[int] = None,
     ylimits: Optional[tuple[float, float]] = None,
-    y_axis_ticks_count: int = 6,
+    y_ticks_locator: Locator = LinearLocator(6),
     palette: Optional[list[str]] = None,
     x_to_legend_label_map: Optional[dict[str, str]] = None,
     category_to_y_label_map: Optional[dict[str, str]] = None,
@@ -263,7 +263,7 @@ def barplots(
     :param number_of_rows: Number of rows of the grid of plots. If None, infer it from the number of categories.
     :param number_of_columns: Number of columns of the grid of plots. If None, infer it from the number of categories.
     :param ylimits: Limits of the y-axis. If none, they are inferred by Matplotlib.
-    :param y_axis_ticks_count: Number of ticks to show on the y-axis.
+    :param y_ticks_locator: Locator used to set the y-axis tick positions.
     :param palette: A list of colors to use for the bars. If None, use a default palette.
     :param x_to_legend_label_map: A dictionary that maps the values of `x` to the labels to show in the legend.
         If a key is missing, keep the original value of `x`.
@@ -362,7 +362,7 @@ def barplots(
             ylabel=category_to_y_label_map.get(_category, _category),
             ylimits=ylimits,
             add_legend=False,
-            y_axis_ticks_count=y_axis_ticks_count,
+            y_ticks_locator=y_ticks_locator,
             ax=ax,
             font_size=font_size,
         )
@@ -394,7 +394,7 @@ def barplot_for_multiple_categories(
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
     ylimits: Optional[tuple[float, float]] = None,
-    y_axis_ticks_count: int = 6,
+    y_ticks_locator: Locator = LinearLocator(6),
     palette: Optional[list[str]] = None,
     x_to_legend_label_map: Optional[dict[str, str]] = None,
     hue_category_to_x_tick_label_map: Optional[dict[str, str]] = None,
@@ -432,7 +432,7 @@ def barplot_for_multiple_categories(
     :param xlabel: Label to add to the x-axis, if present.
     :param ylabel: Label to add to the y-axis, if present.
     :param ylimits: Limits of the y-axis. If none, they are inferred by Matplotlib.
-    :param y_axis_ticks_count: Number of ticks to show on the y-axis.
+    :param y_ticks_locator: Locator used to set the y-axis tick positions.
     :param palette: A list of colors to use for the bars. If None, use a default palette.
     :param x_to_legend_label_map: A dictionary that maps the values of `x` to the labels to show in the legend.
         If a key is missing, keep the original value of `x`.
@@ -549,7 +549,7 @@ def barplot_for_multiple_categories(
     # Add a grid on the y-axis;
     ax.grid(axis="y", linestyle="--", linewidth=0.5)
     # Increase the number of y-ticks;
-    ax.yaxis.set_major_locator(LinearLocator(y_axis_ticks_count))
+    ax.yaxis.set_major_locator(y_ticks_locator)
     ax.yaxis.set_major_formatter(lambda x, pos: f"{x:.2f}")
     ax.tick_params(axis="y", labelsize=font_size * 0.7)
     # Set axes labels;

@@ -7,7 +7,7 @@ import pytest
 
 from segretini_matplottini.plot import timeseries
 
-from .utils import reset_plot_style, save_tmp_plot  # noqa: F401
+from .utils import close_plot_after_test, reset_plot_style, save_tmp_plot  # noqa: F401
 
 DATA_DIR = Path(__file__).parent.parent.parent / "data"
 
@@ -30,6 +30,7 @@ def data() -> pd.Series:
     return data
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_default(data: pd.Series) -> None:
     timeseries(
@@ -37,6 +38,7 @@ def test_default(data: pd.Series) -> None:
     )
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_custom_settings(data: pd.Series) -> None:
     timeseries(
@@ -50,6 +52,7 @@ def test_custom_settings(data: pd.Series) -> None:
     )
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_existing_axis(data: pd.Series) -> None:
     _, ax = plt.subplots(1, 1, figsize=(6, 3))
@@ -59,6 +62,7 @@ def test_existing_axis(data: pd.Series) -> None:
     )
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_stem_default(data: pd.Series) -> None:
     timeseries(
@@ -67,6 +71,7 @@ def test_stem_default(data: pd.Series) -> None:
     )
 
 
+@close_plot_after_test
 @save_tmp_plot
 def test_stem_custom_settings(data: pd.Series) -> None:
     timeseries(

@@ -3,6 +3,10 @@
 
 Here you can find a list of the latest updates to `segretini_matplottini`, such as new recipes for plots.
 
+## 2023-11-17
+
+* Replaced `x_axis_ticks_count` and `y_axis_ticks_count` with `x_ticks_locator` and `y_ticks_locator`, which support arbitrary `Locators` such as `LinearLocator` and `LogLocator`, for more flexibility.
+
 ## 2023-10-20
 
 * Added a `get_legend_handles_from_colors` function in `segretini_matplottini.utils` to create the legend handles from a list of colors. Now you can create a personalized legend as follows.

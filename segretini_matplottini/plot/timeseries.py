@@ -6,7 +6,7 @@ import pandas as pd
 from matplotlib.axes import Axes
 from matplotlib.dates import DateFormatter, HourLocator, MinuteLocator, SecondLocator
 from matplotlib.figure import Figure
-from matplotlib.ticker import LinearLocator
+from matplotlib.ticker import LinearLocator, Locator
 
 from segretini_matplottini.utils import activate_dark_background
 from segretini_matplottini.utils import reset_plot_style as _reset_plot_style
@@ -22,6 +22,7 @@ def timeseries(
     ylabel: Optional[str] = None,
     xlimits: Optional[tuple[float, float]] = None,
     ylimits: Optional[tuple[float, float]] = None,
+    y_ticks_locator: Locator = LinearLocator(5),
     date_format: Optional[str] = None,
     seconds_interval_major_ticks: Optional[int] = None,
     minutes_interval_major_ticks: Optional[int] = None,
@@ -49,6 +50,8 @@ def timeseries(
     :param line_width: Width of the time-series line.
     :param xlabel: Label of the x-axis.
     :param ylabel: Label of the y-axis.
+    :param y_ticks_locator: Locator used to set the y-axis tick positions.
+        By default, use linearly spaced ticks.
     :param xlimits: Limits of the y-axis. If none, use `[min(x), max(x)]`.
     :param ylimits: Limits of the y-axis. If none, use `[min(x), max(x)]`.
     :param date_format: If not None, try formatting x-axis tick labels with the specified time format.
@@ -180,7 +183,7 @@ def timeseries(
     else:
         ax.tick_params(axis="x", which="major", labelsize=font_size)
     ax.yaxis.set_major_formatter(lambda x, pos: f"{x:.3f}")
-    ax.yaxis.set_major_locator(LinearLocator(5))
+    ax.yaxis.set_major_locator(y_ticks_locator)
     ax.tick_params(axis="y", which="major", labelsize=font_size - 2)
 
     if xlabel is not None:

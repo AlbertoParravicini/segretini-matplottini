@@ -6,7 +6,7 @@ import pandas as pd
 import seaborn as sns
 from matplotlib.axes import Axes
 from matplotlib.patches import Patch, Rectangle
-from matplotlib.ticker import LinearLocator
+from matplotlib.ticker import LinearLocator, Locator
 from scipy import stats
 
 from segretini_matplottini.utils import (
@@ -35,6 +35,8 @@ def correlation_scatterplot(
     ylimits: Optional[tuple[float, float]] = None,
     x_ticks_formatter: Callable[[float, float], str] = lambda x, pos: f"{x * 100:.0f}%",
     y_ticks_formatter: Callable[[float, float], str] = lambda x, pos: f"{x * 100:.0f}%",
+    x_ticks_locator: Locator = LinearLocator(9),
+    y_ticks_locator: Locator = LinearLocator(9),
     vertical_legend: bool = False,
     legend_position: str = "best",
     label_color: str = "#2f2f2f",
@@ -72,6 +74,8 @@ def correlation_scatterplot(
     :param ylimits: If specified, truncate the y-axis to this interval.
     :param x_ticks_formatter: Callable function used to format x-axis tick labels.
     :param y_ticks_formatter: Callable function used to format y-axis tick labels.
+    :param x_ticks_locator: Locator used to set the x-axis tick positions.
+    :param y_ticks_locator: Locator used to set the y-axis tick positions.
     :param vertical_legend: If True, draw a vertical legend instead of an horizontal one.
     :param legend_position: Position of the legend.
     :param label_color: Color of the linear regression label.
@@ -230,9 +234,9 @@ def correlation_scatterplot(
     ax.grid(axis="both", linestyle="--", linewidth=0.5)
 
     # Ticks and tick labels;
-    ax.xaxis.set_major_locator(LinearLocator(9))
+    ax.xaxis.set_major_locator(x_ticks_locator)
     ax.xaxis.set_major_formatter(x_ticks_formatter)
-    ax.yaxis.set_major_locator(LinearLocator(9))
+    ax.yaxis.set_major_locator(y_ticks_locator)
     ax.yaxis.set_major_formatter(y_ticks_formatter)
     ax.tick_params(labelcolor="#2f2f2f", labelsize=font_size * 0.8)
     # Add legend;
